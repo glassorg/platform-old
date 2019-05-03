@@ -11,6 +11,12 @@ export default class Vector3 {
         this.z = z
     }
 
+    *[Symbol.iterator]() {
+        yield this.x;
+        yield this.y;
+        yield this.z;
+    }
+
     add(v: Vector3) {
         return new Vector3(this.x + v.x, this.y + v.y, this.z + v.z)
     }

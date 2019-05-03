@@ -46,6 +46,10 @@ export default class Color implements Iterable<number> {
         return new Color(this.red * f, this.green * f, this.blue * f, this.alpha)
     }
 
+    opacity(alpha: number) {
+        return new Color(this.red, this.green, this.blue, alpha)
+    }
+
     /**
      * Converts to a 32 bit integer in ABGR format which seems
      * to be what WebGL expects.

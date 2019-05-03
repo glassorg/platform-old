@@ -10,6 +10,11 @@ export default class Vector2 {
         this.y = y
     }
 
+    *[Symbol.iterator]() {
+        yield this.x;
+        yield this.y;
+    }
+
     add(v: Vector2) {
         return new Vector2(this.x + v.x, this.y + v.y)
     }
