@@ -4,10 +4,11 @@ const encryptOptions = { count:2048, ks:256 }
 export function id() { return base64Encode(s.random.randomWords(2)) }
 export function base64Encode(plainText) { return s.codec.base64url.fromBits(s.codec.utf8String.toBits(plainText)) }
 export function base64Decode(base64EncodedText) { return s.codec.utf8String.fromBits(s.codec.base64url.toBits(base64EncodedText))}
-export function hash(text) { return s.codec.base64url.fromBits(s.hash.sha256.hash(text)) }
 export function sign(text, key) { return s.codec.base64url.fromBits(new s.misc.hmac(s.codec.utf8String.toBits(key), s.hash.sha256).encrypt(text)) }
 export function encrypt(object, password) { return base64Encode(s.encrypt(password, JSON.stringify(object), encryptOptions as any)) }
 export function decrypt(text, password) { return JSON.parse(s.decrypt(password, base64Decode(text), encryptOptions)) }
+export function hash(text, salt = id()) { return salt + ":" + s.codec.base64url.fromBits(s.hash.sha256.hash(salt + ":" + text)) }
+export function hashVerify(text, hashed) { return hash(text, hashed.split(":")[0]) === hashed }
 
 export function jwtSign(message, key, expirationSeconds?) {
     let header = { alg: "HS256", typ: "JWT" }

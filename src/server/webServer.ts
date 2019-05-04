@@ -4,11 +4,11 @@ import path from "path";
 import fs from "fs";
 import methodEmulator from "./methodEmulator";
 import bodyParser = require("body-parser");
-import Model from "../data/Model";
 import Namespace, { isNamespace } from "../data/Namespace";
 import IdentityProvider from "./IdentityProvider";
+const glassPackage = require("../../package.json");
 
-export let instance: { projectRoot: string, namespace: Namespace } & Express
+export let instance: { projectRoot: string, namespace: Namespace, packageProperties: any } & Express
 
 /**
  * Initializes the standard glass web server.
@@ -27,14 +27,14 @@ export function create(projectRoot = "./", namespaceOrPath: string | Namespace =
             console.warn(`Error loading webServer namespace: ${namespaceOrPath}`)
         }
     }
-    const packageJson = JSON.parse(fs.readFileSync(path.join(projectRoot, "package.json")).toString())
-    let { name: projectId } = packageJson
+    const packageProperties = JSON.parse(fs.readFileSync(path.join(projectRoot, "package.json")).toString())
+    let { name: projectId } = packageProperties
     process.env.DATASTORE_PROJECT_ID = projectId
     let credentialsPath = path.join(projectRoot, "credentials.json")
     if (fs.existsSync(credentialsPath))
         process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath
 
-    instance = Object.assign(express(), { projectRoot, namespace })
+    instance = Object.assign(express(), { projectRoot, namespace, packageProperties })
     // parse identity token
     instance.use(IdentityProvider)
 
@@ -42,7 +42,7 @@ export function create(projectRoot = "./", namespaceOrPath: string | Namespace =
     instance.use(methodEmulator)
 
     const apiRoot = path.join(projectRoot, "lib/www/api")
-    const glassApiRoot = path.join(projectRoot, "node_modules/@krisnye/glass-platform/www/api")
+    const glassApiRoot = path.join(projectRoot, `node_modules/${glassPackage.name}/www/api`)
     instance.use(apiRouter("/api/", [apiRoot, glassApiRoot]))
 
     const webRoot = path.join(projectRoot, "lib/www")

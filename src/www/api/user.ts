@@ -13,10 +13,8 @@ import { formatPhoneES164 } from "../../utility/phone";
 import User from "../../model/User";
 import Identity from "../../model/Identity";
 import { signToken } from "../../server/IdentityProvider";
+import * as secret from "../../server/secret";
 
-const jwtSecret = "This is what we mostly sign our stuff with. *Mostly*."
-const passwordHashSecret = "And this is the secret for encrypting our passwordHash values."
-export const accessTokenSecret = "Our access tokens are only signed with this key."
 const second = 1
 const minute = 60 * second
 const hour = 60 * minute
@@ -42,7 +40,7 @@ export async function login(state: LoginFormModel): Promise<Patch<LoginFormState
         return { status: "error", error: "User is corrupted" }
     }
 
-    if (crypto.hash(state.password) === user.passwordHash) {
+    if (crypto.hashVerify(state.password, user.passwordHash)) {
         let token = new Identity({
             name: user.name,
             email: user.email,
@@ -78,14 +76,14 @@ export async function signup(user: SignupFormModel, req: Request, res: Response)
         }
 
         const rest: any = { ...user }
-        rest.passwordHash = crypto.encrypt(crypto.hash(user.password), passwordHashSecret)
+        rest.passwordHash = secret.encrypt(crypto.hash(user.password))
         delete rest.password
         delete rest.passwordConfirm
     
         const verifyEmailUrl = getAbsoluteUrl(req, `/api/user/${verifyEmail.name}`)
         const redirectUrl = req.headers.referer
         //  TEMP: made duration longer for easier testing.
-        const token = crypto.jwtSign({ step: "email", redirectUrl, ...rest }, jwtSecret, 2000 * minute)
+        const token = secret.jwtSign({ step: "email", redirectUrl, ...rest }, 2000 * minute)
         const link = verifyEmailUrl + http.queryFromObject({token})
         console.log(`Sending Email Verification link\n${link}`)
         const [response] = await sendgrid.send({
@@ -106,7 +104,7 @@ export async function signup(user: SignupFormModel, req: Request, res: Response)
 }
 
 export async function verifyEmail(req: Request, res: Response) {
-    const message = crypto.jwtVerify(req.query.token, jwtSecret)
+    const message = secret.jwtVerify(req.query.token)
     if (message == null) {
         return res.status(410).send(`This email verification link is expired, please signup again.`)
     }
@@ -115,7 +113,7 @@ export async function verifyEmail(req: Request, res: Response) {
         return res.send(`invalid step: ${email}`)
     }
     // res.send("verifyEmail: " + JSON.stringify({ email, step, ...rest }))
-    const token = crypto.jwtSign({ email, mobile, step: "mobile", ...rest }, jwtSecret, 2000 * minute)
+    const token = secret.jwtSign({ email, mobile, step: "mobile", ...rest }, 2000 * minute)
     let verifyMobileUrl = getAbsoluteUrl(req, `/api/user/${verifyMobile.name}`)
     let link = verifyMobileUrl + http.queryFromObject({token})
     console.log(`Sending Mobile Verification link\n${link}`)
@@ -140,13 +138,13 @@ export async function verifyEmail(req: Request, res: Response) {
 //      [x] Create new User record.
 //      [x] Login -> validate user and password.
 //      [x] Client auth token design.
-//      [ ] Server namespace design including private passwordHash.
+//      [x] Server namespace design including private passwordHash.
 //      [ ] we need to reply with patches back to client on data/put.
 //      [ ] provide User authorization with requests, whitelist public apis.
 //      [ ] implement Patch diff calculation and add tests.
 
 export async function verifyMobile(req: Request, res: Response) {
-    const message = crypto.jwtVerify(req.query.token, jwtSecret)
+    const message = secret.jwtVerify(req.query.token)
     if (message == null) {
         return res.status(410).send(`This email verification link is expired, please signup again.`)
     }
@@ -156,7 +154,7 @@ export async function verifyMobile(req: Request, res: Response) {
     }
     // now decrypt the passwordHash
     console.log("rest", rest)
-    rest.passwordHash = crypto.decrypt(rest.passwordHash, passwordHashSecret)
+    rest.passwordHash = secret.decrypt(rest.passwordHash)
 
     const key = Key.create(namespace.User, email)
     try {

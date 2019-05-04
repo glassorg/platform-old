@@ -5,6 +5,10 @@
     "repository": "https://github.com/glassorg/platform.git",
     "author": "Kris Nye <krisnye@gmail.com>",
     "license": "MIT",
+    "secrets": {
+        "jwtSignature": "Key for signing json web tokens, add custom string to your package.json",
+        "encryptionKey": "General purpose encryption/decryption key, add custom string to your package.json."
+    },
     "dependencies": {
         "@google-cloud/datastore": "^1.4.2",
         "@sendgrid/mail": "^6.3.1",
