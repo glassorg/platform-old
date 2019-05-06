@@ -1,10 +1,12 @@
+import Vector3 from "./Vector3";
+import { epsilon } from "./";
 
 export default class Matrix4 {
 
-    m00: number; m01: number; m02: number; m03: number;
-    m10: number; m11: number; m12: number; m13: number;
-    m20: number; m21: number; m22: number; m23: number;
-    m30: number; m31: number; m32: number; m33: number;
+    readonly m00: number; readonly m01: number; readonly m02: number; readonly m03: number;
+    readonly m10: number; readonly m11: number; readonly m12: number; readonly m13: number;
+    readonly m20: number; readonly m21: number; readonly m22: number; readonly m23: number;
+    readonly m30: number; readonly m31: number; readonly m32: number; readonly m33: number;
 
     constructor(
         m00: number, m01: number, m02: number, m03: number,
@@ -43,6 +45,55 @@ export default class Matrix4 {
         )
     }
 
+    inverse() {
+        let {
+            m00, m01, m02, m03,
+            m10, m11, m12, m13,
+            m20, m21, m22, m23,
+            m30, m31, m32, m33
+        } = this
+
+        let b00 = m00 * m11 - m01 * m10
+        let b01 = m00 * m12 - m02 * m10
+        let b02 = m00 * m13 - m03 * m10
+        let b03 = m01 * m12 - m02 * m11
+        let b04 = m01 * m13 - m03 * m11
+        let b05 = m02 * m13 - m03 * m12
+        let b06 = m20 * m31 - m21 * m30
+        let b07 = m20 * m32 - m22 * m30
+        let b08 = m20 * m33 - m23 * m30
+        let b09 = m21 * m32 - m22 * m31
+        let b10 = m21 * m33 - m23 * m31
+        let b11 = m22 * m33 - m23 * m32
+
+        // Calculate the determinant
+        let det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06
+
+        if (!det) {
+            throw new Error("Cannot invert matrix")
+        }
+        det = 1.0 / det
+
+        return new Matrix4(
+            (m11 * b11 - m12 * b10 + m13 * b09) * det,
+            (m02 * b10 - m01 * b11 - m03 * b09) * det,
+            (m31 * b05 - m32 * b04 + m33 * b03) * det,
+            (m22 * b04 - m21 * b05 - m23 * b03) * det,
+            (m12 * b08 - m10 * b11 - m13 * b07) * det,
+            (m00 * b11 - m02 * b08 + m03 * b07) * det,
+            (m32 * b02 - m30 * b05 - m33 * b01) * det,
+            (m20 * b05 - m22 * b02 + m23 * b01) * det,
+            (m10 * b10 - m11 * b08 + m13 * b06) * det,
+            (m01 * b08 - m00 * b10 - m03 * b06) * det,
+            (m30 * b04 - m31 * b02 + m33 * b00) * det,
+            (m21 * b02 - m20 * b04 - m23 * b00) * det,
+            (m11 * b07 - m10 * b09 - m12 * b06) * det,
+            (m00 * b09 - m01 * b07 + m02 * b06) * det,
+            (m31 * b01 - m30 * b03 - m32 * b00) * det,
+            (m20 * b03 - m21 * b01 + m22 * b00) * det,
+        )
+    }
+
     toArray() {
         return [
             this.m00, this.m01, this.m02, this.m03,
@@ -64,20 +115,84 @@ export default class Matrix4 {
             && a.m30 === b.m30 && a.m31 === b.m31 && a.m32 === b.m32 && a.m33 === b.m33
     }
 
-    static identity = Object.freeze(new Matrix4(
+    static identity = new Matrix4(
         1, 0, 0, 0,
         0, 1, 0, 0,
         0, 0, 1, 0,
         0, 0, 0, 1
-    ))
+    )
 
-    static scaling(scaleX: number, scaleY: number = scaleX, scaleZ: number = scaleY) {
+    static rotation(axis: Vector3, angle: number) {
+        let { x, y, z } = axis
+        let len = Math.hypot(x, y, z)
+        let s, c, t
+      
+        if (len < epsilon) {
+            return null
+        }
+      
+        len = 1 / len
+        x *= len
+        y *= len
+        z *= len
+      
+        s = Math.sin(angle)
+        c = Math.cos(angle)
+        t = 1 - c;
+
         return new Matrix4(
-            scaleX, 0, 0, 0,
-            0, scaleY, 0, 0,
-            0, 0, scaleZ, 0,
+            x * x * t + c,
+            y * x * t + z * s,
+            z * x * t - y * s,
+            0,
+            x * y * t - z * s,
+            y * y * t + c,
+            z * y * t + x * s,
+            0,
+            x * z * t + y * s,
+            y * z * t - x * s,
+            z * z * t + c,
+            0,
+            0,
+            0,
+            0,
+            1,
+        )
+    }
+
+    static scaling(x: number, y: number = x, z: number = y) {
+        return new Matrix4(
+            x, 0, 0, 0,
+            0, y, 0, 0,
+            0, 0, z, 0,
             0, 0, 0, 1
         )
+    }
+
+    static translation(x: number, y: number, z: number) {
+        return new Matrix4(
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            x, y, z, 1
+        )
+    }
+
+    static transformation(
+        translation: Vector3,
+        scaling: Vector3 = new Vector3(1, 1, 1),
+        axis: Vector3 = new Vector3(0, 0, 0),
+        angle = 0
+    ) {
+        // TODO: This can be made much more efficient than this later.
+        let transform = Matrix4.translation(translation.x, translation.y, translation.z)
+        if (scaling.x !== 1 || scaling.y !== 1 || scaling.z != 1) {
+            transform = transform.multiply(Matrix4.scaling(scaling.x, scaling.y, scaling.z))
+        }
+        if (angle !== 0) {
+            transform = transform.multiply(Matrix4.rotation(axis, angle)!)
+        }
+        return transform
     }
 
 }
