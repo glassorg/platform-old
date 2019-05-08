@@ -15,7 +15,7 @@ export default class Line {
      * @param alpha value normally between 0 and 1
      */
     getPosition(alpha: number) {
-        this.a.lerp(this.b, alpha)
+        return this.a.lerp(this.b, alpha)
     }
 
     toString() {

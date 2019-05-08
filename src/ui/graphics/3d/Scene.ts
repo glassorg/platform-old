@@ -1,14 +1,16 @@
 import Graphics from "../Graphics";
-import SceneNode from "./SceneNode";
 import Color from "../../math/Color";
+import Control from "./Control";
 
-export default class Scene extends SceneNode {
+export default class Scene extends Control {
 
-    color: Color = Color.transparent
-    depth: number = 1
+    width = window.outerWidth
+    height = window.outerHeight
+    backColor = Color.transparent
+    depth = 1
 
     draw(g: Graphics, time) {
-        g.clear(this.color, this.depth)
+        g.clear(this.backColor, this.depth)
         super.draw(g, time)
     }
 

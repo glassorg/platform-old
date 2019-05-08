@@ -1,3 +1,4 @@
+
 export const epsilon = 0.000001
 
 export function equivalent(a: number, b: number) {

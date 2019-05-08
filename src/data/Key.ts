@@ -126,6 +126,7 @@ export default class Key<T = any> {
     static create<T = Model>(type: ModelClass<T>, id: string): ModelKey<T>
     static create<T = Model>(type: ModelSchema<T>, id: string): ModelKey<T>
     static create<T = Model>(type: ModelClass<T>, query: Query<T>): QueryKey<T>
+    static create<T = Model>(type: StateSchema<T>, id: string): StateKey<T>
     static create<T = Model, P = Model>(parent: ModelKey<P>, type: ModelClass<T>, id: string): ModelKey<T>
     static create<T = Model, P = Model>(parent: ModelKey<P>, type: ModelClass<T>, query: Query<T>): QueryKey<T>
     static create<T = Model>(parentOrType: ModelKey<T> | ModelSchema<T>, typeOrQueryOrId: ModelSchema<T> | Query<T> | string = "", idOrQuery?: Query<T> | string): Key<T> {

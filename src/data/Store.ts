@@ -9,7 +9,7 @@ export type Listener = (key: Key) => void
 export type Unwatch = () => void
 
 /**
- * IStore is the low level asynchronous model saving and loading interface.
+ * Store is the low level asynchronous model saving and loading interface.
  */
 export default abstract class Store {
 

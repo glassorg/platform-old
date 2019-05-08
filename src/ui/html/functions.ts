@@ -1,4 +1,10 @@
 import INode from "../INode";
+import Vector3 from "../math/Vector3";
+
+export function getPosition(e: MouseEvent, element: HTMLElement = e.target as HTMLElement) {
+    let bounds = element.getBoundingClientRect()
+    return new Vector3(e.pageX - bounds.left, e.pageY - bounds.top)
+}
 
 export function isAncestorOrSelf(self: INode, possibleAncestor: INode) {
     for (let node: INode | null = self; node != null; node = node.parentNode) {

@@ -5,6 +5,45 @@ import * as html from "../html";
 import Graphics2D from "./Graphics2D";
 import Graphics from "./Graphics";
 import Graphics3D from "./Graphics3D";
+import Pickable, { isPickable } from "./3d/Pickable";
+import Vector3 from "../math/Vector3";
+import { getPosition } from "../html/functions";
+import Capsule from "../math/Capsule";
+import Sphere from "../math/Sphere";
+
+function bindMouseEvents(canvas: HTMLCanvasElement) {
+    let mouseTarget: Pickable | null = null
+    function pick(e: MouseEvent) {
+        let firstChild = canvas.firstChild
+        if (isPickable(firstChild)) {
+            let front = getPosition(e)
+            let back = new Vector3(front.x, front.y, 1)
+            let ray = new Capsule(new Sphere(front, 0), new Sphere(back, 0))
+            let picked = firstChild.pick(ray)
+            if (mouseTarget !== picked) {
+                if (mouseTarget && mouseTarget.onmouseout) {
+                    mouseTarget.onmouseout(e)
+                }
+                mouseTarget = picked
+                if (mouseTarget && mouseTarget.onmouseover) {
+                    mouseTarget.onmouseover(e)
+                }
+            }
+            return mouseTarget
+        }
+        return null
+    }
+
+    // add some event routing
+    for (let event of ["mousedown", "mouseup", "mousemove", "click"]) {
+        canvas.addEventListener(event, (e: any) => {
+            let target = pick(e)
+            if (target && target[event]) {
+                target[event](e)
+            }
+        })
+    }
+}
 
 const contextSymbol = Symbol("context")
 function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement, dimensions: 2 | 3) {
@@ -16,6 +55,8 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
         return
     }
     canvas[contextSymbol] = c
+
+    bindMouseEvents(canvas)
 
     let graphics: Graphics
     function repaint(time) {
@@ -61,6 +102,7 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
             }
         }
     })
+    return repaint
 }
 
 export default function Canvas(c: Context, p: {
@@ -71,7 +113,10 @@ export default function Canvas(c: Context, p: {
 }) {
     let { dimensions, component, componentArg, ...rest } = p
     let canvas = c.begin(html.canvas, rest)
-        ensureRootRepaintableVirtualNode(c, canvas, dimensions)
+        let repaint = ensureRootRepaintableVirtualNode(c, canvas, dimensions)
         c.render(component, componentArg)
+        if (repaint) {
+            repaint(0)
+        }
     c.end(html.canvas)
 }

@@ -2,18 +2,8 @@ import Graphics3D from "./Graphics3D";
 import Matrix4 from "../math/Matrix4";
 import Vector2 from "../math/Vector2";
 
-export interface IUniforms {
-    model: Matrix4
-    view: Matrix4
-    projection: Matrix4
-    screen: Vector2
-    readonly modelView: Matrix4
-    readonly modelViewProjection: Matrix4
-    readonly viewProjection: Matrix4
+export class Uniforms {
     [property: string]: any
-}
-
-class Uniforms {
     model: Matrix4 = Matrix4.identity
     view: Matrix4 = Matrix4.identity
     projection: Matrix4 = Matrix4.identity
@@ -70,7 +60,7 @@ export function setUniform(g: Graphics3D, uniform: WebGLActiveInfo, location: We
     }
 }
 
-export function createUniforms(gl: WebGL2RenderingContext, invalidate: () => void): IUniforms {
+export function createUniforms(gl: WebGL2RenderingContext, invalidate: () => void): Uniforms {
     return new Proxy(new Uniforms(), {
         set(obj, prop, value) {
             // if value is a string then it represents the path to a texture
@@ -80,5 +70,5 @@ export function createUniforms(gl: WebGL2RenderingContext, invalidate: () => voi
             }
             return result
         }
-    }) as IUniforms
+    }) as Uniforms
 }

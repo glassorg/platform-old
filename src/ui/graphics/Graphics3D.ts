@@ -6,7 +6,7 @@ import Program from "./Program";
 import VertexShader from "./VertexShader";
 import FragmentShader from "./FragmentShader";
 import { memoize } from "../../utility/common";
-import { IUniforms, createUniforms, setUniform } from "./Uniforms";
+import { Uniforms, createUniforms, setUniform } from "./Uniforms";
 import VertexBuffer from "./VertexBuffer";
 import VertexStream from "./VertexStream";
 import Vector2 from "../math/Vector2";
@@ -14,7 +14,7 @@ import Vector2 from "../math/Vector2";
 export default class Graphics3D extends Graphics {
 
     public readonly gl: WebGL2RenderingContext
-    public readonly uniforms: IUniforms
+    public readonly uniforms: Uniforms
 
     private getWebGLVertexShader: (shader: VertexShader) => WebGLShader
     private getWebGLFragmentShader: (shader: FragmentShader) => WebGLShader

@@ -78,6 +78,10 @@ export default class Vector3 {
         return new Vector3(this.x * invLength, this.y * invLength, this.z * invLength);
     }
 
+    translate(v: Vector3) {
+        return this.add(v)
+    }
+
     transform(m: Matrix4) {
         let { x, y, z } = this
         let w = m.m03 * x + m.m13 * y + m.m23 * z + m.m33;
