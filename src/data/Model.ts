@@ -1,6 +1,6 @@
 import { Schema, Properties } from "./schema";
 import validate from "./schema/validate";
-import Serializer from "./Serializer";
+import * as Serializer from "./Serializer";
 import isDebug from "../isDebug";
 
 export type ModelConstructor<T> = new (propertiesArray: Array<{ [name: string]: any }>) => T
@@ -87,7 +87,13 @@ export default class Model {
         }
     }
 
-    public static serializer = new Serializer()
+    private static _serializer: Serializer.default
+    public static get serializer() {
+        if (Model._serializer == null) {
+            Model._serializer = new Serializer.default()
+        }
+        return Model._serializer
+    }
 
 }
 Object.freeze(Model.properties)

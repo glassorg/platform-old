@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
 import * as webServer from "../../server/webServer";
-import Datastore from "../../server/gcloud/Datastore";
+import Firestore from "../../server/gcloud/Firestore";
 import Key from "../../data/Key";
 import Entity from "../../data/Entity";
 import Patch from "../../data/Patch";
 import Model from "../../data/Model";
 import clonePatch from "../../utility/clonePatch";
 
-const datastore = new Datastore(webServer.instance.namespace)
+const database = new Firestore({ namespace: webServer.instance.namespace })
 
 function getKeys(keyStrings: string[]) {
-    return keyStrings.map(k => Key.parse(datastore.namespace, k))
+    return keyStrings.map(k => Key.parse(database.namespace, k))
 }
 
 type Batch = { [key: string]: Patch<Entity> }
@@ -24,7 +24,7 @@ export async function put(patches: Batch) {
     }
     let response: Batch = {}
     let newEntities: Entity[] = []
-    let entities = await datastore.get(keys)
+    let entities = await database.all(keys)
     for (let i = 0; i < keys.length; i++) {
         let key = keys[i]
         let patch = patches[key.toString()]
@@ -42,11 +42,11 @@ export async function put(patches: Batch) {
         newEntities.push(entity)
         response[key.toString()] = patch == null ? null : entity
     }
-    datastore.put(newEntities)
+    database.put(newEntities)
     return response
 }
 
 export async function get(keyStrings: string[]): Promise<Entity[][]> {
     const keys = getKeys(keyStrings)
-    return await datastore.get(keys)
+    return await database.all(keys)
 }

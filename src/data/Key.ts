@@ -94,6 +94,7 @@ export default class Key<T = any> {
     public readonly id: string | null
     public readonly query: Query<T> | null
     public readonly string: string
+    public readonly path: string
 
     private constructor(
         parent: ModelKey | ModelSchema<T> | null = null,
@@ -117,6 +118,12 @@ export default class Key<T = any> {
         this.id = id
         this.query = query
         this.string = string
+        this.path = this.schema.name
+        if (this.id)
+            this.path += "/" + this.id
+        if (this.parent)
+            this.path = this.parent.path + "/" + this.path
+
         Object.freeze(this)
     }
 
@@ -178,15 +185,6 @@ export default class Key<T = any> {
     isPossibleMatch(this: QueryKey<T>, key: ModelKey<T>): boolean {
         return this.type === key.type
             && (this.parent && this.parent.string) === (key.parent && key.parent.string)
-    }
-
-    getPath() {
-        let path = this.schema.name
-        if (this.id)
-            path += "/" + this.id
-        if (this.parent)
-            path = this.parent.getPath() + "/" + path
-        return path
     }
 
     toString() {

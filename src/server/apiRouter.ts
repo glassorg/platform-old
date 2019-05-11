@@ -27,14 +27,18 @@ function wrapSimpleFunction(fn) {
 export default function create(apiRequestPath: string, apiHandlerDirectories: string[]) {
 
     return function(req: Request, res: Response, next) {
+        console.log("A ===========================")
         // we have to reserialize and parse json 
         if (req.path.startsWith(apiRequestPath)) {
             const requestPath = req.path.slice(apiRequestPath.length)
             const parsedPath = validPathRegex.exec(requestPath)
+            console.log("B ===========================", {parsedPath})
             if (parsedPath != null) {
+                console.log("C ===========================", {parsedPath})
                 const [, handlerName, , exportName = "default"] = parsedPath
                 for (let apiHandlerDirectory of apiHandlerDirectories) {
                     const file = path.join(apiHandlerDirectory, `./${handlerName}.js`)
+                    console.log("D ===========================", file)
                     if (existsSync(file)) {
                         try {
                             let handlerModule = require(file)

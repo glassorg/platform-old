@@ -6,7 +6,6 @@ import methodEmulator from "./methodEmulator";
 import bodyParser = require("body-parser");
 import Namespace, { isNamespace } from "../data/Namespace";
 import IdentityProvider from "./IdentityProvider";
-const glassPackage = require("../../package.json");
 
 export let instance: { projectRoot: string, namespace: Namespace, packageProperties: any } & Express
 
@@ -37,12 +36,12 @@ export function create(projectRoot = "./", namespaceOrPath: string | Namespace =
     instance = Object.assign(express(), { projectRoot, namespace, packageProperties })
     // parse identity token
     instance.use(IdentityProvider)
-
     instance.use(bodyParser.text({ type: "application/json" }))
     instance.use(methodEmulator)
 
+    // dynamic loading of api, this isn't working with webpack?
     const apiRoot = path.join(projectRoot, "lib/www/api")
-    const glassApiRoot = path.join(projectRoot, `node_modules/${glassPackage.name}/www/api`)
+    const glassApiRoot = path.join(projectRoot, `node_modules/@glas/platform/www/api`)
     instance.use(apiRouter("/api/", [apiRoot, glassApiRoot]))
 
     const webRoot = path.join(projectRoot, "lib/www")

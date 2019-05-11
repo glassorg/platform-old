@@ -1,5 +1,3 @@
-import Namespace from "./Namespace"
-import Model, { ModelClass } from "./Model"
 import Key from "./Key"
 
 const typeKey = ""
@@ -8,9 +6,9 @@ export default class Serializer {
     private replacer: (key: string, value: any) => any
     private reviver: (key: string, value: any) => any
     private indent: number
-    public readonly namespace: Namespace
+    public readonly namespace
 
-    constructor(namespace: Namespace = {}, indent: number = 0) {
+    constructor(namespace = {}, indent: number = 0) {
         this.namespace = namespace
         this.replacer = function(key: string, value: any) {
             if (value != null && typeof value === "object" && namespace.hasOwnProperty(value.constructor.name)) {
@@ -47,8 +45,10 @@ export default class Serializer {
         return JSON.stringify(object, this.replacer, this.indent > 0 ? this.indent : undefined)
     }
 
-    public register(name: string, type: ModelClass) {
+    public register(name: string, type) {
         this.namespace[name] = type
     }
+
+    public static readonly default = new Serializer()
 
 }
