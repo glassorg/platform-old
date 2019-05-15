@@ -19,3 +19,4 @@ Main glass library
     - Support Direct Nesting of Components AGAIN. Add Unit Tests to verify.
     X DataTable columns need to render entire cells. which is harder, I know.
     X createInput shouldn't have to take FieldProperties object. Simplify this.
+    - Add firestore.FieldValue.serverTimestamp() sentinel values on create/update.

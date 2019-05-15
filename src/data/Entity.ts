@@ -2,7 +2,6 @@ import Model, { ModelClass } from "./Model";
 import { ModelKey } from "./Key";
 import * as schema from "./schema";
 import TimeStamp from "./TimeStamp";
-import { pathMatch } from "tough-cookie";
 import { getPath } from "../utility/common";
 import Patch, { createPatch } from "./Patch";
 import Store from "./Store";
