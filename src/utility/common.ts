@@ -69,26 +69,42 @@ export function traverse(value, schema: Schema, callback: Callback, ancestors: a
     if (value != null && typeof value === "object") {
         if (Array.isArray(value)) {
             if (schema.items) {
-                for (let i = 0; i < value.length; i++) {
-                    ancestors.push(value)
-                    path.push(i)
-                    let itemSchema = Array.isArray(schema.items) ? (schema.items[i] || schema.additionalItems) : schema.items
-                    if (itemSchema)
-                        traverse(value[i], itemSchema, callback, ancestors, path)
-                    path.pop()
-                    ancestors.pop()
-                }
-            }
-        }else {
-            for (let name in value) {
                 ancestors.push(value)
-                path.push(name)
-                let propertySchema = schema.properties && schema.properties[name] || schema.additionalProperties && schema.additionalProperties
-                if (propertySchema)
-                    traverse(value[name], propertySchema, callback, ancestors, path)
-                path.pop()
+                for (let i = 0; i < value.length; i++) {
+                    let itemSchema = Array.isArray(schema.items) ? (schema.items[i] || schema.additionalItems) : schema.items
+                    if (itemSchema) {
+                        path.push(i)
+                        traverse(value[i], itemSchema, callback, ancestors, path)
+                        path.pop()
+                    }
+                }
                 ancestors.pop()
             }
+        }
+        else {
+            ancestors.push(value)
+            for (let name in value) {
+                let propertySchema = schema.properties && schema.properties[name] || schema.additionalProperties && schema.additionalProperties
+                if (propertySchema) {
+                    path.push(name)
+                    traverse(value[name], propertySchema, callback, ancestors, path)
+                    path.pop()
+                }
+            }
+            // also traverse any schema properties that we didn't get in 
+            if (schema.properties) {
+                for (let name in schema.properties) {
+                    if (!value.hasOwnProperty(name)) {
+                        let propertySchema = schema.properties[name]
+                        if (propertySchema) {
+                            path.push(name)
+                            traverse(value[name], propertySchema, callback, ancestors, path)
+                            path.pop()
+                        }
+                    }
+                }
+            }
+            ancestors.pop()
         }
     }
 }

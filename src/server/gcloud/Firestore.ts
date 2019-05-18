@@ -6,10 +6,11 @@ import * as common from "../../utility/common";
 import {Firestore as GoogleFirestore, Query as GoogleQuery, DocumentReference, DocumentSnapshot} from "@google-cloud/firestore";
 import { Schema } from "../../data/schema";
 import Serializer from "../../data/Serializer";
+import getPackageJson, { getProjectId } from "../getPackageJson";
 
 const serializedProperty = "_"
 
-function getIndexedValues(entity: Entity) {
+export function getIndexedValues(entity: Entity) {
     let values: any = {}
     let deleted = entity.deleted != null
     common.traverse(entity, entity.constructor as Schema, (value, schema, ancestors, path) => {
@@ -100,11 +101,12 @@ export default class Firestore implements Database {
 
     private gfirestore: GoogleFirestore
     public readonly namespace!: Namespace
-    public readonly projectId?: string
+    public readonly projectId?: string = getProjectId()
     public readonly hardDelete: boolean = true
 
     constructor(properties: { namespace: Namespace } & { [P in keyof Firestore]?: Firestore[P] }) {
         Object.assign(this, properties)
+        let packageJson = getPackageJson()
         this.gfirestore = new GoogleFirestore({ projectId: this.projectId })
     }
 

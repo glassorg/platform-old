@@ -1,5 +1,5 @@
 import test from "ava";
-import Firestore from "./Firestore";
+import Firestore, { getIndexedValues } from "./Firestore";
 import Entity from "../../data/Entity";
 import Model from "../../data/Model";
 import Key from "../../data/Key";
@@ -24,9 +24,29 @@ export default class TestEntity extends Entity {
     })
     complete!: boolean
 
+    @Model.property({ index: true })
+    get computed() { return 10 }
 }
 
 const namespace = { TestEntity }
+
+test("indexes", assert => {
+    let modified = { by: "krisnye@gmail.com", date: Date.parse("1971-12-09T12:00:00") }
+    let kris = new TestEntity({ key: "TestEntity/kris", name: "Kris", complete: true, created: modified, updated: modified })
+    let indexes = getIndexedValues(kris)
+    assert.deepEqual(
+        indexes,
+        {
+            "name": kris.name,
+            "complete": true,
+            "computed": 10,
+            "created.by": modified.by,
+            "created.date": modified.date,
+            "updated.by": modified.by,
+            "updated.date": modified.date
+        }
+    )
+})
 
 if (process.platform !== "darwin") {
     test("test suspended", assert => {

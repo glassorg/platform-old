@@ -15,8 +15,19 @@ function getKeys(keyStrings: string[]) {
 
 type Batch = { [key: string]: Patch<Entity> }
 
-export async function put(patches: Batch) {
-    let keys = getKeys(Object.keys(patches))
+//  create: entities, each is assigned a new key?
+export async function create(batch: Batch) {
+    throw new Error("not implemented")
+}
+export async function set(batch: Batch) {
+    return await put(batch, false)
+}
+export async function patch(batch: Batch) {
+    return await put(batch, true)
+}
+
+async function put(batch: Batch, patch: boolean) {
+        let keys = getKeys(Object.keys(batch))
     for (let key of keys) {
         if (!Key.isModelKey(key)) {
             throw new Error(`Invalid model key: ${key}`)
@@ -24,11 +35,11 @@ export async function put(patches: Batch) {
     }
     let response: Batch = {}
     let newEntities: Entity[] = []
-    let entities = await database.all(keys)
+    let entities = patch ? await database.all(keys) : null
     for (let i = 0; i < keys.length; i++) {
         let key = keys[i]
-        let patch = patches[key.toString()]
-        let entity = entities[i][0]
+        let patch = batch[key.toString()]
+        let entity = entities != null ? entities[i][0] : null
         if (entity != null) {
             // no deletion yet.
             if (patch == null) {
@@ -39,7 +50,7 @@ export async function put(patches: Batch) {
             // make sure patch is a full instance
             entity = patch instanceof Entity ? patch : new key.type!(patch as any) as Entity
         }
-        newEntities.push(entity)
+        newEntities.push(entity!)
         response[key.toString()] = patch == null ? null : entity
     }
     database.put(newEntities)

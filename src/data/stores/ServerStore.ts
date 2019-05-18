@@ -61,10 +61,10 @@ export default class ServerStore extends MemoryStore {
                 throw new Error("No deleting yet")
             }
 
-            invoke(`${this.path}/put`, { [key.toString()]: value }).then(result => {
-                console.log("put?", result)
+            invoke(`${this.path}/patch`, { [key.toString()]: value }).then(result => {
+                console.log("patch?", result)
             }, reason => {
-                console.log("Invoke put error", reason)
+                console.log("Invoke patch error", reason)
             })
         }
         return changed
