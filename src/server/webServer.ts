@@ -36,7 +36,7 @@ export function create(projectRoot = "./", namespaceOrPath: string | Namespace =
     instance = Object.assign(express(), { projectRoot, namespace, packageProperties })
     // parse identity token
     instance.use(IdentityProvider)
-    instance.use(bodyParser.text({ type: "application/json" }))
+    instance.use(bodyParser.text({ type: "application/json", limit: 10 * 1000 * 1000 }))
     instance.use(methodEmulator)
 
     // dynamic loading of api, this isn't working with webpack?

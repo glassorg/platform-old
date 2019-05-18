@@ -20,7 +20,9 @@ export async function create(batch: Batch) {
     throw new Error("not implemented")
 }
 export async function set(batch: Batch) {
-    return await put(batch, false)
+    await put(batch, false)
+    // set does not return full data, just confirmation count
+    return Object.keys(batch).length
 }
 export async function patch(batch: Batch) {
     return await put(batch, true)
@@ -53,7 +55,7 @@ async function put(batch: Batch, patch: boolean) {
         newEntities.push(entity!)
         response[key.toString()] = patch == null ? null : entity
     }
-    database.put(newEntities)
+    await database.put(newEntities)
     return response
 }
 
