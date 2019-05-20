@@ -51,7 +51,7 @@ function parse(key): { parent?: string, type?: string, id?: string, query?: any 
 function stringify(steps: any[]) {
     let buffer: string[] = []
     for (let step of steps) {
-        if (isQuery(step)) {
+        if (isPlainObject(step)) {
             buffer.push("?", JSON.stringify(step))
         } else if (step != null) {
             if (buffer.length > 0) {

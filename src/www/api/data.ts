@@ -20,16 +20,39 @@ export async function create(batch: Batch) {
     throw new Error("not implemented")
 }
 export async function set(batch: Batch) {
-    await put(batch, false)
-    // set does not return full data, just confirmation count
-    return Object.keys(batch).length
+    return await put(batch, false)
 }
 export async function patch(batch: Batch) {
     return await put(batch, true)
 }
 
+const batchLimit = 500
+function splitBatchToSmallBatchesUnderLimit(batch: Batch) {
+    let currentBatchSize = 0
+    let batches: Batch[] = [{}]
+    for (let key in batch) {
+        if (currentBatchSize === batchLimit) {
+            batches.push({})
+            currentBatchSize = 0
+        }
+        batches[batches.length - 1][key] = batch[key]
+        currentBatchSize++
+    }
+    return batches
+}
+
 async function put(batch: Batch, patch: boolean) {
-        let keys = getKeys(Object.keys(batch))
+    let batches = splitBatchToSmallBatchesUnderLimit(batch)
+    let results = await Promise.all(batches.map(b => putLimited(b, patch)))
+    let mergedResult = Object.assign({}, ...results)
+    return mergedResult
+}
+
+async function putLimited(batch: Batch, patch: boolean) {
+    let keys = getKeys(Object.keys(batch))
+    if (keys.length > batchLimit) {
+        throw new Error(`Batch exceeded ${batchLimit} row limit: ${keys.length}`)
+    }
     for (let key of keys) {
         if (!Key.isModelKey(key)) {
             throw new Error(`Invalid model key: ${key}`)

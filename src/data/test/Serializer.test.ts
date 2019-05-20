@@ -38,7 +38,7 @@ test("Model properties have schema name set", t => {
 })
 
 test("Model class has store", t => {
-    t.true(Foo.store === "session")
+    t.true(typeof Foo.store === "string")
 })
 
 test("Serialization", t => {

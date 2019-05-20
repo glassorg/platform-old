@@ -87,14 +87,9 @@ function toEntity<T extends Entity>(namespace: Namespace, doc: DocumentSnapshot)
     if (!doc.exists) {
         return null
     }
-    let name = doc.ref.path.split('/')[0]
-    let type = namespace[name]
-    if (type == null) {
-        throw new Error(`Type not found: ${name}`)
-    }
     let data = doc.data()!
     let key = Key.parse(namespace, doc.ref.path) as ModelKey
-    return new type(deserialize(key, data[serializedProperty], namespace)) as T
+    return deserialize(key, data[serializedProperty], namespace)
 }
 
 export default class Firestore implements Database {

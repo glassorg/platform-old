@@ -39,4 +39,6 @@ export default abstract class Entity extends Model {
         Store.default.patch(this.key, patch)
     }
 
+    static store = "server"
+
 }
