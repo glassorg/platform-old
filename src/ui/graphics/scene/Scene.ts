@@ -11,6 +11,12 @@ export default class Scene extends Control {
 
     draw(g: Graphics, time) {
         g.clear(this.backColor, this.depth)
+
+        // (position.x * 2.0) / screen.x - 1.0,
+        // 1.0 - (position.y * 2.0) / screen.y,
+        // position.z * 2.0 * -1.0,
+        // position.w
+
         super.draw(g, time)
     }
 

@@ -10,6 +10,8 @@ import { Uniforms, createUniforms, setUniform } from "./Uniforms";
 import VertexBuffer from "./VertexBuffer";
 import VertexStream from "./VertexStream";
 import Vector2 from "../math/Vector2";
+import Matrix4 from "../math/Matrix4";
+import Vector3 from "../math/Vector3";
 
 export default class Graphics3D extends Graphics {
 
@@ -74,6 +76,30 @@ export default class Graphics3D extends Graphics {
         this.uniforms.screen = new Vector2(width, height)
     }
 
+    get width() {
+        return this.gl.canvas.width
+    }
+
+    get height() {
+        return this.gl.canvas.height
+    }
+
+    translate(dx: number, dy: number, dz: number) {
+        this.uniforms.translate(dx, dy, dz)
+    }
+
+    rotate(angle: number) {
+        this.uniforms.rotate(angle)
+    }
+
+    scale(sx: number, sy: number, sz: number) {
+        this.uniforms.scale(sx, sy, sz)
+    }
+
+    transform(m: Matrix4) {
+        this.uniforms.transform(m)
+    }
+
     clear(color: Color = Color.transparent, depth: number = 1) {
         let { gl } = this
         gl.clearColor(color.red, color.green, color.blue, color.alpha)
@@ -83,6 +109,24 @@ export default class Graphics3D extends Graphics {
 
     begin() {
         let gl = this.gl
+
+        // we initialize all graphics contexts to a 2d transformation
+        this.uniforms.model = Matrix4.identity
+        this.uniforms.view = Matrix4.identity
+        this.uniforms.projection = Matrix4.identity
+        // this.uniforms.projection = new Matrix4(
+        //     2 / this.width, 0, 0, 0,
+        //     0, 2 / this.height, 0, 0,
+        //     0, 0, 2 / 1, 0,
+        //     -1, -1, -1, 1
+        // )
+        // the projection should apply the screen transformation.
+
+        // (position.x * 2.0) / screen.x - 1.0,
+        // 1.0 - (position.y * 2.0) / screen.y,
+        // position.z * 2.0 * -1.0,
+        // position.w
+
     }
 
     end() {
@@ -126,10 +170,19 @@ export default class Graphics3D extends Graphics {
         }
     }
 
-    fillRectangle(x: number, y: number, width: number, height: number, color: Color) {
-        // console.log("Graphics3D.fillRectangle")
-        //  this simplified format would need abstraction when rendering component info
-        //  will also need to use standard uniforms of Model, ViewProjection
+    fillRectangle(x: number, y: number, width: number, height: number, color: Color, depth: number = 0) {
+        let a = new Vector3(x, y, depth).transform(this.uniforms.model)
+        let b = new Vector3(x + width, y, depth).transform(this.uniforms.model)
+        let c = new Vector3(x, y + height, depth).transform(this.uniforms.model)
+        let d = new Vector3(x + width, y + height, depth).transform(this.uniforms.model)
+        this.vertexStream.write(
+            ...a, ...color,
+            ...b, ...color,
+            ...c, ...color,
+            ...c, ...color,
+            ...b, ...color,
+            ...d, ...color,
+        )
     }
 
     private _program!: Program
@@ -147,8 +200,8 @@ export default class Graphics3D extends Graphics {
         }
     }
 
-    flush() {
-        if (this.vertexStream) {
+    flush(property?: string) {
+        if (this.vertexStream && (property !== "model" || !this.program.vertexShader.pretransformed)) {
             this.vertexStream.flush()
         }
     }

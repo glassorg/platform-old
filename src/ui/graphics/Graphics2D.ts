@@ -1,5 +1,6 @@
 import Color from "../math/Color";
 import Graphics from "./Graphics";
+import Matrix4 from "../math/Matrix4";
 
 export default class Graphics2D extends Graphics {
 
@@ -8,6 +9,30 @@ export default class Graphics2D extends Graphics {
     constructor(context: CanvasRenderingContext2D) {
         super()
         this.context = context
+    }
+
+    get width() {
+        return this.context.canvas.width
+    }
+
+    get height() {
+        return this.context.canvas.height
+    }
+
+    translate(dx: number, dy: number, dz: number) {
+        this.context.translate(dx, dy)
+    }
+
+    rotate(angle: number) {
+        this.context.rotate(angle)
+    }
+
+    scale(sx: number, sy: number = sx, sz: number = sx) {
+        this.context.scale(sx, sy)
+    }
+
+    transform(m: Matrix4) {
+        this.context.transform(m.m00, m.m01, m.m10, m.m11, m.m30, m.m31)
     }
 
     clear(color: Color = Color.transparent, depth: number = 1) {

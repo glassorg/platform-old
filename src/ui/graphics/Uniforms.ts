@@ -1,6 +1,7 @@
 import Graphics3D from "./Graphics3D";
 import Matrix4 from "../math/Matrix4";
 import Vector2 from "../math/Vector2";
+import Vector3 from "../math/Vector3";
 
 export class Uniforms {
     [property: string]: any
@@ -11,21 +12,24 @@ export class Uniforms {
     //  the mul order may be opposite
     get modelView(): Matrix4 {
         return this.model.multiply(this.view)
-        // let out = mat4.create()
-        // mat4.mul(out, this.model, this.view)
-        // return out
     }
     get modelViewProjection(): Matrix4 {
         return this.modelView.multiply(this.projection)
-        // let out = mat4.create()
-        // mat4.mul(out, this.modelView, this.projection)
-        // return out
     }
     get viewProjection(): Matrix4 {
         return this.view.multiply(this.projection)
-        // let out = mat4.create()
-        // mat4.mul(out, this.view, this.projection)
-        // return out
+    }
+    translate(dx: number, dy: number, dz: number = 0) {
+        this.transform(Matrix4.translation(dx, dy, dz))
+    }
+    rotate(angle: number) {
+        this.transform(Matrix4.rotation(new Vector3(0, 0, 1), angle)!)
+    }
+    scale(sx: number, sy: number = sx, sz: number = sx) {
+        this.transform(Matrix4.scaling(sx, sy, sz))
+    }
+    transform(m: Matrix4) {
+        this.model = m.multiply(this.model)
     }
 }
 
@@ -60,13 +64,13 @@ export function setUniform(g: Graphics3D, uniform: WebGLActiveInfo, location: We
     }
 }
 
-export function createUniforms(gl: WebGL2RenderingContext, invalidate: () => void): Uniforms {
+export function createUniforms(gl: WebGL2RenderingContext, invalidate: (string) => void): Uniforms {
     return new Proxy(new Uniforms(), {
         set(obj, prop, value) {
             // if value is a string then it represents the path to a texture
             let result = Reflect.set(obj, prop, value)
             if (result) {
-                invalidate()
+                invalidate(prop)
             }
             return result
         }

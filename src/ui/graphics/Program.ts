@@ -36,7 +36,8 @@ export default class Program {
                 gl_Position = vec4(position, 1) * modelViewProjection;
                 vs_color = color;
             }
-            `
+            `,
+            true
         ),
         new FragmentShader(
             `

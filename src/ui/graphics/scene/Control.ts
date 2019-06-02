@@ -20,10 +20,18 @@ export default class Control extends SceneNode implements Pickable {
         if (this.backColor.isVisible) {
             g.fillRectangle(this.x, this.y, this.width, this.height, this.backColor)
         }
-        super.draw(g, time)
+        if (this.firstChild) {
+            if (this.x !== 0 || this.y !== 0) {
+                g.translate(this.x, this.y)
+                super.draw(g, time)
+                g.translate(-this.x, -this.y)
+            } else {
+                super.draw(g, time)
+            }
+        }
     }
 
-    get position() { return new Vector3(this.x, this.y, 0) }
+    get position() { return new Vector3(this.x, this.y, this.depth) }
     get bounds() { return new Rectangle(this.x, this.y, this.width, this.height) }
 
     pick(ray: Capsule) {

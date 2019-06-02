@@ -3,7 +3,7 @@ import Vector3 from "../math/Vector3";
 
 export function getPosition(e: MouseEvent, element: HTMLElement = e.target as HTMLElement) {
     let bounds = element.getBoundingClientRect()
-    return new Vector3(e.pageX - bounds.left, e.pageY - bounds.top)
+    return new Vector3(e.clientX - bounds.left, e.clientY - bounds.top)
 }
 
 export function isAncestorOrSelf(self: INode, possibleAncestor: INode) {

@@ -5,7 +5,7 @@ import * as html from "../html";
 import Graphics2D from "./Graphics2D";
 import Graphics from "./Graphics";
 import Graphics3D from "./Graphics3D";
-import Pickable, { isPickable } from "./3d/Pickable";
+import Pickable, { isPickable } from "./scene/Pickable";
 import Vector3 from "../math/Vector3";
 import { getPosition } from "../html/functions";
 import Capsule from "../math/Capsule";
@@ -37,6 +37,9 @@ function bindMouseEvents(canvas: HTMLCanvasElement) {
     // add some event routing
     for (let event of ["mousedown", "mouseup", "mousemove", "click"]) {
         canvas.addEventListener(event, (e: any) => {
+            if (event === "mousedown") {
+                debugger
+            }
             let target = pick(e)
             if (target && target[event]) {
                 target[event](e)
