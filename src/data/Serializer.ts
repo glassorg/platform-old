@@ -22,6 +22,9 @@ export default class Serializer {
                 delete value[typeKey]
                 let modelConstructor = namespace[name]
                 if (modelConstructor == null) {
+                    console.log("********************************************")
+                    console.log(Object.keys(namespace).join(" : "))
+                    console.log("********************************************")
                     throw new Error(`Class not found in namespace: ${name}`)
                 }
                 return new modelConstructor(value)

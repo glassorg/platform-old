@@ -7,7 +7,7 @@ import Patch from "../../data/Patch";
 import Model from "../../data/Model";
 import clonePatch from "../../utility/clonePatch";
 
-const database = new Firestore({ namespace: webServer.instance.namespace })
+const database = webServer.instance.database
 
 function getKeys(keyStrings: string[]) {
     return keyStrings.map(k => Key.parse(database.namespace, k))

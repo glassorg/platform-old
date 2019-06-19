@@ -1,5 +1,5 @@
+import * as webServer from "./webServer";
 
 import sendgrid from "@sendgrid/mail"
-console.warn("need to load sendgrid credentials dynamically")
-// sendgrid.setApiKey(null)
+sendgrid.setApiKey(webServer.instance.config.sendgrid!.apiKey)
 export default sendgrid

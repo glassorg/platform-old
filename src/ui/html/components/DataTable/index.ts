@@ -191,7 +191,7 @@ export default function DataTable(c: Context, p: {
         render(ScrollPanel, {
             id: bodyId,
             class: "DataTable_Body",
-            content: () => {
+            content(c: Context) {
                 if (keys) {
                     for (let key of keys) {
                         render(DataTable_BodyRow, { key, columns })

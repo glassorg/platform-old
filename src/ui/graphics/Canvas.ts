@@ -37,9 +37,6 @@ function bindMouseEvents(canvas: HTMLCanvasElement) {
     // add some event routing
     for (let event of ["mousedown", "mouseup", "mousemove", "click"]) {
         canvas.addEventListener(event, (e: any) => {
-            if (event === "mousedown") {
-                debugger
-            }
             let target = pick(e)
             if (target && target[event]) {
                 target[event](e)

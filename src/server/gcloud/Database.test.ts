@@ -48,7 +48,8 @@ test("indexes", assert => {
     )
 })
 
-if (process.platform !== "darwin") {
+let disableDatabaseTests = true // process.platform !== "darwin"
+if (disableDatabaseTests) {
     test("test suspended", assert => {
         console.log("Firestore tests suspended for now")
         assert.true(true)

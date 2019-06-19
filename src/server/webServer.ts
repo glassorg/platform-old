@@ -1,4 +1,6 @@
 import express, { Request, Response, Express } from "express";
+import Datastore from "./gcloud/Datastore";
+import Database from "./gcloud/Database";
 import apiRouter from "./apiRouter";
 import path from "path";
 import fs from "fs";
@@ -6,34 +8,53 @@ import methodEmulator from "./methodEmulator";
 import bodyParser = require("body-parser");
 import Namespace, { isNamespace } from "../data/Namespace";
 import IdentityProvider from "./IdentityProvider";
+import Firestore from "./gcloud/Firestore";
 
-export let instance: { projectRoot: string, namespace: Namespace, packageProperties: any } & Express
+export type Config = {
+    projectRoot: string,
+    namespace?: Namespace,
+    secrets?: {
+        jwtSignature: string,
+        encryptionKey: string
+    },
+    twilio?: {
+        fromPhone: string,
+        account: string,
+        token: string
+    },
+    sendgrid?: {
+        apiKey: string
+    }
+}
+
+export let instance: { database: Database, config: Config & { namespace: Namespace } } & Express
 
 /**
  * Initializes the standard glass web server.
  * @param projectRoot the root directory of the project
  * @param namespaceOrPath the entity namespace or a string to the namespace module relative to the projectRoot
  */
-export function create(projectRoot = "./", namespaceOrPath: string | Namespace = "./lib/model/index.js") {
-    let namespace: Namespace
-    if (isNamespace(namespaceOrPath)) {
-        namespace = namespaceOrPath
-    } else {
+export function create(config: Config) {
+    let { projectRoot, namespace } = config
+    let namespaceOrPath = config.namespace
+    if (!isNamespace(namespace)) {
+        let namespacePath = path.join(projectRoot, "./lib/model/index.js")
         try {
-            namespace = require(path.join(projectRoot, namespaceOrPath))
+            namespace = require(namespacePath)
         } catch (e) {
             namespace = {}
-            console.warn(`Error loading webServer namespace: ${namespaceOrPath}`)
+            console.warn(`Error loading webServer namespace: ${namespacePath}`)
         }
     }
     const packageProperties = JSON.parse(fs.readFileSync(path.join(projectRoot, "package.json")).toString())
-    let { name: projectId } = packageProperties
+    let projectId = packageProperties.id || packageProperties.name
     process.env.DATASTORE_PROJECT_ID = projectId
     let credentialsPath = path.join(projectRoot, "credentials.json")
     if (fs.existsSync(credentialsPath))
         process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath
 
-    instance = Object.assign(express(), { projectRoot, namespace, packageProperties })
+    let database = packageProperties.firestore ? new Firestore({namespace:namespace!}) : new Datastore(namespace!)
+    instance = Object.assign(express(), { config, database }) as any
     // parse identity token
     instance.use(IdentityProvider)
     instance.use(bodyParser.text({ type: "application/json", limit: 10 * 1000 * 1000 }))

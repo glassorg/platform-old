@@ -38,7 +38,7 @@ export default function ForgotForm(c: Context) {
             id: "forgotForm",
             descriptor: ForgotFormModel,
             oncomplete(user: ForgotFormModel) {
-                console.log("Forgot: ", user)
+                console.log("Forgot not implemented: ", user)
             }
         }
     )

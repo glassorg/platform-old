@@ -2,11 +2,11 @@ import * as crypto from "../utility/crypto";
 import * as webServer from "./webServer";
 
 export function getJwtSignature() {
-    return webServer.instance.packageProperties.secret.jwtSignature.toString()
+    return webServer.instance.config.secrets!.jwtSignature.toString()
 }
 
 export function getEncryptionKey() {
-    return webServer.instance.packageProperties.secret.encryptionKey.toString()
+    return webServer.instance.config.secrets!.encryptionKey.toString()
 }
 
 /**

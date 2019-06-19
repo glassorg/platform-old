@@ -13,7 +13,11 @@ class SvgElementFactory extends HtmlElementFactory<SVGElement> {
     public rect = factory<SVGRectElement>("rect")
     public path = factory<SVGPathElement>("path")
     public text = factory<SVGTextElement>("text")
+    public use = factory<SVGUseElement>("use")
+    public defs = factory<SVGDefsElement>("defs")
+    public clipPath = factory<SVGClipPathElement>("clipPath")
     public animateMotion = factory<SVGElement>("animateMotion")
+    public g = factory<SVGGElement>("g")
     public mpath = factory("mpath")
 
     constructor() {

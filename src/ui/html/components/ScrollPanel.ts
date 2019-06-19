@@ -66,7 +66,7 @@ export default function ScrollPanel(c: Context, p: {
             saveState()
         }
     })
-        c.render(content)
+        content(c)
     c.end(html.div)
 
     function saveState() {

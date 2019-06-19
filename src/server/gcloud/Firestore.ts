@@ -92,30 +92,30 @@ function toEntity<T extends Entity>(namespace: Namespace, doc: DocumentSnapshot)
     return deserialize(key, data[serializedProperty], namespace)
 }
 
-export default class Firestore implements Database {
+export default class Firestore extends Database {
 
     private gfirestore: GoogleFirestore
-    public readonly namespace!: Namespace
     public readonly projectId?: string = getProjectId()
     public readonly hardDelete: boolean = true
 
     constructor(properties: { namespace: Namespace } & { [P in keyof Firestore]?: Firestore[P] }) {
+        super(properties.namespace)
         Object.assign(this, properties)
         let packageJson = getPackageJson()
         this.gfirestore = new GoogleFirestore({ projectId: this.projectId })
     }
 
     async all<T = Entity>(keys: Key[]): Promise<T[][]> {
-        return Promise.all(keys.map(key => Key.isModelKey(key) ? this.get(key).then(entity => entity ? [entity] : []) : this.query(key as QueryKey))) as any
+        return Promise.all(keys.map(key => Key.isModelKey(key) ? this.getInternal(key).then(entity => entity ? [entity] : []) : this.queryInternal(key as QueryKey))) as any
     }
 
-    async get<T extends Entity>(key: ModelKey<T>): Promise<T | null> {
+    async getInternal<T extends Entity>(key: ModelKey<T>): Promise<T | null> {
         let docRef = this.gfirestore.doc(key.toString())
         let doc = await docRef.get()
         return toEntity<T>(this.namespace, doc) as T | null
     }
 
-    async query<T extends Entity>(key: QueryKey<T>): Promise<T[]> {
+    async queryInternal<T extends Entity>(key: QueryKey<T>): Promise<T[]> {
         let gquery = toGoogleQuery(this.gfirestore, key)
         let gquerySnapshot = await gquery.get()
         return gquerySnapshot.docs.map(doc => toEntity<T>(this.namespace, doc)!)

@@ -19,8 +19,6 @@ export default class User extends Entity {
 
 }
 
-// ok... what do we want to store in the  AccessToken
-
 const sessionKey = Key.create({ name: "User.sessionKey", store: "session", type: "string" })
 const localKey = Key.create({ name: "User.localKey", store: "local", type: "string" })
 

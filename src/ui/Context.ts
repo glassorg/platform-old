@@ -272,7 +272,7 @@ export default class Context {
             this.renderStack.pop()
             let firstNode = (insertAfter ? insertAfter.nextSibling : parentNode.firstChild)
             if (firstNode == null || insertAfter === this.insertAfter)
-                throw new Error("Component must render one node")
+                throw new Error(`Component must render one node: ${type.toString()}`)
             if (firstNode.component != null) {
                 //  nested components
                 //  child components are first but we want most ancestral component on top
