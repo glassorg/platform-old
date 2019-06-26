@@ -15,6 +15,7 @@ export type InputArguments = {
 }
 
 export type Schema = {
+    id?: string
     title?: string
     description?: string
     oneOf?: Schema[]

@@ -30,7 +30,7 @@ export async function login(state: LoginFormModel): Promise<Patch<LoginFormState
     if (!(state instanceof LoginFormModel)) {
         return { status: "error", error: "invalid state" }
     }
-    let user = await database.get(Key.create(namespace.User, state.email))
+    let [user] = await database.get([Key.create(namespace.User, state.email)])
 
     if (user == null) {
         return { status: "invalid user" }
@@ -57,7 +57,7 @@ export async function login(state: LoginFormModel): Promise<Patch<LoginFormState
  * Returns true if a User with this email exists, false otherwise.
  */
 export async function exists(email: string): Promise<boolean> {
-    let user = await database.get(Key.create(namespace.User, email))
+    let [user] = await database.get([Key.create(namespace.User, email)])
     console.log(JSON.stringify({ email, user: user || null }))
     return user != null
 }

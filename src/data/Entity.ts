@@ -13,17 +13,18 @@ export default abstract class Entity extends Model {
         validate(this: Entity, value) {
             if (value.type !== this.constructor)
                 return `key is of wrong type: ${value.schema.name}, expected: ${this.constructor.name}`
-        }
+        },
+        id: "."
     })
     key!: ModelKey
 
-    @Model.property(TimeStamp)
+    @Model.property(TimeStamp, { id: "," })
     created?: TimeStamp
 
-    @Model.property(TimeStamp)
+    @Model.property(TimeStamp, { id: ":" })
     updated?: TimeStamp
 
-    @Model.property(TimeStamp)
+    @Model.property(TimeStamp, { id: ";" })
     deleted?: TimeStamp
 
     //  function for patching a descendant object

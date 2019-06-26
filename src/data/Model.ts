@@ -38,14 +38,19 @@ export default class Model {
             }
         }
 
-        this.validate()
-        Object.freeze(this)
+        if (Model.ValidateAndFreezeOnConstruction) {
+            this.validate()
+            Object.freeze(this)
+        }
     }
 
-    protected validate() {
+    static ValidateAndFreezeOnConstruction = typeof window !== "undefined"
+
+    validate() {
         let errors = validate(this.constructor as Schema, this, this, [this.constructor.name])
-        if (errors.length > 0)
+        if (errors.length > 0) {
             throw new Error(errors.join(",\n"))
+        }
     }
 
     //  Model class decorator 

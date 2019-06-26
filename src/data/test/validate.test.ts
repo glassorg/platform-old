@@ -42,6 +42,8 @@ class ValidatePerson extends Entity {
     customValue!: string
 }
 
+Model.ValidateAndFreezeOnConstruction = true
+
 test("can construct valid model", t => {
     t.notThrows(() => {
         let modified = { by: "kody.j.king@gmail.com", date: Date.parse("1995-09-25T12:00:00") }

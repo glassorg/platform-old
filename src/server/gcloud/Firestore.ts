@@ -1,6 +1,6 @@
 import Entity from "../../data/Entity";
 import Key, { ModelKey, QueryKey } from "../../data/Key";
-import Database from "./Database";
+import Database from "../Database";
 import Namespace from "../../data/Namespace";
 import * as common from "../../utility/common";
 import {Firestore as GoogleFirestore, Query as GoogleQuery, DocumentReference, DocumentSnapshot} from "@google-cloud/firestore";
@@ -105,20 +105,33 @@ export default class Firestore extends Database {
         this.gfirestore = new GoogleFirestore({ projectId: this.projectId })
     }
 
-    async all<T = Entity>(keys: Key[]): Promise<T[][]> {
-        return Promise.all(keys.map(key => Key.isModelKey(key) ? this.getInternal(key).then(entity => entity ? [entity] : []) : this.queryInternal(key as QueryKey))) as any
+    async get<T extends Entity = Entity>(keys: ModelKey<T>[]): Promise<Array<T | null>> {
+        throw new Error("need to reimplement this for batch get")
+        // let docRef = this.gfirestore.doc(key.toString())
+        // let doc = await docRef.get()
+        // return toEntity<T>(this.namespace, doc) as T | null
     }
 
-    async getInternal<T extends Entity>(key: ModelKey<T>): Promise<T | null> {
-        let docRef = this.gfirestore.doc(key.toString())
-        let doc = await docRef.get()
-        return toEntity<T>(this.namespace, doc) as T | null
-    }
-
-    async queryInternal<T extends Entity>(key: QueryKey<T>): Promise<T[]> {
+    query<T extends Entity>(key: QueryKey<T>): Promise<T[]> {
         let gquery = toGoogleQuery(this.gfirestore, key)
-        let gquerySnapshot = await gquery.get()
-        return gquerySnapshot.docs.map(doc => toEntity<T>(this.namespace, doc)!)
+        let error: any = null
+        return new Promise((resolve, reject) => {
+            let records: T[] = []
+            gquery.stream().on('data', (doc) => {
+                try {
+                    // records.push(toEntity<T>(this.namespace, doc)!)
+                    records.push(doc)
+                } catch (e) {
+                    reject(error = e)
+                }
+            }).on('end', () => {
+                if (error == null) {
+                    resolve(records)
+                }
+            }).on('error', (e) => {
+                reject(error = e)
+            });
+        })
     }
 
     //  create, update, delete

@@ -1,19 +1,20 @@
-import GoogleDatastore from "@google-cloud/datastore";
+const { Datastore: GDatastore } = require("@google-cloud/datastore");
+import { DatastoreKey as GKey } from "@google-cloud/datastore/entity";
 import Key, { QueryKey, ModelKey} from "../../data/Key";
-import Database from "./Database";
-import { DatastoreKey } from "@google-cloud/datastore/entity";
+import Database from "../Database";
 import Entity from "../../data/Entity";
 import { Schema } from "../../data/schema";
 import * as common from "../../utility/common";
 import Namespace from "../../data/Namespace";
-import Serializer from "../../data/Serializer";
-
-const { Query, Transaction } = GoogleDatastore
+import Serializer, { typeKey } from "../../data/Serializer";
+import * as compression from "../compression";
+import { entity } from "@google-cloud/datastore/build/src/entity";
+import Model from "../../data/Model";
 
 const serializedProperty = "_"
 const excludeFromIndexes = [serializedProperty]
-type GoogleEntity = { [serializedProperty]: string, [GoogleDatastore.KEY]: DatastoreKey }
-type GoogleEntityUpsert = { key: DatastoreKey, data: any, excludeFromIndexes: string[] }
+type GoogleEntity = { [serializedProperty]: string }
+type GoogleEntityUpsert = { key, data: any, excludeFromIndexes: string[] }
 
 function getIndexedValues(entity: Entity) {
     let properties = (entity.constructor as any).properties as { [name: string]: Schema }
@@ -38,19 +39,21 @@ const getSerializer = common.memoize(
 )
 
 function serialize(entity: Entity, namespace: Namespace) {
-    //  remove the type
-    let values = Object.assign({}, entity)
-    //  remove the key
-    delete values.key
-    return getSerializer(namespace).stringify(values)
+    let values = JSON.parse(getSerializer(namespace).stringify(entity))
+    delete values[typeKey]
+    delete values[Entity.properties.key!.id!.valueOf()]
+    return JSON.stringify(values)
 }
 
 function deserialize(key: ModelKey, serialized: string, namespace: Namespace) {
-    let values = getSerializer(namespace).parse(serialized) as Entity
-    //  restore the key
-    values.key = key
-    //  restore the type
-    return new key.type!(values as any)
+    {
+        let json = JSON.parse(serialized)
+        json[typeKey] = key.type!.name
+        json.key = key
+        serialized = JSON.stringify(json)
+    }
+    let result = getSerializer(namespace).parse(serialized) as Entity
+    return result
 }
 
 function getGooglePath(key: ModelKey, path: string[] = []) {
@@ -65,15 +68,15 @@ function getGooglePath(key: ModelKey, path: string[] = []) {
     return path
 }
 
-function getGoogleKey(gdatastore: GoogleDatastore, key: ModelKey) {
+function getGoogleKey(gdatastore, key: ModelKey) {
     return gdatastore.key(getGooglePath(key))
 }
 
-function getGlassKey(gkey: DatastoreKey, namespace: Namespace) {
+function getGlassKey(gkey, namespace: Namespace) {
     return Key.parse(namespace, ...gkey.path.map(x => String(x))) as ModelKey
 }
 
-function getGoogleQuery(gdatastore: GoogleDatastore, key: QueryKey) {
+function getGoogleQuery(gdatastore, key: QueryKey) {
     if (!key.type || !key.type.name) {
         throw new Error("A key must have a schema with a name to create a query.")
     }
@@ -113,9 +116,9 @@ function getGoogleQuery(gdatastore: GoogleDatastore, key: QueryKey) {
                 const value = where[name]
                 if (typeof value === "object") {
                     const op: any = Object.keys(value || {})[0]
-                    gquery.filter(name, op, where[name])
+                    gquery.filter(name, op, where[name] as any)
                 } else {
-                    gquery.filter(name, where[name])
+                    gquery.filter(name, where[name] as any)
                 }
             }
         }
@@ -124,52 +127,87 @@ function getGoogleQuery(gdatastore: GoogleDatastore, key: QueryKey) {
     return gquery
 }
 
+//  for some reason entities queried in batch from datastore
+//  don't seem to be sorted by the requested key order
+//  so we will re-sort them here.
+function sortEntities(gentities: any[], gkeys: GKey[]): GoogleEntity[] {
+    let keyToIndex: { [key: string]: number } = {}
+    for (let i = 0; i < gkeys.length; i++) {
+        keyToIndex[gkeys[i].path as any] = i
+    }
+    let sorted: any[] = new Array(gentities.length)
+    for (let gentity of gentities) {
+        let index = keyToIndex[gentity[GDatastore.KEY].path]
+        if (index == null) {
+            throw new Error("index not found for key")
+        }
+        sorted[index] = gentity
+    }
+    return sorted
+}
+
 export default class Datastore extends Database {
 
-    private gdatastore: GoogleDatastore
+    public gdatastore
+    public readonly maxLimit = 10000
 
-    constructor(namespace: Namespace) {
-        super(namespace)
-        this.gdatastore = new GoogleDatastore()
+    constructor(properties: { namespace: Namespace, projectId?: string }) {
+        super(properties.namespace)
+        this.gdatastore = new GDatastore({ projectId: properties.projectId })
     }
 
-    getGoogleEntity(gdatastore: GoogleDatastore, entity: Entity, key = entity.key): GoogleEntityUpsert {
+    getGoogleEntity(gdatastore, entity: Entity, key = entity.key): GoogleEntityUpsert {
         let data = getIndexedValues(entity)
-        data[serializedProperty] = serialize(entity, this.namespace)
+        data[serializedProperty] = compression.deflate.compress(serialize(entity, this.namespace))
         return { key: getGoogleKey(gdatastore, key), data, excludeFromIndexes }
     }
 
-    getGlassEntity(gentity: GoogleEntity) {
-        let gkey = gentity[GoogleDatastore.KEY]
+    getGlassEntity(gentity: GoogleEntity | null) {
+        if (gentity == null) {
+            return null
+        }
+        let gkey = gentity[GDatastore.KEY]
         let key = getGlassKey(gkey, this.namespace)
-        return deserialize(key, gentity[serializedProperty], this.namespace)
+        // let compressedSize = gentity[serializedProperty].length
+        let compressedData = gentity[serializedProperty]
+        // handle legacy decompression for now
+        let decompressor = typeof compressedData === "string" ? compression.deflate : compression.jsonCompression
+        let decompressed = decompressor.decompress(compressedData)
+        // let decompressedSize = JSON.stringify(decompressed).length
+        // let ratio = Math.round(compressedSize / decompressedSize * 100)
+        // console.log(ratio + "% " + (decompressedSize / 10 ** 6) + " -> " + (compressedSize / 10 ** 6))
+        return deserialize(key, decompressed, this.namespace)
+        // return gentity
     }
 
-    //  retrieve
-    all<T = Entity>(keys: Key[]): Promise<T[][]> {
-        const getGlassEntities = (values: object[]) => {
-            return values.filter((value) => value !== undefined)
-            .map((value) => this.getGlassEntity(value as GoogleEntity))
-        }
-        return <any>Promise.all(
-            keys.map(
-                (key) => {
-                    if (Key.isModelKey(key)) {
-                        let gkey = getGoogleKey(this.gdatastore, key)
-                        return this.gdatastore.get(gkey).then(getGlassEntities as any) as Promise<Entity[]>
-                    } else {
-                        let gquery = getGoogleQuery(this.gdatastore, key as QueryKey)
-                        return this.gdatastore.runQuery(gquery).then(
-                            results => {
-                                let entities = getGlassEntities(results[0])
-                                return entities
-                            }
-                            // getGlassEntities as any
-                        ) as any as Promise<Entity[]>
+    async get<T extends Entity>(keys: ModelKey<T>[]): Promise<Array<T | null>> {
+        let gkeys = keys.map(key => getGoogleKey(this.gdatastore, key))
+        let [gentities] = await this.gdatastore.get(gkeys) as GoogleEntity[][]
+        gentities = sortEntities(gentities, gkeys)
+        return gentities.map(gentity => this.getGlassEntity(gentity)) as any
+    }
+
+    async query<T extends Entity>(key: QueryKey<T>): Promise<T[]> {
+        let gquery = getGoogleQuery(this.gdatastore, key as QueryKey)
+        return new Promise((resolve, reject) => {
+            let entities: T[] = []
+            this.gdatastore.runQueryStream(gquery)
+                .on('error', (e) => {
+                    console.log("Datastore.query#runQueryStream Error: ", e)
+                    reject(e)
+                })
+                .on('data', (gentity) => {
+                    // entities.push(entities.length as any)
+                    let entity = this.getGlassEntity(gentity)
+                    if (entity) {
+                        entities.push(entity as T)
                     }
-                }
-            )
-        )
+                })
+                // .on('info', (info) => {})
+                .on('end', () => {
+                    resolve(entities)
+                })
+        })
     }
 
     //  create, update, delete
@@ -177,9 +215,15 @@ export default class Datastore extends Database {
         if (!Array.isArray(entities)) {
             entities = [entities]
         }
+        if (!Model.ValidateAndFreezeOnConstruction) {
+            for (let entity of entities) {
+                entity.validate()
+            }
+        }
         let gentities = entities.map((entity) => this.getGoogleEntity(this.gdatastore, entity))
         let response = await this.gdatastore.upsert(gentities).then(
             () => {
+                console.log(`Entities written: ${gentities.length}`)
                 // console.log("ENTITIES WRITTEN: " + JSON.stringify(entities, null, 2))
             }
         )

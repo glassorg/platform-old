@@ -1,6 +1,6 @@
 import express, { Request, Response, Express } from "express";
 import Datastore from "./gcloud/Datastore";
-import Database from "./gcloud/Database";
+import Database from "./Database";
 import apiRouter from "./apiRouter";
 import path from "path";
 import fs from "fs";
@@ -13,6 +13,7 @@ import Firestore from "./gcloud/Firestore";
 export type Config = {
     projectRoot: string,
     namespace?: Namespace,
+    firestore?: boolean,
     secrets?: {
         jwtSignature: string,
         encryptionKey: string
@@ -35,6 +36,11 @@ export let instance: { database: Database, config: Config & { namespace: Namespa
  * @param namespaceOrPath the entity namespace or a string to the namespace module relative to the projectRoot
  */
 export function create(config: Config) {
+    process.on('uncaughtException', function(err) {
+        // handle the error safely
+        console.log("glass.platform.server.webServer uncaughtException:", err)
+    })
+
     let { projectRoot, namespace } = config
     let namespaceOrPath = config.namespace
     if (!isNamespace(namespace)) {
@@ -48,12 +54,13 @@ export function create(config: Config) {
     }
     const packageProperties = JSON.parse(fs.readFileSync(path.join(projectRoot, "package.json")).toString())
     let projectId = packageProperties.id || packageProperties.name
-    process.env.DATASTORE_PROJECT_ID = projectId
+    // process.env.DATASTORE_PROJECT_ID = projectId
     let credentialsPath = path.join(projectRoot, "credentials.json")
-    if (fs.existsSync(credentialsPath))
-        process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath
+    // if (fs.existsSync(credentialsPath)) {
+    //     process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath
+    // }
 
-    let database = packageProperties.firestore ? new Firestore({namespace:namespace!}) : new Datastore(namespace!)
+    let database = new (config.firestore ? Firestore : Datastore)({namespace:namespace!, projectId})
     instance = Object.assign(express(), { config, database }) as any
     // parse identity token
     instance.use(IdentityProvider)

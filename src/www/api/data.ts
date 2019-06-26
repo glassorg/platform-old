@@ -9,8 +9,10 @@ import clonePatch from "../../utility/clonePatch";
 
 const database = webServer.instance.database
 
-function getKeys(keyStrings: string[]) {
-    return keyStrings.map(k => Key.parse(database.namespace, k))
+function getKeys(keyStrings: Array<string|string[]>) {
+    return keyStrings.map(k => {
+        return Array.isArray(k) ? getKeys(k) : Key.parse(database.namespace, k)
+    })
 }
 
 type Batch = { [key: string]: Patch<Entity> }
@@ -82,7 +84,7 @@ async function putLimited(batch: Batch, patch: boolean) {
     return response
 }
 
-export async function get(keyStrings: string[]): Promise<Entity[][]> {
+export async function get(keyStrings: Array<string|string[]>): Promise<Entity[][]> {
     const keys = getKeys(keyStrings)
     return await database.all(keys)
 }

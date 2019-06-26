@@ -2,20 +2,21 @@ import test from "ava"
 import Model from "../Model"
 import Entity from "../Entity"
 import Serializer from "../Serializer"
+import { AssertionError } from "assert";
 
 @Model.class()
 export default class SerializerPerson extends Entity {
 
-    @Model.property({ type: "string" })
+    @Model.property({ type: "string", id: "a" })
     name!: string
 
-    @Model.property({ type: "string", format: "date" })
+    @Model.property({ type: "string", format: "date", id: "b" })
     birthDate!: string
 
-    @Model.property({ type: "integer", default: 7 })
+    @Model.property({ type: "integer", default: 7, id: "c" })
     favoriteNumber!: number
 
-    @Model.property({ type: "array", items: { type: "integer" } })
+    @Model.property({ type: "array", items: { type: "integer" }, id: "d" })
     array!: number
 
 }
@@ -24,7 +25,19 @@ class Foo extends SerializerPerson {
 }
 
 const namespace = { SerializerPerson }
-const { stringify, parse } = new Serializer(namespace)
+const { stringify, parse } = new Serializer(namespace, { compress: false })
+
+// test("Serializer Compression", t => {
+//     let entity = new SerializerPerson({ key: "SerializerPerson/kris", name: "Kris Nye", birthDate: "1990-12-05", favoriteNumber: 69, array: [4,2]})
+//     t.true(entity != null)
+//     let compressor = new Serializer(namespace, { compress: true })
+//     // let compressed = compressor.stringify(entity)
+//     t.notDeepEqual(stringify(entity), compressor.stringify(entity))
+//     // make sure we can decompress an uncompressed entity
+//     t.deepEqual(entity, compressor.parse(stringify(entity)))
+//     // make sure we can decompress a compressed entity
+//     t.deepEqual(entity, compressor.parse(compressor.stringify(entity)))
+// })
 
 test("SerializerPerson has registered with Model.serializer", t => {
     t.true(Model.serializer.namespace.SerializerPerson === SerializerPerson)
@@ -49,3 +62,4 @@ test("Serialization", t => {
     let parsedSerializerPerson = parse(personString)
     t.deepEqual(person, parsedSerializerPerson)
 })
+
