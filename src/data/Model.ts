@@ -29,12 +29,15 @@ export default class Model {
             for (let name in properties) {
                 let value = properties[name]
                 let definedProperty = definedProperties[name]
-                if (definedProperty && definedProperty.coerce != null)
+                if (definedProperty && definedProperty.coerce != null) {
                     value = definedProperty.coerce.call(this, value)
-                if (isDebug && !Object.isFrozen(value)) {
+                }
+                if (Model.ValidateAndFreezeOnConstruction) {
                     Object.freeze(value)
                 }
-                this[name] = value
+                if (definedProperty == null || definedProperty.default != /* deliberately untruthy */ value) {
+                    this[name] = value
+                }
             }
         }
 

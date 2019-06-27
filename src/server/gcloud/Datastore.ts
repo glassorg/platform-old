@@ -39,6 +39,7 @@ const getSerializer = common.memoize(
 )
 
 function serialize(entity: Entity, namespace: Namespace) {
+    return getSerializer(namespace).stringify(entity)
     let values = JSON.parse(getSerializer(namespace).stringify(entity))
     delete values[typeKey]
     delete values[Entity.properties.key!.id!.valueOf()]
@@ -46,12 +47,17 @@ function serialize(entity: Entity, namespace: Namespace) {
 }
 
 function deserialize(key: ModelKey, serialized: string, namespace: Namespace) {
-    {
-        let json = JSON.parse(serialized)
-        json[typeKey] = key.type!.name
-        json.key = key
-        serialized = JSON.stringify(json)
-    }
+    // {
+    //     let json = JSON.parse(serialized)
+    //     // return json
+    //     json[typeKey] = key.type!.name
+    //     json.key = key
+    //     serialized = JSON.stringify(json)
+    // }
+    //  TODO: Make our Serializer.deserialize function way faster.
+    // let entity = Object.assign(Object.create(key.type!.prototype), JSON.parse(serialized))
+    // entity.key = key
+    // return entity
     let result = getSerializer(namespace).parse(serialized) as Entity
     return result
 }
@@ -162,7 +168,25 @@ export default class Datastore extends Database {
         return { key: getGoogleKey(gdatastore, key), data, excludeFromIndexes }
     }
 
-    getGlassEntity(gentity: GoogleEntity | null) {
+    getGlassKey(gentity) {
+        let gkey = gentity[GDatastore.KEY]
+        return getGlassKey(gkey, this.namespace)
+    }
+    decompressEntity(gentity) {
+        if (gentity == null) {
+            return null
+        }
+        let gkey = gentity[GDatastore.KEY]
+        let compressedData = gentity[serializedProperty]
+        let decompressed = compression.deflate.decompress(compressedData)
+        return decompressed
+    }
+    deserializeEntity(key, decompressed) {
+        return deserialize(key, decompressed, this.namespace)
+    }
+
+    getGlassEntity(gentity: GoogleEntity | null, force = false) {
+        // return gentity
         if (gentity == null) {
             return null
         }
@@ -177,7 +201,6 @@ export default class Datastore extends Database {
         // let ratio = Math.round(compressedSize / decompressedSize * 100)
         // console.log(ratio + "% " + (decompressedSize / 10 ** 6) + " -> " + (compressedSize / 10 ** 6))
         return deserialize(key, decompressed, this.namespace)
-        // return gentity
     }
 
     async get<T extends Entity>(keys: ModelKey<T>[]): Promise<Array<T | null>> {

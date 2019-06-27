@@ -25,7 +25,7 @@ class Foo extends SerializerPerson {
 }
 
 const namespace = { SerializerPerson }
-const { stringify, parse } = new Serializer(namespace, { compress: false })
+const { stringify, parse } = new Serializer(namespace, { indent: 4 })
 
 // test("Serializer Compression", t => {
 //     let entity = new SerializerPerson({ key: "SerializerPerson/kris", name: "Kris Nye", birthDate: "1990-12-05", favoriteNumber: 69, array: [4,2]})
