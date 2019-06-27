@@ -39,8 +39,9 @@ export default class Serializer {
         // this pretraversal revive function is much faster than using the built in JSON.parse reviver
         let root = JSON.parse(text)
         function pretraverse(key, object) {
+            let typeName = object[typeKey]
             let childCount = object[countKey] || 0
-            if (childCount > 0) {
+            if (typeName == null || childCount > 0) {
                 for (let childKey in object) {
                     let value = object[childKey]
                     if (value && typeof value === "object") {
@@ -51,16 +52,15 @@ export default class Serializer {
                     }
                 }
             }
-            if (object && object[typeKey]) {
-                let name = object[typeKey]
+            if (typeName) {
                 delete object[typeKey]
                 delete object[countKey]
-                let modelConstructor = namespace[name]
+                let modelConstructor = namespace[typeName]
                 if (modelConstructor == null) {
                     console.log("********************************************")
                     console.log(Object.keys(namespace).join(" : "))
                     console.log("********************************************")
-                    throw new Error(`Class not found in namespace: ${name}`)
+                    throw new Error(`Class not found in namespace: ${typeName}`)
                 }
                 object = new modelConstructor(object)
             }
@@ -74,25 +74,27 @@ export default class Serializer {
         let { namespace } = this
         let encodedTypeCount = 0
         function pretraverse(key, object) {
+            if (object.toJSON) {
+                return object.toJSON()
+            }
+            // we CAN NOT mutate the input object so we will copy it
+            let output = Array.isArray(object) ? object.slice(0) : { ...object }
             let initialTypeCount = encodedTypeCount
             for (let childKey in object) {
                 let value = object[childKey]
                 if (value && typeof value === "object") {
-                    let change = pretraverse(childKey, value)
-                    if (value !== change) {
-                        object[childKey] = change
-                    }
+                    output[childKey] = pretraverse(childKey, value)
                 }
             }
             if (object != null && typeof object === "object" && namespace.hasOwnProperty(object.constructor.name)) {
                 let encodedChildrenCount = encodedTypeCount - initialTypeCount
                 let modelConstructor = object.constructor
-                object = { [typeKey]: modelConstructor.name, ...object }
+                output = { [typeKey]: modelConstructor.name, ...output }
                 if (encodedChildrenCount > 0) {
-                    object[countKey] = 1
+                    output[countKey] = 1
                 }
             }
-            return object
+            return output
         }
         root = pretraverse("", root)
         return JSON.stringify(root, null, this.indent > 0 ? this.indent : undefined)

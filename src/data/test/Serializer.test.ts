@@ -56,10 +56,10 @@ test("Model class has store", t => {
 
 test("Serialization", t => {
     let modified = { by: "krisnye@gmail.com", date: Date.parse("1971-12-09T12:00:00") }
-    let person = new SerializerPerson({ key: "SerializerPerson/kris", name: "Kris Nye", birthDate: "1971-12-09", created: modified, updated: modified, array: [12, 20, 13] })
-    t.true(person.favoriteNumber === 7)
-    let personString = stringify(person)
+    let persons = [new SerializerPerson({ key: "SerializerPerson/kris", name: "Kris Nye", birthDate: "1971-12-09", created: modified, updated: modified, array: [12, 20, 13] })]
+    t.true(persons[0].favoriteNumber === 7)
+    let personString = stringify(persons)
     let parsedSerializerPerson = parse(personString)
-    t.deepEqual(person, parsedSerializerPerson)
+    t.deepEqual(persons, parsedSerializerPerson)
 })
 
