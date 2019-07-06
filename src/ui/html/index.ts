@@ -1,3 +1,6 @@
+
+export { default as default } from "./factories";
+
 import HtmlElementFactory from "./HtmlElementFactory";
 import INode from "../INode";
 
