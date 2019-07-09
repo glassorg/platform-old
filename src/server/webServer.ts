@@ -1,4 +1,5 @@
 import express, { Request, Response, Express } from "express";
+import compression from "compression";
 import Datastore from "./gcloud/Datastore";
 import Database from "./Database";
 import apiRouter from "./apiRouter";
@@ -42,7 +43,7 @@ export function create(config: Config) {
     })
 
     let { projectRoot, namespace } = config
-    let namespaceOrPath = config.namespace
+    // let namespaceOrPath = config.namespace
     if (!isNamespace(namespace)) {
         let namespacePath = path.join(projectRoot, "./lib/model/index.js")
         try {
@@ -55,13 +56,15 @@ export function create(config: Config) {
     const packageProperties = JSON.parse(fs.readFileSync(path.join(projectRoot, "package.json")).toString())
     let projectId = packageProperties.id || packageProperties.name
     // process.env.DATASTORE_PROJECT_ID = projectId
-    let credentialsPath = path.join(projectRoot, "credentials.json")
+    // let credentialsPath = path.join(projectRoot, "credentials.json")
     // if (fs.existsSync(credentialsPath)) {
     //     process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath
     // }
 
     let database = new (config.firestore ? Firestore : Datastore)({namespace:namespace!, projectId})
     instance = Object.assign(express(), { config, database }) as any
+    // use gzip compression at level 1 for maximum speed, minimal compression
+    instance.use(compression({ level: 1 }))
     // parse identity token
     instance.use(IdentityProvider)
     instance.use(bodyParser.text({ type: "application/json", limit: 10 * 1000 * 1000 }))

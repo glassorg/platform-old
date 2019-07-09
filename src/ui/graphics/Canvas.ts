@@ -1,7 +1,7 @@
 import Context from "../Context";
 import { extendElementAsVirtualNodeRoot } from "../VirtualNode";
 import { Render } from "../Component";
-import * as html from "../html";
+import html from "../html";
 import Graphics2D from "./Graphics2D";
 import Graphics from "./Graphics";
 import Graphics3D from "./Graphics3D";

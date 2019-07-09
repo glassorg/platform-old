@@ -3,7 +3,7 @@ import Model from "../../../data/Model";
 import Key from "../../../data/Key";
 import Stylesheets from "../Stylesheets";
 import State from "../../../data/State";
-import * as html from "../";
+import html from "../";
 import { Render } from "../../Component";
 
 Stylesheets.add(s => `

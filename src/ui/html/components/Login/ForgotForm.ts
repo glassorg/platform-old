@@ -3,7 +3,6 @@ import Model from "../../../../data/Model";
 import Key from "../../../../data/Key";
 import User from "../../../../model/User";
 import * as schema from "../../../../data/schema";
-import { div, span } from "../../../html";
 import Form from "./../Form";
 
 @Model.class()

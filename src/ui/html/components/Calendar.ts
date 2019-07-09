@@ -3,7 +3,6 @@ import Model from "../../../data/Model";
 import Context from "../../Context";
 import State from "../../../data/State";
 import Key from "../../../data/Key";
-import defaultStyleSheet from "../defaultStylesheet"; defaultStyleSheet;
 import HtmlContext from "../HtmlContext";
 import localize from "../../localize";
 

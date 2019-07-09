@@ -4,7 +4,7 @@ import Key from "../../../data/Key";
 import State from "../../../data/State";
 import Stylesheets from "../Stylesheets";
 import { Render } from "../../Component";
-import * as html from "../";
+import html from "../";
 
 export const TabControlHeight = 48
 

@@ -1,7 +1,7 @@
-import html, { HtmlFactories } from "./";
+import svg, { SvgFactories } from "./";
 import Context from "../Context";
 import TypedContext from "../TypedContext";
 
 export default function(c: Context) {
-    return TypedContext.create<HtmlFactories>(c, html)
+    return TypedContext.create<SvgFactories>(c, svg)
 }

@@ -6,7 +6,7 @@ import User from "../../../../model/User";
 import * as schema from "../../../../data/schema";
 import Form from "../Form";
 import Identity from "../../../../model/Identity";
-import { div, span, p } from "../../../html";
+import html from "../../../html";
 
 type Status = {
     message?: string
@@ -52,8 +52,8 @@ export class LoginFormModel extends Model {
 
 export default function LoginForm(c: Context) {
     let state = c.store.get(LoginFormState.key)
-    c.begin(div)
-        c.empty(p, "Status: " + state.status)
+    c.begin(html.div)
+        c.empty(html.p, "Status: " + state.status)
         c.render(Form,
             {
                 id: "loginForm",
@@ -68,5 +68,5 @@ export default function LoginForm(c: Context) {
                 }
             }
         )
-    c.end(div)
+    c.end(html.div)
 }

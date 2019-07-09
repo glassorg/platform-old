@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, response } from "express";
 import * as webServer from "../../server/webServer";
 import Firestore from "../../server/gcloud/Firestore";
 import Key from "../../data/Key";
@@ -87,4 +87,38 @@ async function putLimited(batch: Batch, patch: boolean) {
 export async function get(keyStrings: Array<string|string[]>): Promise<Entity[][]> {
     const keys = getKeys(keyStrings)
     return await database.all(keys)
+}
+
+export function query(req: Request, res: Response & { flush }) {
+    let keyString = req.body
+    let key: Key
+    let sendError = (error) => {
+        console.log(`api/data/query streaming error`, error)
+        return res.status(500).send("streaming error")
+    }
+    try {
+        key = Key.parse(database.namespace, keyString)
+    } catch (e) {
+        return res.status(400).send(`Invalid Key: ${keyString}`)
+    }
+    if (!Key.isQueryKey(key)) {
+        return res.status(400).send(`Not a query key: ${key}`)
+    }
+    res.type("text/plain")
+    try {
+        database.raw(
+            key,
+            (row) => {
+                if (row != null) {
+                    res.write(row)
+                    res.write("\n")
+                } else {
+                    res.end()
+                }
+            },
+            sendError
+        )
+    } catch (e) {
+        sendError(e)
+    }
 }

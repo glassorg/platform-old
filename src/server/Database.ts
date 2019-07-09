@@ -2,6 +2,9 @@ import Key, { ModelKey, QueryKey } from "../data/Key"
 import Entity from "../data/Entity"
 import Namespace from "../data/Namespace";
 
+export type RowCallback = (record: string | null) => void
+export type ErrorCallback = (error: Error) => void
+
 /**
  * Low level database interface.
  * Does NOT provide security, stamping or schema validation.
@@ -21,6 +24,7 @@ abstract class Database {
         return Promise.all(keys.map(key => Key.isModelKey(key) ? this.get([key]) : this.query(key as QueryKey)))
     }
     abstract put(values: Entity | Entity[]): Promise<void>
+    abstract raw(key: QueryKey, callback: RowCallback, error?: ErrorCallback)
 
 }
 

@@ -1,40 +1,48 @@
 import HtmlElementFactory from "./HtmlElementFactory";
-import INode from "../INode";
+import NodeFactory from "../NodeFactory";
 
-export const defaultAttributes = { class: true, type: true }
+const defaultAttributes = { class: true, type: true }
 function factory<T extends HTMLElement>(tag: string, attributes: { [name: string]: boolean } = defaultAttributes) {
-    return new HtmlElementFactory<T>(tag, attributes)
+    return HtmlElementFactory<T>(tag, attributes)
 }
 
-export const h1 = factory<HTMLElement>("h1")
-export const h2 = factory<HTMLElement>("h2")
-export const h3 = factory<HTMLElement>("h3")
-export const h4 = factory<HTMLElement>("h4")
-export const h5 = factory<HTMLElement>("h5")
-export const h6 = factory<HTMLElement>("h6")
-export const hr = factory<HTMLElement>("hr")
-export const p = factory<HTMLElement>("p")
-export const div = factory<HTMLElement>("div")
-export const span = factory<HTMLElement>("span")
-export const footer = factory<HTMLElement>("footer")
-export const header = factory<HTMLElement>("header")
-export const a = factory<HTMLAnchorElement>("a")
-export const img = factory<HTMLImageElement>("img")
-export const label = factory<HTMLLabelElement>("label")
-export const button = factory<HTMLButtonElement>("button")
-export const form = factory<HTMLFormElement>("form")
-export const input = factory<HTMLInputElement>("input", {
-    ...defaultAttributes,
-    pattern: true,
-    placeholder: true,
-    maxlength: true,
-    minlength: true,
-    readonly: true,
-    size: true,
-    spellcheck: true
-})
-export const select = factory<HTMLSelectElement>("select")
-export const option = factory<HTMLOptionElement>("option")
-export const style = factory<HTMLStyleElement>("style")
-export const textarea = factory<HTMLTextAreaElement>("textarea")
-export const canvas = factory<HTMLCanvasElement>("canvas")
+export class HtmlFactories {
+
+    [p: string]: NodeFactory
+
+    h1 = factory<HTMLElement>("h1")
+    h2 = factory<HTMLElement>("h2")
+    h3 = factory<HTMLElement>("h3")
+    h4 = factory<HTMLElement>("h4")
+    h5 = factory<HTMLElement>("h5")
+    h6 = factory<HTMLElement>("h6")
+    hr = factory<HTMLElement>("hr")
+    p = factory<HTMLElement>("p")
+    div = factory<HTMLElement>("div")
+    span = factory<HTMLElement>("span")
+    footer = factory<HTMLElement>("footer")
+    header = factory<HTMLElement>("header")
+    a = factory<HTMLAnchorElement>("a")
+    img = factory<HTMLImageElement>("img")
+    label = factory<HTMLLabelElement>("label")
+    button = factory<HTMLButtonElement>("button")
+    form = factory<HTMLFormElement>("form")
+    input = factory<HTMLInputElement>("input", {
+        ...defaultAttributes,
+        pattern: true,
+        placeholder: true,
+        maxlength: true,
+        minlength: true,
+        readonly: true,
+        size: true,
+        spellcheck: true
+    })
+    select = factory<HTMLSelectElement>("select")
+    option = factory<HTMLOptionElement>("option")
+    style = factory<HTMLStyleElement>("style")
+    textarea = factory<HTMLTextAreaElement>("textarea")
+    canvas = factory<HTMLCanvasElement>("canvas")
+    iframe = factory<HTMLIFrameElement>("iframe")
+}
+
+export default new HtmlFactories()

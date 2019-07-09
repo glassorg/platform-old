@@ -5,7 +5,6 @@ import Store from "../data/Store";
 import NodeFactory from "./NodeFactory";
 import localize from "./localize";
 import bindComponentToDom from "./html/bindComponentToDom";
-// import HtmlContext from "./html/HtmlContext";
 
 type ComponentEventHandler = (component: Component) => void
 
@@ -79,10 +78,10 @@ export default class Context {
     //  END STATS
     ////////////////////////////////////////////////////////////////////////////////
 
-    begin<T extends INode>(classOrFactory: NodeFactory<T> | NodeClass<T>, properties?) {
+    begin<T extends INode>(factory: NodeFactory<T>, properties?) {
         if (!this.isRendering)
             throw new Error("Invalid attempt to render without beginRender / endRender")
-        let factory = isNodeClass(classOrFactory) ? classOrFactory.getFactory() : classOrFactory
+        // let factory = isNodeClass(classOrFactory) ? classOrFactory.getFactory() : classOrFactory
         // we recycle nodes if they come from the same factory
         const maybeRecycle = this.insertBefore as T
         let node: T | null = maybeRecycle != null && maybeRecycle.factory === factory ? maybeRecycle : null
@@ -102,9 +101,8 @@ export default class Context {
         return node
     }
 
-    end<T extends INode>(classOrFactory: NodeFactory<T> | NodeClass<T>) {
-        if (classOrFactory != null) {
-            let factory = isNodeClass(classOrFactory) ? classOrFactory.getFactory() : classOrFactory
+    end<T extends INode>(factory: NodeFactory<T>) {
+        if (factory != null) {
             if (this.parentNode.factory !== factory) {
                 throw new Error("Begin and end node factories do not match")
             }
@@ -119,24 +117,24 @@ export default class Context {
         this.pop()
     }
 
-    /**
-     * Begins and ends a new empty node.
-     * @param nodeClass
-     * @param properties
-     */
-    empty<T extends INode>(nodeClass: NodeClass<T>, properties?) : T
+    // /**
+    //  * Begins and ends a new empty node.
+    //  * @param nodeClass
+    //  * @param properties
+    //  */
+    // empty<T extends INode>(nodeClass: NodeClass<T>, properties?) : T
     /**
      * Begins and ends a new empty node.
      * @param factory
      * @param properties
      */
     empty<T extends INode>(factory: NodeFactory<T>, properties?: any) : T
-    /**
-     * Begins and ends a new empty node.
-     * @param factory
-     * @param properties
-     */
-    empty<T>(render: Render<T>, properties?: T): void
+    // /**
+    //  * Begins and ends a new empty node.
+    //  * @param factory
+    //  * @param properties
+    //  */
+    // empty<T>(render: Render<T>, properties?: T): void
     /**
      * Begins and ends a new node containing text content.
      * @param factory 
@@ -146,27 +144,23 @@ export default class Context {
     empty<T extends INode>(factory: NodeFactory<T>, properties: any, content: string): T
     /**
      * Begins and ends a new node optionally containing content.
-     * @param factoryOrRenderOrClass 
+     * @param factory 
      * @param propertiesOrContent 
      * @param content 
      */
-    empty<T,NT extends INode = INode>(factoryOrRenderOrClass: NodeFactory<NT> | Render<T> | NodeClass<NT>, propertiesOrContent?: any, content?: string) {
-        if (typeof factoryOrRenderOrClass === "function" && !isNodeClass(factoryOrRenderOrClass)) {
-            return this.render(factoryOrRenderOrClass, propertiesOrContent)
+    empty<T,NT extends INode = INode>(factory: NodeFactory<NT>, propertiesOrContent?: any, content?: string) {
+        let node
+        if (typeof propertiesOrContent === "string") {
+            node = this.begin(factory)
+            this.text(propertiesOrContent)
         } else {
-            let node
-            if (typeof propertiesOrContent === "string") {
-                node = this.begin(factoryOrRenderOrClass)
-                this.text(propertiesOrContent)
-            } else {
-                node = this.begin(factoryOrRenderOrClass, propertiesOrContent)
-                if (content != null) {
-                    this.text(content)
-                }
+            node = this.begin(factory, propertiesOrContent)
+            if (content != null) {
+                this.text(content)
             }
-            this.end(factoryOrRenderOrClass)
-            return node as NT
         }
+        this.end(factory)
+        return node as NT
     }
 
     text(content: string) {
@@ -216,7 +210,12 @@ export default class Context {
 
     postRenderCallbacks = new Set<Function>()
     isRendering: boolean = false
+    private static currentStack: Context[] = []
+    static get current() {
+        return Context.currentStack[Context.currentStack.length - 1]
+    }
     beginRender(parentNode: INode, insertAfterNode: INode | null = null) {
+        Context.currentStack.push(this)
         this.isRendering = true
         this.elements[0] = parentNode
         this.elements[1] = insertAfterNode
@@ -224,6 +223,7 @@ export default class Context {
     }
     endRender() {
         this.isRendering = false
+        Context.currentStack.pop()
     }
     rerender(components: Set<Component>, time) {
         for (let component of components) {

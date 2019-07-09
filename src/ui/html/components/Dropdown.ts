@@ -2,7 +2,7 @@ import Context from "../../Context";
 import { InputState } from "./Input";
 import Key from "../../../data/Key";
 import FocusState from "../../../model/FocusState";
-import * as html from "../";
+import html from "../";
 
 export default function Dropdown(c: Context, p: {
     id: string,

@@ -1,5 +1,5 @@
 import Context from "../../Context";
-import * as html from "..";
+import html from "..";
 import Key, { ModelKey } from "../../../data/Key";
 import State from "../../../data/State";
 import { key, string, number, Schema, getSubSchema, InputArguments } from "../../../data/schema";

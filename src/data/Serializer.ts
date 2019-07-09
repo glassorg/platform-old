@@ -67,7 +67,10 @@ export default class Serializer {
             return object
         }
     
-        return pretraverse("", root)
+        if (root != null && typeof root === "object") {
+            root = pretraverse("", root)
+        }
+        return root
     }
 
     public stringify(root) {
@@ -96,7 +99,9 @@ export default class Serializer {
             }
             return output
         }
-        root = pretraverse("", root)
+        if (root != null && typeof root === "object") {
+            root = pretraverse("", root)
+        }
         return JSON.stringify(root, null, this.indent > 0 ? this.indent : undefined)
     }
 

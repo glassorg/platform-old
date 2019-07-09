@@ -4,7 +4,7 @@ import Key from "../../../data/Key";
 import FocusState from "../../../model/FocusState";
 import State from "../../../data/State";
 import { getAncestorForm, getFormValues } from "../../../ui/html/functions";
-import * as html from "../";
+import html from "../";
 
 const canSelect: { [type: string]: boolean } = {
     text: true,

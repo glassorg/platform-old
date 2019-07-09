@@ -1,7 +1,7 @@
 const { Datastore: GDatastore } = require("@google-cloud/datastore");
 import { DatastoreKey as GKey } from "@google-cloud/datastore/entity";
 import Key, { QueryKey, ModelKey} from "../../data/Key";
-import Database from "../Database";
+import Database, { ErrorCallback, RowCallback } from "../Database";
 import Entity from "../../data/Entity";
 import { Schema } from "../../data/schema";
 import * as common from "../../utility/common";
@@ -210,26 +210,41 @@ export default class Datastore extends Database {
         return gentities.map(gentity => this.getGlassEntity(gentity)) as any
     }
 
-    async query<T extends Entity>(key: QueryKey<T>): Promise<T[]> {
+    raw(key: QueryKey, callback: RowCallback, error?: ErrorCallback) {
         let gquery = getGoogleQuery(this.gdatastore, key as QueryKey)
+        this.gdatastore.runQueryStream(gquery)
+            .on('error', (e) => {
+                console.log("Datastore.query#runQueryStream Error: ", e)
+                if (error) {
+                    error(e)
+                }
+            })
+            .on('data', (gentity) => {
+                let rawData = compression.deflate.decompress(gentity[serializedProperty])
+                callback(rawData)
+            })
+            .on('end', () => {
+                callback(null)
+            }
+        )
+    }
+
+    async query<T extends Entity>(key: QueryKey<T>): Promise<T[]> {
         return new Promise((resolve, reject) => {
             let entities: T[] = []
-            this.gdatastore.runQueryStream(gquery)
-                .on('error', (e) => {
-                    console.log("Datastore.query#runQueryStream Error: ", e)
-                    reject(e)
-                })
-                .on('data', (gentity) => {
-                    // entities.push(entities.length as any)
-                    let entity = this.getGlassEntity(gentity)
+            this.raw(key, (row) => {
+                if (row) {
+                    let entity = getSerializer(this.namespace).parse(row) as Entity
                     if (entity) {
                         entities.push(entity as T)
                     }
-                })
-                // .on('info', (info) => {})
-                .on('end', () => {
+                } else {
                     resolve(entities)
-                })
+                }
+            }, (e) => {
+                console.log("Datastore.query#runQueryStream Error: ", e)
+                reject(e)
+            })
         })
     }
 

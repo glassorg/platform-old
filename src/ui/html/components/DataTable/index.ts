@@ -6,7 +6,7 @@ import { Schema } from "../../../../data/schema";
 import Stylesheets from "../../Stylesheets";
 import ScrollPanel, { ScrollPanelState } from "../ScrollPanel";
 import State from "../../../../data/State";
-import * as html from "../..";
+import html from "../..";
 
 Stylesheets.add(s => `
     .DataTable {

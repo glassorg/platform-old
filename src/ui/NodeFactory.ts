@@ -1,11 +1,14 @@
 import INode from "./INode";
 import Context from "./Context";
 
-export default abstract class NodeFactory<T extends INode = INode> {
+type NodeFactory<T extends INode = INode> = {
 
     text?: NodeFactory
-    abstract create(context: Context): T
-    abstract setProperties(node: T, properties)
-    abstract dispose(node: T): void
+    create(context: Context): T
+    setProperties(node: T, properties)
+    dispose(node: T): void
+    toString(): string
 
 }
+
+export default NodeFactory

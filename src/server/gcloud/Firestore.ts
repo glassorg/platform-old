@@ -1,6 +1,6 @@
 import Entity from "../../data/Entity";
 import Key, { ModelKey, QueryKey } from "../../data/Key";
-import Database from "../Database";
+import Database, { ErrorCallback, RowCallback } from "../Database";
 import Namespace from "../../data/Namespace";
 import * as common from "../../utility/common";
 import {Firestore as GoogleFirestore, Query as GoogleQuery, DocumentReference, DocumentSnapshot} from "@google-cloud/firestore";
@@ -103,6 +103,10 @@ export default class Firestore extends Database {
         Object.assign(this, properties)
         let packageJson = getPackageJson()
         this.gfirestore = new GoogleFirestore({ projectId: this.projectId })
+    }
+
+    raw(key: QueryKey, callback: RowCallback, error?: ErrorCallback) {
+        throw new Error("not implemented")
     }
 
     async get<T extends Entity = Entity>(keys: ModelKey<T>[]): Promise<Array<T | null>> {

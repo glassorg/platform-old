@@ -1,7 +1,7 @@
 import Model from "../../../../data/Model";
 import { Render } from "../../../Component";
 import Context from "../../../Context";
-import html from "../../factories";
+import html from "../../";
 import { getValue } from "../../../../data/schema";
 
 type ColumnProperties<T> = {

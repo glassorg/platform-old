@@ -9,9 +9,7 @@ import ForgotForm from "./ForgotForm";
 import Identity from "../../../../model/Identity";
 import invoke from "../../../../server/invoke";
 import Store from "../../../../data/Store";
-import { div, span, button } from "../../../html";
 import HtmlContext from "../../HtmlContext";
-import { endEdit } from "../EditPopup";
 
 @Model.class()
 class LoginState extends State {

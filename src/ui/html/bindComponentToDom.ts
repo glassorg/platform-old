@@ -24,7 +24,7 @@ export default function bindComponentToDom<T>(
 
         let finish = performance.now()
         let delta = finish - start
-        // console.log(`${delta.toFixed(2)} ms: Update ${count}, Skipped: ${context.skipped}, Reused: ${context.recycled}, Removed: ${context.removed}, Added: ${context.created}`)
+        console.log(`${delta.toFixed(2)} ms: Update ${count}, Skipped: ${context.skipped}, Reused: ${context.recycled}, Removed: ${context.removed}, Added: ${context.created}`)
     }
 
     function queueRender(components: Set<Component>) {

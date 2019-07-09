@@ -1,14 +1,9 @@
 import Context from "../../Context";
-import Model from "../../../data/Model";
-import Key from "../../../data/Key";
-import FocusState from "../../../model/FocusState";
-import State from "../../../data/State";
-import svg from "../../svg";
-import * as html from "../";
+import * as svg from "../../svg";
 
 export default function Loader(c: Context, percent: number) {
     let percentage = percent.toString() + "%"
-    c.begin(svg, { 
+    c.begin(svg.element, { 
         version: "1.1", baseProfile: "full", 
         width: percentage, height: percentage,
         viewBox: "-150, -150, 300, 300"
@@ -71,5 +66,5 @@ export default function Loader(c: Context, percent: number) {
             stroke: "none",
             fill: "none"
         })
-    c.end(svg)
+    c.end(svg.element)
 }

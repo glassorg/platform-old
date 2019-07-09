@@ -3,7 +3,7 @@ import Model from "../../../data/Model";
 import Key from "../../../data/Key";
 import FocusState from "../../../model/FocusState";
 import State from "../../../data/State";
-import * as html from "../";
+import html from "../";
 
 @Model.class()
 class CheckboxState extends State {

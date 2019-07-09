@@ -28,11 +28,8 @@ test("Compression Performance", assert => {
         let ratio = Math.round(compressedLength / inputLength * 100)
         // console.log(JSON.stringify(compressed).length + " " + JSON.stringify(input).length)
         assert.deepEqual(JSON.stringify(input), JSON.stringify(output))
-        console.log(`###########################################################`)
-        // console.log(compressed)
         // console.log(`###########################################################`)
-        // console.log(output)
-        console.log(`${compressor.name}: ratio: ${ratio}%, compress: ${ctime}, decompress: ${dtime}`)
-        console.log(`###########################################################`)
+        // console.log(`${compressor.name}: ratio: ${ratio}%, compress: ${ctime}, decompress: ${dtime}`)
+        // console.log(`###########################################################`)
     }
 })

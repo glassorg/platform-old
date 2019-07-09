@@ -26,9 +26,7 @@ export default class ServerStore extends MemoryStore {
             return false
         }
 
-        console.log(`ensureLoaded ${key}`)
-        invoke<string[],Entity[][]>(`${this.path}/get`, [key.toString()]).then(result => {
-            let entities = result[0]
+        let handleEntities = (entities: Entity[]) => {
             // now... do we store individual query results, or entire result sets?
             // for now let's just store the whole value till we can analyze
             for (let entity of entities) {
@@ -41,9 +39,47 @@ export default class ServerStore extends MemoryStore {
             }
             if (Key.isModelKey(key) && entities.length == 0)
                 super.setValue(key, null)
-        }, reason => {
-            console.log("Invoke get error", reason)
-        })
+        }
+
+        console.log(`ensureLoaded ${key}`)
+
+        if (Key.isQueryKey(key)) {
+            const rowDelimiter = "\n"
+            let url = `${this.path}/query/${key}`
+            let xhr = new XMLHttpRequest()
+            let read = 0
+            let entities: Entity[] = []
+            let tryRead = () => {
+                let text = xhr.responseText
+                let rowEnd = text.lastIndexOf(rowDelimiter)
+                // console.log('tryRead', {rowEnd})
+                if (rowEnd > 0) {
+                    // console.log("next", { read, rowEnd })
+                    let unread = text.slice(read, rowEnd)
+                    if (unread.length > 0) {
+                        read = rowEnd
+                        let serializedRows = unread.trim().split(rowDelimiter)
+                        entities.push(...serializedRows.map(raw => Model.serializer.parse(raw)))
+                        // console.log("Deserialize: " + serializedRows.length)
+                    }
+                }
+            }
+            xhr.onprogress = tryRead
+            xhr.onload = () => {
+                tryRead()
+                handleEntities(entities)
+            }
+            xhr.open("GET", url)
+            xhr.responseType = "text"
+            xhr.send()
+        } else {
+            invoke<string[],Entity[][]>(`${this.path}/get`, [key.toString()]).then(result => {
+                let entities = result[0]
+                handleEntities(entities)
+            }, reason => {
+                console.log("Invoke get error", reason)
+            })
+        }
         return true
     }
 

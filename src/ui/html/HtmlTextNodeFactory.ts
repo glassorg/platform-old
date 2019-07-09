@@ -2,12 +2,11 @@ import NodeFactory from "../NodeFactory";
 import INode from "../INode";
 import Context from "../Context";
 
-export default class HtmlTextNodeFactory extends NodeFactory {
+export default class HtmlTextNodeFactory implements NodeFactory {
 
     public static instance: NodeFactory = new HtmlTextNodeFactory()
 
     private constructor() {
-        super()
     }
 
     create(c: Context): INode {

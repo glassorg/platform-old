@@ -3,7 +3,7 @@ import path from "path";
 import { existsSync } from "fs";
 import Model from "../data/Model";
 
-const validPathRegex = /^([a-z_0-9]+)(\/([a-z_0-9]+))?$/i
+const validPathRegex = /^([a-z_0-9]+)(\/([a-z_0-9]+))?(.*)$/i
 
 function wrapSimpleFunction(fn) {
     return function(req: Request, res: Response) {
@@ -34,12 +34,13 @@ export default function create(apiRequestPath: string, apiHandlerDirectories: st
         // console.log("A ===========================")
         // we have to reserialize and parse json 
         if (req.path.startsWith(apiRequestPath)) {
-            const requestPath = req.path.slice(apiRequestPath.length)
+            const url = decodeURIComponent(req.url)
+            const requestPath = url.slice(apiRequestPath.length)
             const parsedPath = validPathRegex.exec(requestPath)
-            // console.log("B ===========================", {parsedPath})
+            // console.log("B ===========================", {url,parsedPath})
             if (parsedPath != null) {
-                // console.log("C ===========================", {parsedPath})
-                const [, handlerName, , exportName = "default"] = parsedPath
+                let [, handlerName, , exportName = "default", content] = parsedPath
+                // console.log("C ===========================", {handlerName, exportName, content})
                 for (let apiHandlerDirectory of apiHandlerDirectories) {
                     const file = path.join(apiHandlerDirectory, `./${handlerName}.js`)
                     // console.log("D ===========================", file)
@@ -47,10 +48,18 @@ export default function create(apiRequestPath: string, apiHandlerDirectories: st
                         let handlerModule = require(file)
                         //  AFTER requiring handler then we deserialize
                         //  so that it can register handlers for types it's expecting.
+                        let exportFunction = handlerModule[exportName]
+                        // this is new to handle default
+                        if (exportFunction == null) {
+                            content = exportFunction + content
+                            exportFunction = handlerModule.default
+                        }
                         if (typeof req.body === "string") {
                             req.body = Model.serializer.parse(req.body)
                         }
-                        let exportFunction = handlerModule[exportName]
+                        if (req.method === "GET" && content.length > 0) {
+                            req.body = content.slice(1)
+                        }
                         if (typeof exportFunction === "function") {
                             if (exportFunction.length !== 2) {
                                 // we wrap simple functions with 1 parameter

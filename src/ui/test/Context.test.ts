@@ -1,12 +1,12 @@
 import test from "ava"
 import Context from "../Context"
 import { JSDOM } from "jsdom"
-import { div } from "../html"
+import html from "../html"
 
 function Row(c: Context, index: number) {
-    c.begin(div)
+    c.begin(html.div)
         c.text(`Test ${index}`)
-    c.end(div)
+    c.end(html.div)
 }
 
 function Empty(c: Context, index: number) {

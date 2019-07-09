@@ -5,7 +5,7 @@ import User from "../../../../model/User";
 import * as schema from "../../../../data/schema";
 import Form from "../Form";
 import State from "../../../../data/State";
-import { div, span, p } from "../../../html";
+import html from "../../../html";
 
 @Model.class()
 export class SignupFormModel extends Model {
@@ -67,13 +67,13 @@ export class SignupFormState extends State {
 
 export default function SignupForm(c: Context) {
     const state = c.store.get(SignupFormState.key)
-    c.begin(div)
+    c.begin(html.div)
         let status = SignupFormStatus.instance[state.status]
-        c.begin(p)
+        c.begin(html.p)
             if (status.message) {
                 c.text(`Status: ${status.message}`)
             }
-        c.end(p)
+        c.end(html.p)
         if (status.canSubmit) {
             c.render(Form,
                 {
@@ -88,5 +88,5 @@ export default function SignupForm(c: Context) {
                 }
             )
         }
-    c.end(div)
+    c.end(html.div)
 }
