@@ -1,6 +1,4 @@
 
-export { default as default } from "./factories";
-
 import HtmlElementFactory from "./HtmlElementFactory";
 import NodeFactory from "../NodeFactory";
 
