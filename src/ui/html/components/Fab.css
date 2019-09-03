@@ -1,0 +1,25 @@
+
+.Fab {
+    cursor: pointer;
+    background: var(--theme-primary);
+    display: inline-block;
+    width: 60px;
+    height: 60px;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: var(--theme-margin);
+    box-shadow: var(--theme-shadow-2);
+    transition:
+        all var(--theme-transition-time-function);
+}
+.Fab:hover {
+    box-shadow: var(--theme-shadow-3);
+}
+.Fab:hover:active {
+    box-shadow: var(--theme-shadow-1);
+}

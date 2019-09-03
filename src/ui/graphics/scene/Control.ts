@@ -1,12 +1,12 @@
 import Graphics from "../Graphics";
-import SceneNode from "./SceneNode";
+import { Node } from "./Node";
 import Color from "../../math/Color";
 import Pickable, { isPickable } from "./Pickable";
 import Capsule from "../../math/Capsule";
 import Rectangle from "../../math/Rectangle";
 import Vector3 from "../../math/Vector3";
 
-export default class Control extends SceneNode implements Pickable {
+export class Control extends Node implements Pickable {
 
     x: number = 0
     y: number = 0
@@ -54,4 +54,13 @@ export default class Control extends SceneNode implements Pickable {
         return null
     }
 
+    onmouseover?: (e: MouseEvent) => void
+    onmouseout?: (e: MouseEvent) => void
+    onmousemove?: (e: MouseEvent) => void
+    onmousedown?: (e: MouseEvent) => void
+    onmouseup?: (e: MouseEvent) => void
+    onclick?: (e: MouseEvent) => void
+
 }
+
+export default Control.getFactory<Control & Pickable>()

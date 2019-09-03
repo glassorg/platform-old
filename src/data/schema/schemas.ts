@@ -1,7 +1,6 @@
 import { Schema, InputArguments } from "./Schema";
 import Context from "../../ui/Context";
 import Key from "../Key";
-import { FieldArguments } from "../../ui/html/components/Field";
 import Input, { InputType, InputProperties } from "../../ui/html/components/Input";
 import { formatPhoneNumberUSA } from "../../utility/phone";
 import Model from "../Model";
@@ -35,7 +34,7 @@ function renderInput(c: Context, props: InputArguments, type: InputType) {
     if (schema.pattern) {
         inputProperties.pattern = schema.pattern.source
     }
-    c.render(Input, inputProperties)
+    Input(inputProperties)
 }
 
 export const object: Schema = {

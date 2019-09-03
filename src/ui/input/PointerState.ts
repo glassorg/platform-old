@@ -26,7 +26,7 @@ export default class PointerState extends Dependent {
     @Dependent.property()
     pointers!: { [id: string]: Pointer }
 
-    static key = Key.create(PointerState)
+    static key = Key.create(PointerState, "singleton")
     static watched(key: ModelKey<PointerState>) {
         let element = window.document
         element.addEventListener("pointerdown", addPointer)

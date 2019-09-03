@@ -1,5 +1,4 @@
 import Context from "../../ui/Context";
-import { FieldArguments } from "../../ui/html/components/Field";
 
 export type Properties = { [name: string]: Schema | undefined }
 export type Class = { prototype: object }

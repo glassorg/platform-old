@@ -5,6 +5,7 @@ import Store from "../data/Store";
 import NodeFactory from "./NodeFactory";
 import localize from "./localize";
 import bindComponentToDom from "./html/bindComponentToDom";
+import SoundContext from "./sound/SoundContext";
 
 type ComponentEventHandler = (component: Component) => void
 
@@ -39,6 +40,7 @@ export default class Context {
     private renderStack: Component[] = []
     public onDispose?: ComponentEventHandler
     public store: DefaultStore = Store.default
+    public sound: SoundContext = new SoundContext()
     public document: Document
     public localize = localize
 
@@ -247,7 +249,7 @@ export default class Context {
         }
     }
 
-    render<T>(type: Render<T>, properties?: T, forceRenderBecauseStateChanged = false) {
+    render<T>(type: Render<T>, properties?: T, forceRenderBecauseStateChanged = false): INode {
         if (!this.isRendering)
             throw new Error("Invalid attempt to render without beginRender / endRender")
         let parentNode = this.parentNode
@@ -285,6 +287,7 @@ export default class Context {
             if (lastNode !== firstNode)
                 throw new Error("Component cannot render more than one node")
         }
+        return this.insertAfter!
     }
 
     private push(element: INode) {
@@ -305,11 +308,26 @@ export default class Context {
         return insertBefore
     }
 
-    static bind<T>(render: Render<T>, arg?: T, container: HTMLElement = document.body) {
+    public static bind<T>(render: Render<T>, arg?: T, container: HTMLElement = document.body) {
         if (container == null) {
             throw new Error("document.body must be defined before calling this function")
         }
         bindComponentToDom(container, render as any, arg)
     }
 
+    public static component<T>(render: (c: Context) => void): () => INode
+    public static component<T>(render: (c: Context, p: T) => void): (p: T) => INode
+    public static component<T>(render: (c: Context, p: T) => void): (p: T) => INode {
+        return (properties: T) => {
+            return Context.current.render(render, properties)
+        }
+    }
+
 }
+
+/**
+ * Alternative way to convert a render function to a component function.
+ * Javascript doesn't yet have a standard proposal for function declarators though.
+ * So this is not useful yet.
+ */
+export const component = Context.component

@@ -1,8 +1,8 @@
 import Graphics from "../Graphics";
 import Color from "../../math/Color";
-import Control from "./Control";
+import { Control } from "./Control";
 
-export default class Scene extends Control {
+export class Scene extends Control {
 
     width = window.outerWidth
     height = window.outerHeight
@@ -21,3 +21,5 @@ export default class Scene extends Control {
     }
 
 }
+
+export default Scene.getFactory<Scene>()

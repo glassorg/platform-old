@@ -12,14 +12,22 @@ Main glass library
 ## Development
     guild watch
 
-## TODO
-    - Using Render components which have a return value... via direct nesting would cause their dispose functions to not be executed. Need a solution to this.
-    - Support Direct Nesting of Components AGAIN. Add Unit Tests to verify.
-    X DataTable columns need to render entire cells. which is harder, I know.
-    X createInput shouldn't have to take FieldProperties object. Simplify this.
-    - Add firestore.FieldValue.serverTimestamp() sentinel values on create/update.
-
 ## App Engine Docs
     https://cloud.google.com/appengine/docs/standard/#instance_classes
     https://cloud.google.com/appengine/docs/standard/nodejs/config/appref
     https://googleapis.dev/nodejs/datastore/latest/index.html
+
+## Cordova
+    I got this error when running "cordova emulate android"
+
+    Waiting for emulator to start...
+    PANIC: Missing emulator engine program for 'x86' CPU.
+    I did this: (Not sure it helped)
+        https://stackoverflow.com/questions/55204871/panic-missing-emulator-engine-program-for-x86-cpu-windows-10
+
+    Then I did added this to my ~/.bash_profile and it worked:
+
+        export ANDROID_SDK_ROOT=~/Library/Android/sdk
+        export PATH=$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/tools:$PATH
+
+    Hot reloading? https://stackoverflow.com/questions/46262816/cordova-hot-reloading-on-device-without-ionic

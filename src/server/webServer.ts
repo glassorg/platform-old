@@ -55,12 +55,6 @@ export function create(config: Config) {
     }
     const packageProperties = JSON.parse(fs.readFileSync(path.join(projectRoot, "package.json")).toString())
     let projectId = packageProperties.id || packageProperties.name
-    // process.env.DATASTORE_PROJECT_ID = projectId
-    // let credentialsPath = path.join(projectRoot, "credentials.json")
-    // if (fs.existsSync(credentialsPath)) {
-    //     process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath
-    // }
-
     let database = new (config.firestore ? Firestore : Datastore)({namespace:namespace!, projectId})
     instance = Object.assign(express(), { config, database }) as any
     // use gzip compression at level 1 for maximum speed, minimal compression
@@ -70,7 +64,6 @@ export function create(config: Config) {
     instance.use(bodyParser.text({ type: "application/json", limit: 10 * 1000 * 1000 }))
     instance.use(methodEmulator)
 
-    // dynamic loading of api, this isn't working with webpack?
     const apiRoot = path.join(projectRoot, "lib/www/api")
     const glassApiRoot = path.join(projectRoot, `node_modules/@glas/platform/www/api`)
     instance.use(apiRouter("/api/", [apiRoot, glassApiRoot]))

@@ -1,5 +1,5 @@
 import Context from "../../Context";
-import html from "../";
+import * as html from "../";
 
 export default function Icon(c: Context, p: { src: string } & { [key: string]: any}) {
     let { src, class: cls = "", ...rest } = p

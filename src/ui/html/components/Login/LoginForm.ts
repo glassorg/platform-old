@@ -6,7 +6,7 @@ import User from "../../../../model/User";
 import * as schema from "../../../../data/schema";
 import Form from "../Form";
 import Identity from "../../../../model/Identity";
-import html from "../../../html";
+import * as html from "../../../html";
 
 type Status = {
     message?: string
@@ -32,7 +32,7 @@ export class LoginFormState extends State {
     @Model.property(schema.string)
     accessToken?: string
 
-    static readonly key = Key.create(LoginFormState)
+    static readonly key = Key.create(LoginFormState, "singleton")
     static store = "memory"
 
 }
@@ -46,7 +46,7 @@ export class LoginFormModel extends Model {
     @Model.property(schema.password, { title: "Password", required: true })
     password!: string
 
-    static readonly key = Key.create(LoginFormModel)
+    static readonly key = Key.create(LoginFormModel, "singleton")
 
 }
 

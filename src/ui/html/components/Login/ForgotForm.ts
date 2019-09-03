@@ -26,7 +26,7 @@ export class ForgotFormModel extends Model {
     })
     passwordConfirm!: string
 
-    static readonly key = Key.create(ForgotFormModel)
+    static readonly key = Key.create(ForgotFormModel, "singleton")
 
 }
 

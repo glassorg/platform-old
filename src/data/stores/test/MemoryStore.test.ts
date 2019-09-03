@@ -5,7 +5,7 @@ import Key, { ModelKey } from "../../Key"
 import Store from "../../Store"
 
 test("Primitive keys", t => {
-    let primitiveKey = Key.create<string>({ name: "Foo", store: "memory", type: "string", default: "bar" })
+    let primitiveKey = Key.create<string>({ name: "Foo", store: "memory", type: "string", default: "bar" }, "singleton")
     let store = new MemoryStore()
     let value = store.peek(primitiveKey)
     t.deepEqual(value, primitiveKey.schema.default)

@@ -81,7 +81,7 @@ export default function HtmlElementFactory<T extends Element>(
         }
     }
 
-    function renderElement(properties?: object | Content) {
+    function renderElement(properties?: object | Content): T {
         let c = Context.current
         let content: Content | null = null
         if (typeof properties !== "object") {
@@ -99,6 +99,9 @@ export default function HtmlElementFactory<T extends Element>(
             throw new Error(`Unsupported content type: ${content}`)
         }
         c.end(factory)
+
+        // return element as unknown as HTMLElement
+        return element as T
     }
 
     return Object.assign(renderElement, factory)

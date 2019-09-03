@@ -36,13 +36,13 @@ const keyMap = {
 function parse(key): { parent?: string, type?: string, id?: string, query?: any } {
     let result = match(keyRegex, keyMap, key)
     if (result == null) {
-        throw new Error("invalid key: {{key}}")
+        throw new Error(`Invalid key: ${key}`)
     }
     if (result.query) {
         try {
             result.query = JSON.parse(result.query)
         } catch (e) {
-            throw new Error("invalid key query: {{key}}, {{e}}")
+            throw new Error(`Invalid key query: ${key}, ${e}`)
         }
     }
     return result
@@ -127,20 +127,22 @@ export default class Key<T = any> {
         Object.freeze(this)
     }
 
-    static create<T extends State>(type: StateClass<T>): StateKey<T>
-    static create<T = Model>(type: StateSchema<T>): StateKey<T>
-    static create<T = Model>(type: ModelSchema<T>): ModelKey<T>
+    // static create<T extends State>(type: StateClass<T>): StateKey<T>
+    // static create<T = Model>(type: StateSchema<T>): StateKey<T>
+    // static create<T = Model>(type: ModelSchema<T>): ModelKey<T>
     static create<T = Model>(type: ModelClass<T>, id: string): ModelKey<T>
     static create<T = Model>(type: ModelSchema<T>, id: string): ModelKey<T>
     static create<T = Model>(type: ModelClass<T>, query: Query<T>): QueryKey<T>
+    static create<T extends State>(type: StateClass<T>, id: string): StateKey<T>
     static create<T = Model>(type: StateSchema<T>, id: string): StateKey<T>
+    static create<T = Model, P = Model>(parent: ModelKey<P>, type: ModelSchema<T>, id: string): ModelKey<T>
     static create<T = Model, P = Model>(parent: ModelKey<P>, type: ModelClass<T>, id: string): ModelKey<T>
     static create<T = Model, P = Model>(parent: ModelKey<P>, type: ModelClass<T>, query: Query<T>): QueryKey<T>
     static create<T = Model>(parentOrType: ModelKey<T> | ModelSchema<T>, typeOrQueryOrId: ModelSchema<T> | Query<T> | string = "", idOrQuery?: Query<T> | string): Key<T> {
         return new Key(parentOrType, typeOrQueryOrId, idOrQuery)
     }
 
-    static parse(namespace: Namespace, ...steps: Array<Key | ModelClass | string | Query>) {
+static parse(namespace: Namespace, ...steps: Array<Key | ModelClass | string | Query>) {
         //  get namespace, possibly consuming first step
         if (!isNamespace(namespace)) {
             throw new Error("Namespace or Key is required")

@@ -19,6 +19,6 @@ export default class User extends Entity {
 
 }
 
-const sessionKey = Key.create({ name: "User.sessionKey", store: "session", type: "string" })
-const localKey = Key.create({ name: "User.localKey", store: "local", type: "string" })
+const sessionKey = Key.create({ name: "User.sessionKey", store: "session", type: "string" }, "singleton")
+const localKey = Key.create({ name: "User.localKey", store: "local", type: "string" }, "singleton")
 

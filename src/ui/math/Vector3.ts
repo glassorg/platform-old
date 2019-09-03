@@ -95,6 +95,23 @@ export default class Vector3 {
 
     static zero = new Vector3(0, 0, 0)
 
+    // https://www.habrador.com/tutorials/interpolation/1-catmull-rom-splines/
+    // //Returns a position between 4 Vector3 with Catmull-Rom spline algorithm
+	// //http://www.iquilezles.org/www/articles/minispline/minispline.htm
+	// Vector3 GetCatmullRomPosition(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
+	// {
+	// 	//The coefficients of the cubic polynomial (except the 0.5f * which I added later for performance)
+	// 	Vector3 a = 2f * p1;
+	// 	Vector3 b = p2 - p0;
+	// 	Vector3 c = 2f * p0 - 5f * p1 + 4f * p2 - p3;
+	// 	Vector3 d = -p0 + 3f * p1 - 3f * p2 + p3;
+
+	// 	//The cubic polynomial: a + b * t + c * t^2 + d * t^3
+	// 	Vector3 pos = 0.5f * (a + (b * t) + (c * t * t) + (d * t * t * t));
+
+	// 	return pos;
+	// }
+
     toArray() {
         return [ this.x, this.y, this.z ]
     }

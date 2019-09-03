@@ -1,7 +1,7 @@
 import VirtualNode from "../../VirtualNode";
 import Graphics from "../Graphics";
 
-export default class SceneNode extends VirtualNode {
+export class Node extends VirtualNode {
 
     render(g: Graphics, time) {
         this.dirty = false
@@ -10,10 +10,12 @@ export default class SceneNode extends VirtualNode {
 
     draw(g: Graphics, time) {
         for (let node = this.firstChild; node != null; node = node.nextSibling) {
-            if (node instanceof SceneNode) {
+            if (node instanceof Node) {
                 node.render(g, time)
             }
         }
     }
 
 }
+
+export default Node.getFactory<Node>()

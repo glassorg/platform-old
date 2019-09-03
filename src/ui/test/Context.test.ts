@@ -1,7 +1,7 @@
 import test from "ava"
 import Context from "../Context"
 import { JSDOM } from "jsdom"
-import html from "../html"
+import * as html from "../html"
 
 function Row(c: Context, index: number) {
     c.begin(html.div)

@@ -5,7 +5,7 @@ import { getFormValues } from "../../../ui/html/functions";
 import Model from "../../../data/Model";
 import Key, { ModelKey } from "../../../data/Key";
 import invoke from "../../../server/invoke";
-import html from "../";
+import * as html from "../";
 
 // deliberately compatible with ISchema for a Model
 export type FormDescriptor = {

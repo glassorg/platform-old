@@ -1,7 +1,7 @@
 import Context from "../../Context";
 import * as svg from "../../svg";
 
-export default function Loader(c: Context, percent: number) {
+export default Context.component((c: Context, percent: number) => {
     let percentage = percent.toString() + "%"
     c.begin(svg.element, { 
         version: "1.1", baseProfile: "full", 
@@ -67,4 +67,4 @@ export default function Loader(c: Context, percent: number) {
             fill: "none"
         })
     c.end(svg.element)
-}
+})

@@ -1,7 +1,7 @@
 import Context from "../../Context";
 import { Schema, InputArguments } from "../../../data/schema";
 import { string } from "../../../data/schema";
-import html from "../";
+import * as html from "../";
 
 export type FieldArguments = InputArguments & {
     id: string,

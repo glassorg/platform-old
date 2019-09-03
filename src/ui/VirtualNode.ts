@@ -95,8 +95,8 @@ export default class VirtualNode implements INode {
         return child
     }
 
-    public static getFactory(): NodeFactory {
-        return VirtualNodeFactory.getInstance(this as NodeClass<VirtualNode>)
+    public static getFactory<T extends VirtualNode>(this: NodeClass<T>): NodeFactory<T> & Render<T> {
+        return getFactoryInstance(this) as any
     }
 
     markDirty() {
@@ -107,30 +107,46 @@ export default class VirtualNode implements INode {
 
 }
 
-class VirtualNodeFactory<T extends VirtualNode> {
+type Properties<T> = { [P in keyof T]?: T[P] } & { content?: Content }
+type Render<T> = (properties?: Properties<T> | Content) => void
+type Content = () => void
 
-    nodeClass: NodeClass<T>
-
-    constructor(nodeClass: NodeClass<T>) {
-        this.nodeClass = nodeClass
+const getFactoryInstance = memoize(function <T extends VirtualNode>(nodeClass: NodeClass<T>) {
+    const factory = {
+        create(context: Context): T {
+            return new nodeClass
+        },
+        setProperties(node: T, properties) {
+            Object.assign(node, properties)
+            node.markDirty()
+        },
+        dispose(node: T): void {
+            // TODO: Actually recycle the instance.
+        }
     }
 
-    create(context: Context): T {
-        return new this.nodeClass
+    function renderElement(properties?: Properties<T> | Content): T {
+        let c = Context.current
+        let content: Content | null = null
+        if (typeof properties !== "object") {
+            content = properties as any
+            properties = null as any
+        }
+        else if (properties) {
+            content = properties.content!
+        }
+        let element = c.begin(factory, properties)
+        if (typeof content === "function") {
+            content()
+        }
+        else if (content != null) {
+            throw new Error(`Unsupported content type: ${content}`)
+        }
+        c.end(factory)
+
+        return element as T
     }
 
-    setProperties(node: T, properties) {
-        Object.assign(node, properties)
-        node.markDirty()
-    }
-
-    dispose(node: T): void {
-        // TODO: Actually recycle the instance.
-    }
-
-    static getInstance = memoize((nodeClass: NodeClass<VirtualNode>) => {
-        return new VirtualNodeFactory(nodeClass)
-    })
-
-}
+    return Object.assign(renderElement, factory) as NodeFactory<T> & Render<T>
+})
 

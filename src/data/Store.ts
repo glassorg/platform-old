@@ -32,7 +32,7 @@ export default abstract class Store {
     abstract get<T = Model>(key: QueryKey<T>, peek?: boolean): Array<ModelKey<T>> | undefined
     abstract get<T = Model>(key: Key<T>, peek?: boolean): T | null | Array<ModelKey<T>> | undefined
     abstract patch<T extends string | boolean | number>(key: ModelKey<T>, value: T | null): void
-    abstract patch<T extends Model>(key: ModelKey<T>, value: Patch<T>): void
+    abstract patch<T>(key: ModelKey<T>, value: Patch<T>): void
 
     delete<T = Model>(keys: ModelKey<T>[]): void
     delete<T = Model>(key: ModelKey<T>): void
@@ -84,6 +84,7 @@ export default abstract class Store {
         }
 
         return () => {
+            keyWatchers!.delete(callback)
         }
     }
 

@@ -1,7 +1,7 @@
 import Context from "../Context";
 import { extendElementAsVirtualNodeRoot } from "../VirtualNode";
 import { Render } from "../Component";
-import html from "../html";
+import * as html from "../html";
 import Graphics2D from "./Graphics2D";
 import Graphics from "./Graphics";
 import Graphics3D from "./Graphics3D";
@@ -16,8 +16,9 @@ function bindMouseEvents(canvas: HTMLCanvasElement) {
     function pick(e: MouseEvent) {
         let firstChild = canvas.firstChild
         if (isPickable(firstChild)) {
-            let front = getPosition(e)
-            let back = new Vector3(front.x, front.y, 1)
+            let position = getPosition(e)
+            let front = new Vector3(position.x, position.y, 0)
+            let back = new Vector3(position.x, position.y, 1)
             let ray = new Capsule(new Sphere(front, 0), new Sphere(back, 0))
             let picked = firstChild.pick(ray)
             if (mouseTarget !== picked) {
@@ -105,7 +106,7 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
     return repaint
 }
 
-export default function Canvas(c: Context, p: {
+export default Context.component(function Canvas(c: Context, p: {
     dimensions: 2 | 3,
     component: Render<any>,
     componentArg?: any,
@@ -119,4 +120,4 @@ export default function Canvas(c: Context, p: {
             repaint(0)
         }
     c.end(html.canvas)
-}
+})

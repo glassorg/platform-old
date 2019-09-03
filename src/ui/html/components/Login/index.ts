@@ -9,7 +9,7 @@ import ForgotForm from "./ForgotForm";
 import Identity from "../../../../model/Identity";
 import invoke from "../../../../server/invoke";
 import Store from "../../../../data/Store";
-import HtmlContext from "../../HtmlContext";
+import { div, span, button } from "../..";
 
 @Model.class()
 class LoginState extends State {
@@ -17,30 +17,30 @@ class LoginState extends State {
     @Model.property({ default: "login" })
     mode!: "login" | "signup" | "forgot"
 
-    static readonly key = Key.create(LoginState)
+    static readonly key = Key.create(LoginState, "singleton")
 
 }
 
-let helloResponseKey = Key.create({ name: "helloResponse", store: "memory", type: "string" })
+let helloResponseKey = Key.create({ name: "helloResponse", store: "memory", type: "string" }, "singleton")
 invoke("/api/hello", null).then((response: any) => {
     Store.default.patch(helloResponseKey, response.message)
 })
 
 export default function Login(c: Context) {
-    let { div, span, button, render, end } = HtmlContext(c)
     let identity = Identity.get()
     if (identity) {
-        div()
+        div(() => {
             div(`Hello: ${c.store.get(helloResponseKey)}`)
-            span(`Logged in as: ${identity.name} (${identity.email})`)
+            span(`Logged in as: ${identity!.name} (${identity!.email})`)
             button({
                 onclick(e) {
                     Identity.revoke()
-                }
-            }, `Logout`)
-        end()
+                },
+                content: `Logout`
+            })
+        })
     } else {
-        render(TabControl, {
+        TabControl({
             id: "login",
             tabs: {
                 login: {

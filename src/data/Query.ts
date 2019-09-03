@@ -24,6 +24,18 @@ type Query<T = Model> = {
     sort?: Array<{ [property: string]: Ascending | Descending }>
 }
 
+export function getPathValue(object, path?: Array<string | number>) {
+    if (path != null && object != null) {
+        for (const step of path) {
+            object = object[step]
+            if (object == null) {
+                break
+            }
+        }
+    }
+    return object
+}
+
 export function createPredicate<T>(query: Query<T>) {
     return function(model: T) {
         let where = query.where

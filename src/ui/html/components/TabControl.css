@@ -1,0 +1,32 @@
+
+.TabControl {
+    display: flex;
+    flex-direction: column;
+}
+.TabControl_Bar {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: row;
+    height: calc(var(--theme-font-size-100) + 4 * var(--theme-padding));
+    background: var(--theme-surface);
+    font-size: var(--theme-font-size-100);
+    z-index: 1;
+}
+.TabControl_Tab {
+    text-transform: uppercase;
+    align-items: center;
+    display: flex;
+    cursor: pointer;
+    border-bottom: solid 2px transparent;
+    justify-content: center;
+    flex: 1;
+}
+.TabControl_Tab_active {
+    color: var(--theme-primary);
+    border-bottom: solid 2px var(--theme-primary);
+}
+.TabControl_Content {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}

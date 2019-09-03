@@ -13,7 +13,7 @@ export default class MouseState extends Dependent {
     @State.property({ type: 'integer' })
     y!: number
 
-    static key = Key.create(MouseState)
+    static key = Key.create(MouseState, "singleton")
 
     static watched(key: Key<MouseState>) {
         let target = window.document.body

@@ -4,7 +4,7 @@ import Key from "../../../data/Key";
 import FocusState from "../../../model/FocusState";
 import State from "../../../data/State";
 import { getAncestorForm, getFormValues } from "../../../ui/html/functions";
-import html from "../";
+import * as html from "../";
 
 const canSelect: { [type: string]: boolean } = {
     text: true,
@@ -50,7 +50,7 @@ export type InputProperties = {
     onconfirm?: (this: HTMLInputElement, e: KeyboardEvent) => void,
 }
 
-export default function Input(c: Context, p: InputProperties) {
+export default Context.component((c: Context, p: InputProperties) => {
     let {
         id,
         value,
@@ -200,4 +200,4 @@ export default function Input(c: Context, p: InputProperties) {
     } else {
         return
     }
-}
+})

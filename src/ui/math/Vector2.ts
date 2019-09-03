@@ -11,8 +11,8 @@ export default class Vector2 {
     }
 
     *[Symbol.iterator]() {
-        yield this.x;
-        yield this.y;
+        yield this.x
+        yield this.y
     }
 
     add(v: Vector2) {

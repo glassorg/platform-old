@@ -4,7 +4,7 @@ type Patch<T> = T | null | {
     [P in keyof T]?: Patch<T[P]>
 }
 
-export function createPatch(path: string[], object) {
+export function createPatch(path: Array<string | number>, object) {
     if (path.length === 0) {
         return object
     }

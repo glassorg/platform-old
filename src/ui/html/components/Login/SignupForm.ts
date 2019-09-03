@@ -5,7 +5,7 @@ import User from "../../../../model/User";
 import * as schema from "../../../../data/schema";
 import Form from "../Form";
 import State from "../../../../data/State";
-import html from "../../../html";
+import * as html from "../../../html";
 
 @Model.class()
 export class SignupFormModel extends Model {
@@ -34,7 +34,7 @@ export class SignupFormModel extends Model {
     })
     passwordConfirm!: string
 
-    static readonly key = Key.create(SignupFormModel)
+    static readonly key = Key.create(SignupFormModel, "singleton")
 
 }
 
