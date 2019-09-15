@@ -95,6 +95,18 @@ export default class Vector3 {
 
     static zero = new Vector3(0, 0, 0)
 
+    static random(radius: number) {
+        let u = Math.random()
+        let v = Math.random()
+        let theta = 2 * Math.PI * u
+        let phi = Math.acos(2*v - 1)
+        return new Vector3(
+            Math.sin( theta ) * Math.cos( phi ) * radius,
+            Math.sin( theta ) * Math.sin( phi ) * radius,
+            Math.cos( theta ) * radius
+        )
+    }
+
     // https://www.habrador.com/tutorials/interpolation/1-catmull-rom-splines/
     // //Returns a position between 4 Vector3 with Catmull-Rom spline algorithm
 	// //http://www.iquilezles.org/www/articles/minispline/minispline.htm
