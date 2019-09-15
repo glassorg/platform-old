@@ -23,6 +23,22 @@ test( "RotorMatrixComparison", assert => {
     }
 } )
 
+test( "RotorToMatrix", assert => {
+    for ( let i = 0; i < testDataCount; i++ ) {
+        let [ axis, angle ] = testData[ i ]
+
+        let R = Rotor.rotation( axis, angle ).toMatrix4()
+        let M = Matrix4.rotation( axis, angle )
+        if ( !M )
+            continue
+
+        let v = new Vector4( 1, 2, 3, 1 )
+        let Rv = v.transform( R ).toVector3()
+        let Mv = v.transform( M ).toVector3()
+        assert.true( Rv.equivalent( Mv ) )
+    }
+} )
+
 test( "AngleRecovery", assert => {
     for ( let i = 0; i < testDataCount; i++ ) {
         let [ axis, angle ] = testData[ i ]

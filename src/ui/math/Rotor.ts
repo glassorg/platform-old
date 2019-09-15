@@ -1,4 +1,5 @@
 import Vector3 from "./Vector3"
+import Matrix4 from "./Matrix4"
 
 export default class Rotor {
 
@@ -75,8 +76,15 @@ export default class Rotor {
         return this.inverse().multiply( new Rotor( 0, v.x, v.y, v.z ) ).multiply( this ).axis()
     }
 
+    // This formula was generated with this script: https://gist.github.com/KodyJKing/3d7be1ca4c3c7be742f20452d3963748
     toMatrix4() {
-
+        let q = this
+        return new Matrix4(
+            q.scalar ** 2 - q.xy ** 2 + q.yz ** 2 - q.zx ** 2, 2 * q.scalar * q.xy + 2 * q.yz * q.zx, -2 * q.scalar * q.zx + 2 * q.xy * q.yz, 0,
+            -2 * q.scalar * q.xy + 2 * q.yz * q.zx, q.scalar ** 2 - q.xy ** 2 - q.yz ** 2 + q.zx ** 2, 2 * q.scalar * q.yz + 2 * q.xy * q.zx, 0,
+            2 * q.scalar * q.zx + 2 * q.xy * q.yz, -2 * q.scalar * q.yz + 2 * q.xy * q.zx, q.scalar ** 2 + q.xy ** 2 - q.yz ** 2 - q.zx ** 2, 0,
+            0, 0, 0, 1
+        )
     }
 
     static rotation( axis: Vector3, angle: number ) {
