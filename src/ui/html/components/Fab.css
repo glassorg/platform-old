@@ -2,6 +2,7 @@
 .Fab {
     cursor: pointer;
     background: var(--theme-primary);
+    touch-action: none;
     display: inline-block;
     width: 60px;
     height: 60px;

@@ -1,7 +1,8 @@
 import Model from "./Model"
 
 type Patch<T> = T | null | {
-    [P in keyof T]?: Patch<T[P]>
+    [P in keyof T]?: T[P] | null | object
+    // any    // TODO later, make this correctly recurse with Patch<T[P]>
 }
 
 export function createPatch(path: Array<string | number>, object) {
