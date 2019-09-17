@@ -54,13 +54,12 @@ export class Control extends Node implements Pickable {
         return null
     }
 
-    onmouseover?: (e: MouseEvent) => void
-    onmouseout?: (e: MouseEvent) => void
-    onmousemove?: (e: MouseEvent) => void
-    onmousedown?: (e: MouseEvent) => void
-    onmouseup?: (e: MouseEvent) => void
-    onclick?: (e: MouseEvent) => void
+    onpointerover?: (e: PointerEvent) => void
+    onpointerout?: (e: PointerEvent) => void
+    onpointermove?: (e: PointerEvent) => void
+    onpointerdown?: (e: PointerEvent) => void
+    onpointerup?: (e: PointerEvent) => void
 
 }
 
-export default Control.getFactory<Control & Pickable>()
+export default Control.getFactory<Control>()

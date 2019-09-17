@@ -46,6 +46,21 @@ export default abstract class Store {
         }
     }
 
+    list<T = Model>(key: QueryKey<T>, peek?: boolean): T[] | undefined {
+        let items: T[] = []
+        let keys = this.get(key, peek)
+        if (keys == null) {
+            return undefined
+        }
+        for (let itemKey of keys) {
+            let item = this.get(itemKey, peek)
+            if (item != null) {
+                items.push(item)
+            }
+        }
+        return items
+    }
+
     private watchers?: Map<string, Set<any>>
     private watchListener(key) {
         let value: any = this.peek(key)

@@ -1,6 +1,5 @@
 import Context from "../Context";
 import { extendElementAsVirtualNodeRoot } from "../VirtualNode";
-import { Render } from "../Component";
 import * as html from "../html";
 import Graphics2D from "./Graphics2D";
 import Graphics from "./Graphics";
@@ -11,9 +10,9 @@ import { getPosition } from "../html/functions";
 import Capsule from "../math/Capsule";
 import Sphere from "../math/Sphere";
 
-function bindMouseEvents(canvas: HTMLCanvasElement) {
-    let mouseTarget: Pickable | null = null
-    function pick(e: MouseEvent) {
+function bindPointerEvents(canvas: HTMLCanvasElement) {
+    let pointerTarget: Pickable | null = null
+    function pick(e: PointerEvent) {
         let firstChild = canvas.firstChild
         if (isPickable(firstChild)) {
             let position = getPosition(e)
@@ -21,22 +20,22 @@ function bindMouseEvents(canvas: HTMLCanvasElement) {
             let back = new Vector3(position.x, position.y, 1)
             let ray = new Capsule(new Sphere(front, 0), new Sphere(back, 0))
             let picked = firstChild.pick(ray)
-            if (mouseTarget !== picked) {
-                if (mouseTarget && mouseTarget.onmouseout) {
-                    mouseTarget.onmouseout(e)
+            if (pointerTarget !== picked) {
+                if (pointerTarget && pointerTarget.onpointerout) {
+                    pointerTarget.onpointerout(e)
                 }
-                mouseTarget = picked
-                if (mouseTarget && mouseTarget.onmouseover) {
-                    mouseTarget.onmouseover(e)
+                pointerTarget = picked
+                if (pointerTarget && pointerTarget.onpointerover) {
+                    pointerTarget.onpointerover(e)
                 }
             }
-            return mouseTarget
+            return pointerTarget
         }
         return null
     }
 
     // add some event routing
-    for (let event of ["mousedown", "mouseup", "mousemove", "click"]) {
+    for (let event of ["pointerdown", "pointerup", "pointermove"]) {
         canvas.addEventListener(event, (e: any) => {
             let target = pick(e)
             if (target && target[event]) {
@@ -57,7 +56,7 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
     }
     canvas[contextSymbol] = c
 
-    bindMouseEvents(canvas)
+    bindPointerEvents(canvas)
 
     let graphics: Graphics
     function repaint(time) {
@@ -108,14 +107,16 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
 
 export default Context.component(function Canvas(c: Context, p: {
     dimensions: 2 | 3,
-    component: Render<any>,
-    componentArg?: any,
-    [name: string]: any
+    content: (c: Context) => void,
+    width?: number,
+    height?: number,
+    class?: string,
+    style?: string,
 }) {
-    let { dimensions, component, componentArg, ...rest } = p
+    let { dimensions, content, ...rest } = p
     let canvas = c.begin(html.canvas, rest)
         let repaint = ensureRootRepaintableVirtualNode(c, canvas, dimensions)
-        c.render(component, componentArg)
+        content(c)
         if (repaint) {
             repaint(0)
         }

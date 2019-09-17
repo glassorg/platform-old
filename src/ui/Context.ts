@@ -307,6 +307,7 @@ export default class Context {
         let insertBefore = insertAfter != null ? insertAfter.nextSibling : this.parentNode.firstChild
         return insertBefore
     }
+    public get lastNode() { return this.insertAfter }
 
     public static bind<T>(render: Render<T>, arg?: T, container: HTMLElement = document.body) {
         if (container == null) {

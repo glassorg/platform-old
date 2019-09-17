@@ -24,7 +24,9 @@ export default function bindComponentToDom<T>(
 
         let finish = performance.now()
         let delta = finish - start
-        console.log(`${delta.toFixed(2)} ms: Update ${count}, Skipped: ${context.skipped}, Reused: ${context.recycled}, Removed: ${context.removed}, Added: ${context.created}`)
+        //  using debug so that by default it's not visible
+        //  if you want to see it you have to enable "verbose" in the browser console settings
+        console.debug(`${delta.toFixed(2)} ms: Update ${count}, Skipped: ${context.skipped}, Reused: ${context.recycled}, Removed: ${context.removed}, Added: ${context.created}`)
     }
 
     function queueRender(components: Set<Component>) {

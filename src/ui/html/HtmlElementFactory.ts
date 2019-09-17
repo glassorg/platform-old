@@ -5,7 +5,7 @@ import HtmlTextNodeFactory from "./HtmlTextNodeFactory";
 
 export type Attributes = { [attribute: string]: any }
 const ignoreProperties = { content: true }
-type Content = string | (() => void)
+type Content = string | ((c: Context) => void)
 
 export default function HtmlElementFactory<T extends Element>(
     tagName: string,
@@ -92,7 +92,7 @@ export default function HtmlElementFactory<T extends Element>(
         }
         let element = c.begin(factory, properties)
         if (typeof content === "function") {
-            content()
+            content(c)
         } else if (typeof content === "string") {
             c.text(content)
         } else if (content != null) {

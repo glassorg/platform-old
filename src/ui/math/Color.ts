@@ -50,6 +50,15 @@ export default class Color implements Iterable<number> {
         return new Color(this.red, this.green, this.blue, alpha)
     }
 
+    lerp(color: Color, alpha: number) {
+        return new Color(
+            this.red + alpha * (color.red - this.red),
+            this.green + alpha * (color.green - this.green),
+            this.blue + alpha * (color.blue - this.blue),
+            this.alpha + alpha * (color.alpha - this.alpha)
+        )
+    }
+
     /**
      * Converts to a 32 bit integer in ABGR format which seems
      * to be what WebGL expects.

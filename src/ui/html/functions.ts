@@ -1,5 +1,6 @@
 import INode from "../INode";
 import Vector2 from "../math/Vector2";
+import Context from "../Context";
 
 export function getClientPosition(element: HTMLElement) {
     let bounds = element.getClientRects()[0]
@@ -56,6 +57,12 @@ function getEventListenerTarget(name: string) {
     if (name === "body") {
         return window.document.body
     }
+    if (name === "this") {
+        return Context.current.lastNode
+    }
+    if (name === "parent") {
+        return Context.current.lastNode!.parentNode
+    }
     let element = document.querySelector(name)
     if (element == null) {
         throw new Error(`Query element not found: ${name}`)
@@ -63,15 +70,19 @@ function getEventListenerTarget(name: string) {
     return element
 }
 
-function bindEventListenersInternal(listeners, add = true) {
+function bindEventListenersInternal(listeners, add = true, boundTargets: any = {}) {
     for (let targetName in listeners) {
-        let target = getEventListenerTarget(targetName)
+        let target = boundTargets[name]
+        if (target == null) {
+            target = boundTargets[name] = getEventListenerTarget(targetName)
+        }
         let targetEventListeners = listeners[targetName]
         for (let eventName in targetEventListeners) {
             let eventListener = targetEventListeners[eventName]
             target[add ? "addEventListener" : "removeEventListener"](eventName, eventListener)
         }
     }
+    return boundTargets
 }
 
 /**
@@ -79,8 +90,8 @@ function bindEventListenersInternal(listeners, add = true) {
  * and returns a function which will unbind them all.
  */
 export function bindEventListeners(listeners): () => void {
-    bindEventListenersInternal(listeners, true)
+    let boundTargets = bindEventListenersInternal(listeners, true)
     return () => {
-        bindEventListenersInternal(listeners, false)
+        bindEventListenersInternal(listeners, false, boundTargets)
     }
 }

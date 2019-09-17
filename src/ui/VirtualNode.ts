@@ -109,7 +109,7 @@ export default class VirtualNode implements INode {
 
 type Properties<T> = { [P in keyof T]?: T[P] } & { content?: Content }
 type Render<T> = (properties?: Properties<T> | Content) => void
-type Content = () => void
+type Content = (c: Context) => void
 
 const getFactoryInstance = memoize(function <T extends VirtualNode>(nodeClass: NodeClass<T>) {
     const factory = {
@@ -137,7 +137,7 @@ const getFactoryInstance = memoize(function <T extends VirtualNode>(nodeClass: N
         }
         let element = c.begin(factory, properties)
         if (typeof content === "function") {
-            content()
+            content(c)
         }
         else if (content != null) {
             throw new Error(`Unsupported content type: ${content}`)
