@@ -4,8 +4,8 @@ import Graphics from "../Graphics";
 export class Node extends VirtualNode {
 
     render(g: Graphics, time) {
-        this.dirty = false
         this.draw(g, time)
+        this.dirty = false
     }
 
     draw(g: Graphics, time) {

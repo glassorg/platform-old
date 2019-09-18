@@ -80,6 +80,7 @@ export default class Color implements Iterable<number> {
     static readonly blue = ReadonlyColor(0, 0, 1)
     static readonly white = ReadonlyColor(1, 1, 1)
     static readonly black = ReadonlyColor(0, 0, 0)
+    static readonly gray = ReadonlyColor(0.5, 0.5, 0.5)
     static readonly transparent = ReadonlyColor(0, 0, 0, 0)
 
 }

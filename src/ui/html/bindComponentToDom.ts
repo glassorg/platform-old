@@ -3,6 +3,7 @@ import Store from "../../data/Store";
 import Context from "../Context";
 import DependencyTracker from "../../utility/DependencyTracker";
 import DefaultStore from "../../data/stores/DefaultStore";
+import Key from "../../data/Key";
 
 export default function bindComponentToDom<T>(
     container: HTMLElement,
@@ -47,14 +48,17 @@ export default function bindComponentToDom<T>(
     //  create dependency tracker to track which components are dependent upon which keys
     let dependencies = new DependencyTracker<Component, string>()
     //  listen to writes on the low level store
-    store.addWriteListener((key) => {
+    function writeListener(key: Key) {
         queueRender(dependencies.getDependents(key.string))
-    })
-    store.addReadListener(key => {
+    }
+    function readListener(key: Key) {
         if (context.component) {
             dependencies.add(context.component, key.string)
         }
-    })
+    }
+    store.addWriteListener(writeListener)
+    store.addReadListener(readListener)
+
     let context = new Context(container)
     context.onDispose = (component: Component) => {
         dependencies.remove(component)
@@ -64,4 +68,9 @@ export default function bindComponentToDom<T>(
     context.render(componentType, componentProperties)
     context.endRender()
 
+    //  return a function which can be used to unbind this
+    return () => {
+        store.removeWriteListener(writeListener)
+        store.removeReadListener(readListener)
+    }
 }

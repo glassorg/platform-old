@@ -79,6 +79,7 @@ export function recognize(gestures: Gestures) {
     // crap, what is the correct way to bind these event listeners?
     let timeoutId: any = null
     function update() {
+        console.log("execute update " + Object.keys(gestures).join(", "))
         timeoutId = null
         let pointers = Store.default.list(PointerState.all)!
 
@@ -87,6 +88,7 @@ export function recognize(gestures: Gestures) {
         for (let gestureId in gestures) {
             let gesture = gestures[gestureId]
             let captured = pointers.filter(p => p.handler === gestureId)
+            console.log(gestureId + " " + captured.length)
             //  capture a pointer to the current gesture
             function capture(pointer: PointerState) {
                 // actually capture pointer

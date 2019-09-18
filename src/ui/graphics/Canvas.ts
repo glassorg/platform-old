@@ -106,7 +106,7 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
 }
 
 export default Context.component(function Canvas(c: Context, p: {
-    dimensions: 2 | 3,
+    dimensions?: 2 | 3,
     content: (c: Context) => void,
     width?: number,
     height?: number,
@@ -115,7 +115,7 @@ export default Context.component(function Canvas(c: Context, p: {
 }) {
     let { dimensions, content, ...rest } = p
     let canvas = c.begin(html.canvas, rest)
-        let repaint = ensureRootRepaintableVirtualNode(c, canvas, dimensions)
+        let repaint = ensureRootRepaintableVirtualNode(c, canvas, dimensions = dimensions || 2)
         content(c)
         if (repaint) {
             repaint(0)
