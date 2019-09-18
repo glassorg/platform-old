@@ -65,6 +65,20 @@ export default class Vector3 {
         )
     }
 
+    projection(v: Vector3) {
+        return this.scale( v.dot(this) / this.lengthSquared() )
+    }
+
+    rejection(v: Vector3) {
+        // return v.subtract( this.parallelComponent(v) )
+        let s = v.dot( this ) / this.lengthSquared()
+        return new Vector3(
+            v.x - this.x * s,
+            v.y - this.y * s,
+            v.z - this.z * s,
+        )
+    }
+
     lengthSquared() {
         return this.x * this.x + this.y * this.y + this.z * this.z
     }
