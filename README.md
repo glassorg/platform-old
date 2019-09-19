@@ -31,3 +31,9 @@ Main glass library
         export PATH=$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/tools:$PATH
 
     Hot reloading? https://stackoverflow.com/questions/46262816/cordova-hot-reloading-on-device-without-ionic
+
+
+## Todo
+    Change default2D shader to actually use modelViewProjection matrix
+    Change Scene to Screen and make it set the Projection Matrix to 2D.
+    Create a View or Camera class to handle the View Matrix

@@ -108,25 +108,9 @@ export default class Graphics3D extends Graphics {
     }
 
     begin() {
-        let gl = this.gl
-
-        // we initialize all graphics contexts to a 2d transformation
         this.uniforms.model = Matrix4.identity
         this.uniforms.view = Matrix4.identity
         this.uniforms.projection = Matrix4.identity
-        // this.uniforms.projection = new Matrix4(
-        //     2 / this.width, 0, 0, 0,
-        //     0, 2 / this.height, 0, 0,
-        //     0, 0, 2 / 1, 0,
-        //     -1, -1, -1, 1
-        // )
-        // the projection should apply the screen transformation.
-
-        // (position.x * 2.0) / screen.x - 1.0,
-        // 1.0 - (position.y * 2.0) / screen.y,
-        // position.z * 2.0 * -1.0,
-        // position.w
-
     }
 
     end() {

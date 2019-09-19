@@ -58,20 +58,13 @@ export default class Program {
             in vec4 position;
             in vec4 color;
             uniform vec2 screen;
-            //  TODO: add modelViewProjection t
-            // uniform mat4 modelViewProjection;
+            //  we pretransform our vectors
+            //  so we just need the final projection
+            uniform mat4 projection;
 
             out vec4 vs_color;
             void main() {
-                //  do 2d screen transform manually.
-                //  we are converting fom top-left 0, 0 -> screen.x, screen.y
-                //  coordinates into open gl standard clip space unit cube
-                gl_Position = vec4(
-                    (position.x * 2.0) / screen.x - 1.0,
-                    1.0 - (position.y * 2.0) / screen.y,
-                    position.z * 2.0 * -1.0,
-                    position.w
-                );
+                gl_Position = position * projection;
                 vs_color = color;
             }
             `
