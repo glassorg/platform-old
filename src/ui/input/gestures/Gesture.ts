@@ -1,6 +1,6 @@
-import PointerState from "../PointerState";
-import GestureMatcher from "./GestureMatcher";
-import PointerMatcher from "./PointerMatcher";
+import PointerState from "../PointerState"
+import GestureMatcher from "./GestureMatcher"
+import PointerMatcher from "./PointerMatcher"
 
 type GestureHandler = (pointers: PointerState[]) => void
 type PointerHandler = (pointer: PointerState) => void

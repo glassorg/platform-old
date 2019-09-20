@@ -1,5 +1,5 @@
-import VirtualNode from "../../VirtualNode";
-import Graphics from "../Graphics";
+import VirtualNode from "../../VirtualNode"
+import Graphics from "../Graphics"
 
 export default class Node extends VirtualNode {
 

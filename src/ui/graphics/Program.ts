@@ -1,6 +1,6 @@
-import VertexFormat from "./VertexFormat";
-import VertexShader from "./VertexShader";
-import FragmentShader from "./FragmentShader";
+import VertexFormat from "./VertexFormat"
+import VertexShader from "./VertexShader"
+import FragmentShader from "./FragmentShader"
 
 /**
  * Shader program declaration.

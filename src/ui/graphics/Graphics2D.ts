@@ -1,6 +1,6 @@
-import Color from "../math/Color";
-import Graphics from "./Graphics";
-import Matrix4 from "../math/Matrix4";
+import Color from "../math/Color"
+import Graphics from "./Graphics"
+import Matrix4 from "../math/Matrix4"
 
 export default class Graphics2D extends Graphics {
 

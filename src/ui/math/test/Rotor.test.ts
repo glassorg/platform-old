@@ -1,9 +1,9 @@
 import test from "ava"
-import Vector3 from "../Vector3";
-import Rotor from "../Rotor";
-import Matrix4 from "../Matrix4";
-import Vector4 from "../Vector4";
-import { equivalent } from "..";
+import Vector3 from "../Vector3"
+import Rotor from "../Rotor"
+import Matrix4 from "../Matrix4"
+import Vector4 from "../Vector4"
+import { equivalent } from ".."
 
 const testDataCount = 100
 

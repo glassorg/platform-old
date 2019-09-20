@@ -1,12 +1,12 @@
-import Entity from "../../data/Entity";
-import Key, { ModelKey, QueryKey } from "../../data/Key";
-import Database, { ErrorCallback, RowCallback } from "../Database";
-import Namespace from "../../data/Namespace";
-import * as common from "../../utility/common";
-import {Firestore as GoogleFirestore, Query as GoogleQuery, DocumentReference, DocumentSnapshot} from "@google-cloud/firestore";
-import { Schema } from "../../data/schema";
-import Serializer from "../../data/Serializer";
-import getPackageJson, { getProjectId } from "../getPackageJson";
+import Entity from "../../data/Entity"
+import Key, { ModelKey, QueryKey } from "../../data/Key"
+import Database, { ErrorCallback, RowCallback } from "../Database"
+import Namespace from "../../data/Namespace"
+import * as common from "../../utility/common"
+import {Firestore as GoogleFirestore, Query as GoogleQuery, DocumentReference, DocumentSnapshot} from "@google-cloud/firestore"
+import { Schema } from "../../data/schema"
+import Serializer from "../../data/Serializer"
+import getPackageJson, { getProjectId } from "../getPackageJson"
 
 const serializedProperty = "_"
 

@@ -1,8 +1,8 @@
 import Key, { QueryKey, ModelKey, StateKey } from "./Key"
 import Model from "./Model"
-import State from "./State";
-import DefaultStore from "./stores/DefaultStore";
-import Patch from "./Patch";
+import State from "./State"
+import DefaultStore from "./stores/DefaultStore"
+import Patch from "./Patch"
 
 export type Value = Key[] | Model | any | null
 export type Listener = (key: Key) => void

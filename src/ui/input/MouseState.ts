@@ -1,8 +1,8 @@
-import Dependent from "../../data/Dependent";
-import State from "../../data/State";
-import Key from "../../data/Key";
-import Vector2 from "../math/Vector2";
-import Store from "../../data/Store";
+import Dependent from "../../data/Dependent"
+import State from "../../data/State"
+import Key from "../../data/Key"
+import Vector2 from "../math/Vector2"
+import Store from "../../data/Store"
 
 @State.class()
 export default class MouseState extends Dependent {

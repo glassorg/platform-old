@@ -1,7 +1,7 @@
-import NodeFactory from "../NodeFactory";
-import INode from "../INode";
-import Context from "../Context";
-import HtmlTextNodeFactory from "./HtmlTextNodeFactory";
+import NodeFactory from "../NodeFactory"
+import INode from "../INode"
+import Context from "../Context"
+import HtmlTextNodeFactory from "./HtmlTextNodeFactory"
 
 export type Attributes = { [attribute: string]: any }
 const ignoreProperties = { content: true }

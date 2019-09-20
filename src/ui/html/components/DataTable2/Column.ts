@@ -1,8 +1,8 @@
-// import Model from "../../../../data/Model";
-// import { Render } from "../../../Component";
-// import Context from "../../../Context";
-// import html from "../../";
-// import { getValue } from "../../../../data/schema";
+// import Model from "../../../../data/Model"
+// import { Render } from "../../../Component"
+// import Context from "../../../Context"
+// import html from "../../"
+// import { getValue } from "../../../../data/schema"
 
 // type ColumnProperties<T> = {
 //     [P in keyof Column<T>]?: Column<T>[P]
@@ -21,7 +21,7 @@
 //     if (column.maxWidth)
 //         buffer.push(" max-width:", column.maxWidth, "px;")
 //     if (column.justify) {
-//         buffer.push(" justify-content:", column.justify === "center" ? "center" : column.justify === "left" ? "flex-start" : "flex-end", ";")
+//         buffer.push(" justify-content:", column.justify === "center" ? "center" : column.justify === "left" ? "flex-start" : "flex-end", "")
 //     }
 //     if (column.style) {
 //         buffer.push(column.style)

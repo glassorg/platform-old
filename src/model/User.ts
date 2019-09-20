@@ -1,6 +1,6 @@
 import * as schema from "../data/schema"
 import Entity from "../data/Entity"
-import Key from "../data/Key";
+import Key from "../data/Key"
 
 @Entity.class()
 export default class User extends Entity {

@@ -1,11 +1,11 @@
-import Context from "../../../Context";
-import Model from "../../../../data/Model";
-import Key from "../../../../data/Key";
-import User from "../../../../model/User";
-import * as schema from "../../../../data/schema";
-import Form from "../Form";
-import State from "../../../../data/State";
-import * as html from "../../../html";
+import Context from "../../../Context"
+import Model from "../../../../data/Model"
+import Key from "../../../../data/Key"
+import User from "../../../../model/User"
+import * as schema from "../../../../data/schema"
+import Form from "../Form"
+import State from "../../../../data/State"
+import * as html from "../../../html"
 
 @Model.class()
 export class SignupFormModel extends Model {

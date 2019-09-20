@@ -1,5 +1,5 @@
-import INode from "./INode";
-import Context from "./Context";
+import INode from "./INode"
+import Context from "./Context"
 
 type NodeFactory<T extends INode = INode> = {
 

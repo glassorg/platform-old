@@ -1,15 +1,15 @@
-import express, { Request, Response, Express } from "express";
-import compression from "compression";
-import Datastore from "./gcloud/Datastore";
-import Database from "./Database";
-import apiRouter from "./apiRouter";
-import path from "path";
-import fs from "fs";
-import methodEmulator from "./methodEmulator";
-import bodyParser = require("body-parser");
-import Namespace, { isNamespace } from "../data/Namespace";
-import IdentityProvider from "./IdentityProvider";
-import Firestore from "./gcloud/Firestore";
+import express, { Request, Response, Express } from "express"
+import compression from "compression"
+import Datastore from "./gcloud/Datastore"
+import Database from "./Database"
+import apiRouter from "./apiRouter"
+import path from "path"
+import fs from "fs"
+import methodEmulator from "./methodEmulator"
+import bodyParser = require("body-parser")
+import Namespace, { isNamespace } from "../data/Namespace"
+import IdentityProvider from "./IdentityProvider"
+import Firestore from "./gcloud/Firestore"
 
 export type Config = {
     projectRoot: string,

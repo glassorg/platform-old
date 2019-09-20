@@ -1,7 +1,7 @@
-import Line from "./Line";
-import Sphere from "./Sphere";
-import Matrix4 from "./Matrix4";
-import Vector3 from "./Vector3";
+import Line from "./Line"
+import Sphere from "./Sphere"
+import Matrix4 from "./Matrix4"
+import Vector3 from "./Vector3"
 
 /**
  * Represents a swept sphere with potentially different radius at the starting and ending points.

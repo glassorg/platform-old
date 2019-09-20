@@ -1,10 +1,10 @@
 
 throw new Error("TypedContext is obsolete")
 
-// import NodeFactory from "./NodeFactory";
-// import Context from "./Context";
-// import { Render } from "./Component";
-// import INode from "./INode";
+// import NodeFactory from "./NodeFactory"
+// import Context from "./Context"
+// import { Render } from "./Component"
+// import INode from "./INode"
 
 // type Factories = { [p: string]: NodeFactory }
 // const symbolSymbol = Symbol("TypedContext.symbolSymbol")

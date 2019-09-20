@@ -2,7 +2,7 @@ import test from "ava"
 import Model from "../Model"
 import Entity from "../Entity"
 import Serializer from "../Serializer"
-import { AssertionError } from "assert";
+import { AssertionError } from "assert"
 
 @Model.class()
 export default class SerializerPerson extends Entity {

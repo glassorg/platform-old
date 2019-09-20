@@ -1,6 +1,6 @@
-import INode from "../INode";
-import Vector2 from "../math/Vector2";
-import Context from "../Context";
+import INode from "../INode"
+import Vector2 from "../math/Vector2"
+import Context from "../Context"
 
 export function getClientPosition(element: HTMLElement) {
     let bounds = element.getClientRects()[0]

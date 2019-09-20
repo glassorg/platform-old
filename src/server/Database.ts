@@ -1,6 +1,6 @@
 import Key, { ModelKey, QueryKey } from "../data/Key"
 import Entity from "../data/Entity"
-import Namespace from "../data/Namespace";
+import Namespace from "../data/Namespace"
 
 export type RowCallback = (record: string | null) => void
 export type ErrorCallback = (error: Error) => void

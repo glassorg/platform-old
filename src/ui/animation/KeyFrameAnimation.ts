@@ -1,4 +1,4 @@
-import KeyFrame from "./KeyFrame";
+import KeyFrame from "./KeyFrame"
 
 // type Interpolate<T> = (a: T, b: T, alpha: number) => T 
 

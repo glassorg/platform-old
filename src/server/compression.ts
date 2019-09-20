@@ -1,5 +1,5 @@
-import * as zlib from "zlib";
-// import * as jp from "jsonpack";
+import * as zlib from "zlib"
+// import * as jp from "jsonpack"
 import * as jc from "../utility/jsonCompressor"
 
 const encoding = "base64"

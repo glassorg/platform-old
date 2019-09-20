@@ -1,8 +1,8 @@
-import Query, { isQuery } from "./Query";
-import Model, { ModelClass, ModelSchema } from "./Model";
-import Namespace, { isNamespace } from "./Namespace";
-import { deepFreeze, isPlainObject, isEmptyObject } from "../utility/common";
-import State, { StateSchema, StateClass } from "./State";
+import Query, { isQuery } from "./Query"
+import Model, { ModelClass, ModelSchema } from "./Model"
+import Namespace, { isNamespace } from "./Namespace"
+import { deepFreeze, isPlainObject, isEmptyObject } from "../utility/common"
+import State, { StateSchema, StateClass } from "./State"
 
 export type QueryKey<T = any> = Key<T> & { id: null, query: Query<T> }
 export type ModelKey<T = any> = Key<T> & { id: string, query: null }

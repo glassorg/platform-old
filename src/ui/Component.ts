@@ -1,5 +1,5 @@
-import Context from "./Context";
-import INode from "./INode";
+import Context from "./Context"
+import INode from "./INode"
 
 export type Dispose = () => void
 export type Render<T> = (context: Context, properties: T) => void | Dispose

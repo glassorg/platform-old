@@ -1,6 +1,6 @@
-import Context from "../../Context";
-import { div, span } from "..";
-import "./Fab.css";
+import Context from "../../Context"
+import { div, span } from ".."
+import "./Fab.css"
 
 export default Context.component(function TabControl(c: Context, p: {
     content: string | (() => void),

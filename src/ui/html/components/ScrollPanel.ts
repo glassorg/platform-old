@@ -1,10 +1,10 @@
-import Context from "../../Context";
-import Model from "../../../data/Model";
-import Key from "../../../data/Key";
-import State from "../../../data/State";
-import { div, span } from "../";
-import "./ScrollPanel.css";
-import { getPosition } from "../functions";
+import Context from "../../Context"
+import Model from "../../../data/Model"
+import Key from "../../../data/Key"
+import State from "../../../data/State"
+import { div, span } from "../"
+import "./ScrollPanel.css"
+import { getPosition } from "../functions"
 
 @Model.class()
 export class ScrollPanelState extends State {
