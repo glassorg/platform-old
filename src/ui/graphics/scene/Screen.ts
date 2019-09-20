@@ -16,6 +16,8 @@ export default class Screen extends Control {
     draw(g: Graphics) {
         g.clear(this.backColor, this.depth)
 
+        console.log(this.width, this.height)
+
         if (g instanceof Graphics3D) {
             //  we always initialize a screen to a 2d pixel based projection
             //  with top-left origin

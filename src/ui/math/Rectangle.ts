@@ -2,6 +2,7 @@ import Size from "./Size";
 import Vector2 from "./Vector2";
 import Vector3 from "./Vector3";
 import Vector4 from "./Vector4";
+import Buffer from "./Buffer";
 
 export default class Rectangle implements Size {
 
@@ -26,5 +27,14 @@ export default class Rectangle implements Size {
         return point.x >= this.left && point.x <= this.right
             && point.y >= this.top && point.y <= this.bottom
     }
+
+    add(b: Buffer) {
+        return new Rectangle(this.x - b.left, this.y - b.top, this.width + b.left + b.right, this.height + b.top + b.bottom)
+    }
+
+    subtract(b: Buffer) {
+        return new Rectangle(this.x + b.left, this.y + b.top, this.width - b.left - b.right, this.height - b.top - b.bottom)
+    }
+
 
 }
