@@ -1,7 +1,7 @@
 import VirtualNode from "../../VirtualNode";
 import Graphics from "../Graphics";
 
-export class Node extends VirtualNode {
+export default class Node extends VirtualNode {
 
     draw(g: Graphics) {
         for (let node = this.firstChild; node != null; node = node.nextSibling) {
@@ -13,5 +13,3 @@ export class Node extends VirtualNode {
     }
 
 }
-
-export default Node.getFactory<Node>()

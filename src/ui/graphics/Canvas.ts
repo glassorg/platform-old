@@ -9,7 +9,7 @@ import Vector3 from "../math/Vector3";
 import { getPosition } from "../html/functions";
 import Capsule from "../math/Capsule";
 import Sphere from "../math/Sphere";
-import { Node } from "./scene/Node";
+import Node from "./scene/Node";
 import Dock, { dockLayout } from "./scene/Dock";
 
 function bindPointerEvents(canvas: HTMLCanvasElement) {

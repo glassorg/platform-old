@@ -1,5 +1,5 @@
 import Graphics from "../Graphics";
-import { Node } from "./Node";
+import Node from "./Node";
 import Color from "../../math/Color";
 import Pickable, { isPickable } from "./Pickable";
 import Capsule from "../../math/Capsule";
@@ -7,9 +7,9 @@ import Rectangle from "../../math/Rectangle";
 import Vector3 from "../../math/Vector3";
 import Dock, { dockLayout } from "./Dock";
 
-type LayoutFunction = (container: ControlNode) => void
+type LayoutFunction = (container: Control) => void
 
-export class ControlNode extends Node implements Pickable {
+export default class Control extends Node implements Pickable {
 
     x: number = 0
     y: number = 0
@@ -81,5 +81,3 @@ export class ControlNode extends Node implements Pickable {
     onpointerup?: (e: PointerEvent) => void
 
 }
-
-export default ControlNode.getFactory<ControlNode>()

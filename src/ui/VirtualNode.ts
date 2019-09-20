@@ -3,7 +3,6 @@ import Component from "./Component";
 import Context from "./Context";
 import INode, { NodeClass, isNodeClass } from "./INode";
 import { memoize } from "../utility/common";
-import { Node } from "./graphics/scene/Node";
 
 export function extendElementAsVirtualNodeRoot<T>(element: T): T & INode {
     return Object.defineProperties(element, {
@@ -96,14 +95,18 @@ export default class VirtualNode implements INode {
         return child
     }
 
-    public static getFactory<T extends VirtualNode>(this: NodeClass<T>): NodeFactory<T> & Render<T> {
-        return getFactoryInstance(this) as any
-    }
-
     markDirty() {
         for (let node: INode | null= this; node != null && node.dirty === false; node = node.parentNode) {
             node.dirty = true
         }
+    }
+
+    private static getFactory<T extends VirtualNode>(this: NodeClass<T>): NodeFactory<T> & Render<T> {
+        return getFactoryInstance(this) as any
+    }
+
+    public static node<T extends new(...any) => any>(this: T, properties?: Properties<InstanceType<T>>) {
+        return getFactoryInstance(this as any)(properties)
     }
 
 }
@@ -151,3 +154,13 @@ const getFactoryInstance = memoize(function <T extends VirtualNode>(nodeClass: N
     return Object.assign(renderElement, factory) as NodeFactory<T> & Render<T>
 })
 
+class Foo {
+    x?: number
+    y?: number
+
+    static render<T extends new () => InstanceType<T>>(this: T): InstanceType<T> {
+        return null as any
+    }
+}
+
+// Foo.render().x

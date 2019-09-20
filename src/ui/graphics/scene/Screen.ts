@@ -1,11 +1,11 @@
 import Graphics from "../Graphics";
 import Color from "../../math/Color";
-import { ControlNode } from "./Control";
+import Control from "./Control";
 import Graphics3D from "../Graphics3D";
 import Matrix4 from "../../math/Matrix4";
 import Dock from "./Dock";
 
-export class ScreenNode extends ControlNode {
+export default class Screen extends Control {
 
     width = window.outerWidth
     height = window.outerHeight
@@ -31,5 +31,3 @@ export class ScreenNode extends ControlNode {
     }
 
 }
-
-export default ScreenNode.getFactory<ScreenNode>()
