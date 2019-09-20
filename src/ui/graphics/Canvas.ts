@@ -9,6 +9,8 @@ import Vector3 from "../math/Vector3";
 import { getPosition } from "../html/functions";
 import Capsule from "../math/Capsule";
 import Sphere from "../math/Sphere";
+import { Node } from "./scene/Node";
+import Dock, { dockLayout } from "./scene/Dock";
 
 function bindPointerEvents(canvas: HTMLCanvasElement) {
     let pointerTarget: Pickable | null = null
@@ -78,14 +80,16 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
             }
         }
         if (graphics != null) {
-            dirty = false
             graphics.begin()
+            // layout any children using the Dock layout.
+            dockLayout(canvas)
             for (let node: any = canvas.firstChild; node != null; node = node.nextSibling) {
-                if (typeof node.render === "function") {
-                    node.render(graphics, time)
+                if (node instanceof Node) {
+                    node.draw(graphics)
                 }
             }
             graphics.end()
+            dirty = false
         }
     }
     let dirty = false

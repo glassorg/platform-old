@@ -3,6 +3,7 @@ import Component from "./Component";
 import Context from "./Context";
 import INode, { NodeClass, isNodeClass } from "./INode";
 import { memoize } from "../utility/common";
+import { Node } from "./graphics/scene/Node";
 
 export function extendElementAsVirtualNodeRoot<T>(element: T): T & INode {
     return Object.defineProperties(element, {

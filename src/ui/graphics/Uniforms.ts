@@ -33,6 +33,19 @@ export class Uniforms {
     }
 }
 
+function equals(a, b) {
+    if (a === b) {
+        return true
+    }
+    if (a == null || b == null) {
+        return false
+    }
+    if (typeof a.equals === "function") {
+        return a.equals(b) ? true : false
+    }
+    return false
+}
+
 export function setUniform(g: Graphics3D, uniform: WebGLActiveInfo, location: WebGLUniformLocation, value) {
     let { gl } = g
     if (value != null && value.length == null) {
@@ -67,12 +80,14 @@ export function setUniform(g: Graphics3D, uniform: WebGLActiveInfo, location: We
 export function createUniforms(gl: WebGL2RenderingContext, invalidate: (string) => void): Uniforms {
     return new Proxy(new Uniforms(), {
         set(obj, prop, value) {
-            // if value is a string then it represents the path to a texture
-            let result = Reflect.set(obj, prop, value)
-            if (result) {
-                invalidate(prop)
+            //  if value is a string then it represents the path to a texture
+            if (equals(value, Reflect.get(obj, prop))) {
+                return true
             }
-            return result
+            //  we have to invalidate before changing the value
+            //  or else the flushed vertices will be wrong
+            invalidate(prop)
+            return Reflect.set(obj, prop, value)
         }
     }) as Uniforms
 }

@@ -128,7 +128,7 @@ export default class Matrix4 {
         let s, c, t
       
         if (len < epsilon) {
-            return null
+            throw new Error()
         }
       
         len = 1 / len

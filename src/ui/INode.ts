@@ -9,7 +9,7 @@ export function isNodeClass<T extends INode = INode>(value): value is NodeClass<
 
 export default interface INode {
 
-    // composition methods compatible with Html Node
+    //  Composition methods compatible with Html Node
     appendChild(child)
     removeChild(child)
     insertBefore(child, ref)
@@ -18,10 +18,14 @@ export default interface INode {
     parentNode: INode | null
     nextSibling: INode | null
     previousSibling: INode | null
+    // children: Iterable<INode>
 
+    //  Context rendering properties
     component?: Component
     factory?: NodeFactory
     properties?: any
+
+    //  invalidation
     dirty?: boolean
 
 }
