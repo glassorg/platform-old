@@ -4,7 +4,7 @@ import clonePatch from "../../utility/clonePatch"
 import Store, { Listener, Value } from "../Store"
 import Namespace from "../Namespace"
 import Table from "./Table"
-import validate from "../schema/validate";
+import validate from "../schema/validate"
 
 /**
  * Base class for ModelSource implementations.

@@ -1,6 +1,6 @@
-import VertexElement from "./VertexElement";
-import { getGLTypeSize } from "./functions";
-import * as GL from "./GL";
+import VertexElement from "./VertexElement"
+import { getGLTypeSize } from "./functions"
+import * as GL from "./GL"
 
 /**
  * This creates an array that tracks whether each 
@@ -62,7 +62,7 @@ export default class VertexFormat {
         for (let element of elements) {
             element.stride = stride
         }
-        this.string = this.elements.join(";")
+        this.string = this.elements.join("")
         this.floatElements = get4ByteComponentTypeArray(this)
     }
 

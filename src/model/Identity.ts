@@ -1,9 +1,9 @@
-import * as schema from "../data/schema";
-import Key from "../data/Key";
-import Store from "../data/Store";
-import Model, { ModelClass } from "../data/Model";
-import { memoize } from "../utility/common";
-import User from "./User";
+import * as schema from "../data/schema"
+import Key from "../data/Key"
+import Store from "../data/Store"
+import Model, { ModelClass } from "../data/Model"
+import { memoize } from "../utility/common"
+import User from "./User"
 
 const sessionKey = Key.create<string>({ name: "AccessToken_session", store: "session", type: "string" }, "singleton")
 const localKey = Key.create<string>({ name: "AccessToken_local", store: "local", type: "string" }, "singleton")

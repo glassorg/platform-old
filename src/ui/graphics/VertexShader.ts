@@ -1,5 +1,5 @@
-import Shader from "./Shader";
-import VertexFormat from "./VertexFormat";
+import Shader from "./Shader"
+import VertexFormat from "./VertexFormat"
 
 export default class VertexShader extends Shader {
 

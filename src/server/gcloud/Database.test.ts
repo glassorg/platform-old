@@ -1,10 +1,10 @@
-import test from "ava";
-import Firestore, { getIndexedValues } from "./Firestore";
-import Datastore from "./Datastore";
-import Entity from "../../data/Entity";
-import Model from "../../data/Model";
-import Key from "../../data/Key";
-import Database from "../Database";
+import test from "ava"
+import Firestore, { getIndexedValues } from "./Firestore"
+import Datastore from "./Datastore"
+import Entity from "../../data/Entity"
+import Model from "../../data/Model"
+import Key from "../../data/Key"
+import Database from "../Database"
 
 @Model.class()
 export default class TestEntity extends Entity {
@@ -83,7 +83,7 @@ if (disableDatabaseTests) {
         assert.deepEqual(three!.name, orion.name)
 
         //  compressed
-        //  {"a":"Kody","b":true,",":{"by":"krisnye@gmail.com","date":61156800000},":":{"by":"krisnye@gmail.com","date":61156800000},";":{"by":"krisnye@gmail.com","date":61156800000}}
+        //  {"a":"Kody","b":true,",":{"by":"krisnye@gmail.com","date":61156800000},":":{"by":"krisnye@gmail.com","date":61156800000},"":{"by":"krisnye@gmail.com","date":61156800000}}
         //  uncompressed, gzipped
         //  eJyrVspLzE1VslLyzk+pVNJRSs7PLchJLQGKlBSVpgL5RamJJakpSlbVSkmVQGXZRZnFeZWpDum5iZk5ekDVQD0piSD1ZoaGpmYWBiBQq6NUWpBClr6UVJDtpOqrBQAHKj6W
         //  compressed, gzipped

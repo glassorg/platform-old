@@ -1,6 +1,6 @@
-import NodeFactory from "../NodeFactory";
-import INode from "../INode";
-import Context from "../Context";
+import NodeFactory from "../NodeFactory"
+import INode from "../INode"
+import Context from "../Context"
 
 export default class HtmlTextNodeFactory implements NodeFactory {
 

@@ -1,4 +1,4 @@
-import HtmlElementFactory from "../html/HtmlElementFactory";
+import HtmlElementFactory from "../html/HtmlElementFactory"
 
 const namespace = "http://www.w3.org/2000/svg"
 function factory<T extends SVGElement = SVGElement>(tag: string) {

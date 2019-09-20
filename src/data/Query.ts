@@ -1,7 +1,7 @@
 
-import { isPlainObject } from "../utility/common";
-import Model from "./Model";
-import { getValue } from "./schema/functions";
+import { isPlainObject } from "../utility/common"
+import Model from "./Model"
+import { getValue } from "./schema/functions"
 
 const ops = {
     "!=": (a, b) => a != b,

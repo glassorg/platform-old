@@ -1,11 +1,11 @@
-import Key, { ModelKey } from "../../data/Key";
-import Dependent from "../../data/Dependent";
-import Store from "../../data/Store";
-import INode from "../INode";
-import { Schema } from "../../data/schema";
-import Vector2 from "../math/Vector2";
-import Patch from "../../data/Patch";
-import clonePatch from "../../utility/clonePatch";
+import Key, { ModelKey } from "../../data/Key"
+import Dependent from "../../data/Dependent"
+import Store from "../../data/Store"
+import INode from "../INode"
+import { Schema } from "../../data/schema"
+import Vector2 from "../math/Vector2"
+import Patch from "../../data/Patch"
+import clonePatch from "../../utility/clonePatch"
 
 const maxPoints = 200
 

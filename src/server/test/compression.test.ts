@@ -1,7 +1,7 @@
-import test from "ava";
-import { compressors } from "../compression";
-import { readFileSync, writeFileSync, fstat } from "fs";
-import { join } from "path";
+import test from "ava"
+import { compressors } from "../compression"
+import { readFileSync, writeFileSync, fstat } from "fs"
+import { join } from "path"
 
 test("Compression Performance", assert => {
     let count = 1

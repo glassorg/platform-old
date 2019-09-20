@@ -1,11 +1,11 @@
-import GestureMatcher from "./GestureMatcher";
-import PointerMatcher from "./PointerMatcher";
-import PointerState from "../PointerState";
-import Vector2 from "../../math/Vector2";
-import Gesture from "./Gesture";
-import Gestures from "./Gestures";
-import Store from "../../../data/Store";
-import { bindEventListeners } from "../../html/functions";
+import GestureMatcher from "./GestureMatcher"
+import PointerMatcher from "./PointerMatcher"
+import PointerState from "../PointerState"
+import Vector2 from "../../math/Vector2"
+import Gesture from "./Gesture"
+import Gestures from "./Gestures"
+import Store from "../../../data/Store"
+import { bindEventListeners } from "../../html/functions"
 
 type Matcher = GestureMatcher | PointerMatcher
 

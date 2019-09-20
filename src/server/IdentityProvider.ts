@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import Identity from "../model/Identity";
-import * as crypto from "../utility/crypto";
+import { Request, Response, NextFunction } from "express"
+import Identity from "../model/Identity"
+import * as crypto from "../utility/crypto"
 
 const accessTokenSecret = "Our access tokens are only signed with this key."
 

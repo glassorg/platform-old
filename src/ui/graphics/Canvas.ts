@@ -1,16 +1,16 @@
-import Context from "../Context";
-import { extendElementAsVirtualNodeRoot } from "../VirtualNode";
-import * as html from "../html";
-import Graphics2D from "./Graphics2D";
-import Graphics from "./Graphics";
-import Graphics3D from "./Graphics3D";
-import Pickable, { isPickable } from "./scene/Pickable";
-import Vector3 from "../math/Vector3";
-import { getPosition } from "../html/functions";
-import Capsule from "../math/Capsule";
-import Sphere from "../math/Sphere";
-import Node from "./scene/Node";
-import Dock, { dockLayout } from "./scene/Dock";
+import Context from "../Context"
+import { extendElementAsVirtualNodeRoot } from "../VirtualNode"
+import * as html from "../html"
+import Graphics2D from "./Graphics2D"
+import Graphics from "./Graphics"
+import Graphics3D from "./Graphics3D"
+import Pickable, { isPickable } from "./scene/Pickable"
+import Vector3 from "../math/Vector3"
+import { getPosition } from "../html/functions"
+import Capsule from "../math/Capsule"
+import Sphere from "../math/Sphere"
+import Node from "./scene/Node"
+import Dock, { dockLayout } from "./scene/Dock"
 
 function bindPointerEvents(canvas: HTMLCanvasElement) {
     let pointerTarget: Pickable | null = null

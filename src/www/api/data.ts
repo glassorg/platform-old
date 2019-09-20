@@ -1,11 +1,11 @@
-import { Request, Response, response } from "express";
-import * as webServer from "../../server/webServer";
-import Firestore from "../../server/gcloud/Firestore";
-import Key from "../../data/Key";
-import Entity from "../../data/Entity";
-import Patch from "../../data/Patch";
-import Model from "../../data/Model";
-import clonePatch from "../../utility/clonePatch";
+import { Request, Response, response } from "express"
+import * as webServer from "../../server/webServer"
+import Firestore from "../../server/gcloud/Firestore"
+import Key from "../../data/Key"
+import Entity from "../../data/Entity"
+import Patch from "../../data/Patch"
+import Model from "../../data/Model"
+import clonePatch from "../../utility/clonePatch"
 
 const database = webServer.instance.database
 

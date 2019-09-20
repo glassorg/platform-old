@@ -1,6 +1,6 @@
-import Vector3 from "./Vector3";
-import { equivalent } from ".";
-import Sphere from "./Sphere";
+import Vector3 from "./Vector3"
+import { equivalent } from "."
+import Sphere from "./Sphere"
 
 export default class Ray {
 

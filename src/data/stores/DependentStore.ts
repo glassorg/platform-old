@@ -1,7 +1,7 @@
-import Key from "../Key";
-import MemoryStore from "./MemoryStore";
-import Dependent from "../Dependent";
-import { string } from "../schema";
+import Key from "../Key"
+import MemoryStore from "./MemoryStore"
+import Dependent from "../Dependent"
+import { string } from "../schema"
 
 export default class DependentStore extends MemoryStore {
 

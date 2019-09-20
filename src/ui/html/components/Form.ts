@@ -1,11 +1,11 @@
-import Context from "../../Context";
-import { Schema, Properties, getSubSchema } from "../../../data/schema";
-import Field, { FieldArguments } from "./Field";
-import { getFormValues } from "../../../ui/html/functions";
-import Model from "../../../data/Model";
-import Key, { ModelKey } from "../../../data/Key";
-import invoke from "../../../server/invoke";
-import * as html from "../";
+import Context from "../../Context"
+import { Schema, Properties, getSubSchema } from "../../../data/schema"
+import Field, { FieldArguments } from "./Field"
+import { getFormValues } from "../../../ui/html/functions"
+import Model from "../../../data/Model"
+import Key, { ModelKey } from "../../../data/Key"
+import invoke from "../../../server/invoke"
+import * as html from "../"
 
 // deliberately compatible with ISchema for a Model
 export type FormDescriptor = {

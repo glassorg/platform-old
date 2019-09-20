@@ -1,5 +1,5 @@
-import Component from "./Component";
-import NodeFactory from "./NodeFactory";
+import Component from "./Component"
+import NodeFactory from "./NodeFactory"
 
 export type NodeConstructor<T extends INode> = new () => T
 export type NodeClass<T extends INode> = NodeConstructor<T> & { getFactory(): NodeFactory<T> }

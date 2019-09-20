@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
-import path from "path";
-import { existsSync } from "fs";
-import Model from "../data/Model";
+import { Request, Response } from "express"
+import path from "path"
+import { existsSync } from "fs"
+import Model from "../data/Model"
 
 const validPathRegex = /^([a-z_0-9]+)(\/([a-z_0-9]+))?(.*)$/i
 

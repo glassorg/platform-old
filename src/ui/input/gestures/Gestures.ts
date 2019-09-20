@@ -1,4 +1,4 @@
-import Gesture from "./Gesture";
+import Gesture from "./Gesture"
 
 type Gestures = { [name: string]: Gesture }
 

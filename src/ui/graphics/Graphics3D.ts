@@ -1,17 +1,17 @@
-import Color from "../math/Color";
-import Graphics from "./Graphics";
-import * as GL from "./GL";
-import { createShader, createProgram, createTexture } from "./functions";
-import Program from "./Program";
-import VertexShader from "./VertexShader";
-import FragmentShader from "./FragmentShader";
-import { memoize } from "../../utility/common";
-import { Uniforms, createUniforms, setUniform } from "./Uniforms";
-import VertexBuffer from "./VertexBuffer";
-import VertexStream from "./VertexStream";
-import Vector2 from "../math/Vector2";
-import Matrix4 from "../math/Matrix4";
-import Vector3 from "../math/Vector3";
+import Color from "../math/Color"
+import Graphics from "./Graphics"
+import * as GL from "./GL"
+import { createShader, createProgram, createTexture } from "./functions"
+import Program from "./Program"
+import VertexShader from "./VertexShader"
+import FragmentShader from "./FragmentShader"
+import { memoize } from "../../utility/common"
+import { Uniforms, createUniforms, setUniform } from "./Uniforms"
+import VertexBuffer from "./VertexBuffer"
+import VertexStream from "./VertexStream"
+import Vector2 from "../math/Vector2"
+import Matrix4 from "../math/Matrix4"
+import Vector3 from "../math/Vector3"
 
 export default class Graphics3D extends Graphics {
 

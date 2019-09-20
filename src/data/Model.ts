@@ -1,7 +1,7 @@
-import { Schema, Properties } from "./schema";
-import validate from "./schema/validate";
-import * as Serializer from "./Serializer";
-import isDebug from "../isDebug";
+import { Schema, Properties } from "./schema"
+import validate from "./schema/validate"
+import * as Serializer from "./Serializer"
+import isDebug from "../isDebug"
 
 export type ModelConstructor<T> = new (propertiesArray: Array<{ [name: string]: any }>) => T
 export type ModelSchema<T = any> = Schema & { name: string, store?: string }

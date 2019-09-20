@@ -1,5 +1,5 @@
-import Context from "../../Context";
-import * as svg from "../../svg";
+import Context from "../../Context"
+import * as svg from "../../svg"
 
 export default Context.component((c: Context, percent: number) => {
     let percentage = percent.toString() + "%"

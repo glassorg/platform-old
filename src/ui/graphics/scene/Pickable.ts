@@ -1,5 +1,5 @@
-import Capsule from "../../math/Capsule";
-import PointerTarget from "../../PointerTarget";
+import Capsule from "../../math/Capsule"
+import PointerTarget from "../../PointerTarget"
 
 export function isPickable(value): value is Pickable {
     return value != null && typeof value.pick === "function"

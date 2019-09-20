@@ -1,6 +1,6 @@
-import Matrix4 from "./Matrix4";
-import { equivalent } from ".";
-import Vector3 from "./Vector3";
+import Matrix4 from "./Matrix4"
+import { equivalent } from "."
+import Vector3 from "./Vector3"
 
 export default class Vector4 {
 

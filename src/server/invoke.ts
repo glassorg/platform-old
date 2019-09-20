@@ -1,5 +1,5 @@
-import Model from "../data/Model";
-import Identity from "../model/Identity";
+import Model from "../data/Model"
+import Identity from "../model/Identity"
 
 //  invokes a server side remote api function
 export default async function invoke<In, Out>(path: string, input: In): Promise<Out> {
