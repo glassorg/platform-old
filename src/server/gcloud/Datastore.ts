@@ -1,15 +1,15 @@
-const { Datastore: GDatastore } = require("@google-cloud/datastore");
-import { DatastoreKey as GKey } from "@google-cloud/datastore/entity";
-import Key, { QueryKey, ModelKey} from "../../data/Key";
-import Database, { ErrorCallback, RowCallback } from "../Database";
-import Entity from "../../data/Entity";
-import { Schema } from "../../data/schema";
-import * as common from "../../utility/common";
-import Namespace from "../../data/Namespace";
-import Serializer, { typeKey } from "../../data/Serializer";
-import * as compression from "../compression";
-import { entity } from "@google-cloud/datastore/build/src/entity";
-import Model from "../../data/Model";
+const { Datastore: GDatastore } = require("@google-cloud/datastore")
+import { DatastoreKey as GKey } from "@google-cloud/datastore/entity"
+import Key, { QueryKey, ModelKey} from "../../data/Key"
+import Database, { ErrorCallback, RowCallback } from "../Database"
+import Entity from "../../data/Entity"
+import { Schema } from "../../data/schema"
+import * as common from "../../utility/common"
+import Namespace from "../../data/Namespace"
+import Serializer, { typeKey } from "../../data/Serializer"
+import * as compression from "../compression"
+import { entity } from "@google-cloud/datastore/build/src/entity"
+import Model from "../../data/Model"
 
 const serializedProperty = "_"
 const excludeFromIndexes = [serializedProperty]

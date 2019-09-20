@@ -1,11 +1,11 @@
-import Graphics from "../Graphics";
-import Node from "./Node";
-import Color from "../../math/Color";
-import Pickable, { isPickable } from "./Pickable";
-import Capsule from "../../math/Capsule";
-import Rectangle from "../../math/Rectangle";
-import Vector3 from "../../math/Vector3";
-import Dock, { dockLayout } from "./Dock";
+import Graphics from "../Graphics"
+import Node from "./Node"
+import Color from "../../math/Color"
+import Pickable, { isPickable } from "./Pickable"
+import Capsule from "../../math/Capsule"
+import Rectangle from "../../math/Rectangle"
+import Vector3 from "../../math/Vector3"
+import Dock, { dockLayout } from "./Dock"
 
 type LayoutFunction = (container: Control) => void
 

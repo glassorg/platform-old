@@ -1,4 +1,4 @@
-import Context from "../../ui/Context";
+import Context from "../../ui/Context"
 
 export type Properties = { [name: string]: Schema | undefined }
 export type Class = { prototype: object }

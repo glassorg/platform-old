@@ -1,7 +1,7 @@
 import test from "ava"
 import { JSDOM } from "jsdom"
-import VirtualNode, { extendElementAsVirtualNodeRoot } from "../VirtualNode";
-import INode from "../INode";
+import VirtualNode, { extendElementAsVirtualNodeRoot } from "../VirtualNode"
+import INode from "../INode"
 let dom = new JSDOM("<html><head></head><body></body></html>")
 let document = dom.window.document
 

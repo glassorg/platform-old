@@ -1,4 +1,4 @@
-import PointerState from "../PointerState";
+import PointerState from "../PointerState"
 
 type GestureMatcher = (pointers: PointerState[]) => PointerState[];
 

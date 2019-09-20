@@ -1,10 +1,10 @@
-import Context from "../../Context";
-import Model from "../../../data/Model";
-import Key from "../../../data/Key";
-import FocusState from "../../../model/FocusState";
-import State from "../../../data/State";
-import { getAncestorForm, getFormValues } from "../../../ui/html/functions";
-import * as html from "../";
+import Context from "../../Context"
+import Model from "../../../data/Model"
+import Key from "../../../data/Key"
+import FocusState from "../../../model/FocusState"
+import State from "../../../data/State"
+import { getAncestorForm, getFormValues } from "../../../ui/html/functions"
+import * as html from "../"
 
 const canSelect: { [type: string]: boolean } = {
     text: true,

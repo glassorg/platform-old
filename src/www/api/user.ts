@@ -1,20 +1,20 @@
-import Firestore from "../../server/gcloud/Firestore";
-import * as webServer from "../../server/webServer";
-import Key from "../../data/Key";
-import namespace from "../../model";
-import sendgrid from "../../server/sendgrid";
-import * as crypto from "../../utility/crypto";
-import http from "../../utility/http";
-import { Request, Response } from "express";
-import { default as twilio, fromPhone } from "../../server/twilio";
-import Patch from "../../data/Patch";
-import { LoginFormModel, LoginFormState } from "../../ui/html/components/Login/LoginForm";
-import { SignupFormState, SignupFormModel } from "../../ui/html/components/Login/SignupForm";
-import { formatPhoneES164 } from "../../utility/phone";
-import User from "../../model/User";
-import Identity from "../../model/Identity";
-import { signToken } from "../../server/IdentityProvider";
-import * as secret from "../../server/secret";
+import Firestore from "../../server/gcloud/Firestore"
+import * as webServer from "../../server/webServer"
+import Key from "../../data/Key"
+import namespace from "../../model"
+import sendgrid from "../../server/sendgrid"
+import * as crypto from "../../utility/crypto"
+import http from "../../utility/http"
+import { Request, Response } from "express"
+import { default as twilio, fromPhone } from "../../server/twilio"
+import Patch from "../../data/Patch"
+import { LoginFormModel, LoginFormState } from "../../ui/html/components/Login/LoginForm"
+import { SignupFormState, SignupFormModel } from "../../ui/html/components/Login/SignupForm"
+import { formatPhoneES164 } from "../../utility/phone"
+import User from "../../model/User"
+import Identity from "../../model/Identity"
+import { signToken } from "../../server/IdentityProvider"
+import * as secret from "../../server/secret"
 
 const second = 1
 const minute = 60 * second

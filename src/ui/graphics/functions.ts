@@ -1,4 +1,4 @@
-import * as GL from "./GL";
+import * as GL from "./GL"
 
 const bluePixelData = new Uint8Array([0, 0, 255, 255])
 export function createTexture(gl: WebGL2RenderingContext, src: string, onload: () => void) {

@@ -1,7 +1,7 @@
-// import Context from "../../../Context";
-// import Column from "./Column";
-// import HtmlContext from "../../HtmlContext";
-// import { endEdit } from "../EditPopup";
+// import Context from "../../../Context"
+// import Column from "./Column"
+// import HtmlContext from "../../HtmlContext"
+// import { endEdit } from "../EditPopup"
 
 // export default function Style(
 //     c: Context,

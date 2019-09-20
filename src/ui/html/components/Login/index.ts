@@ -1,15 +1,15 @@
-import Context from "../../../Context";
-import Model from "../../../../data/Model";
-import Key from "../../../../data/Key";
-import State from "../../../../data/State";
-import TabControl from "../TabControl";
-import LoginForm from "./LoginForm";
-import SignupForm from "./SignupForm";
-import ForgotForm from "./ForgotForm";
-import Identity from "../../../../model/Identity";
-import invoke from "../../../../server/invoke";
-import Store from "../../../../data/Store";
-import { div, span, button } from "../..";
+import Context from "../../../Context"
+import Model from "../../../../data/Model"
+import Key from "../../../../data/Key"
+import State from "../../../../data/State"
+import TabControl from "../TabControl"
+import LoginForm from "./LoginForm"
+import SignupForm from "./SignupForm"
+import ForgotForm from "./ForgotForm"
+import Identity from "../../../../model/Identity"
+import invoke from "../../../../server/invoke"
+import Store from "../../../../data/Store"
+import { div, span, button } from "../.."
 
 @Model.class()
 class LoginState extends State {

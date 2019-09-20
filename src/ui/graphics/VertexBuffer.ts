@@ -1,6 +1,6 @@
-import VertexFormat from "./VertexFormat";
-import * as GL from "./GL";
-import Graphics3D from "./Graphics3D";
+import VertexFormat from "./VertexFormat"
+import * as GL from "./GL"
+import Graphics3D from "./Graphics3D"
 
 export default class VertexBuffer {
 

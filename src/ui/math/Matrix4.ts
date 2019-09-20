@@ -1,5 +1,5 @@
-import Vector3 from "./Vector3";
-import { epsilon } from "./";
+import Vector3 from "./Vector3"
+import { epsilon } from "./"
 
 export default class Matrix4 {
 

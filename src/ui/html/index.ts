@@ -1,5 +1,5 @@
 
-import HtmlElementFactory from "./HtmlElementFactory";
+import HtmlElementFactory from "./HtmlElementFactory"
 
 const defaultAttributes = { class: true, type: true }
 function factory<T extends HTMLElement>(tag: string, attributes: { [name: string]: boolean } = defaultAttributes) {

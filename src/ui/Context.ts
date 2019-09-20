@@ -1,11 +1,11 @@
-import INode, { NodeClass, isNodeClass } from "./INode";
-import Component, { Render } from "./Component";
-import DefaultStore from "../data/stores/DefaultStore";
-import Store from "../data/Store";
-import NodeFactory from "./NodeFactory";
-import localize from "./localize";
-import bindComponentToDom from "./html/bindComponentToDom";
-import SoundContext from "./sound/SoundContext";
+import INode, { NodeClass, isNodeClass } from "./INode"
+import Component, { Render } from "./Component"
+import DefaultStore from "../data/stores/DefaultStore"
+import Store from "../data/Store"
+import NodeFactory from "./NodeFactory"
+import localize from "./localize"
+import bindComponentToDom from "./html/bindComponentToDom"
+import SoundContext from "./sound/SoundContext"
 
 type ComponentEventHandler = (component: Component) => void
 

@@ -2,8 +2,8 @@ import test from "ava"
 import Model from "../Model"
 import Entity from "../Entity"
 import Key from "../Key"
-import { object } from "../schema";
-import { createSortCompareFunction } from "../Query";
+import { object } from "../schema"
+import { createSortCompareFunction } from "../Query"
 
 class Person extends Model {
     @Model.property(object)

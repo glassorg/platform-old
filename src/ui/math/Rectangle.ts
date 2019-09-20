@@ -1,8 +1,8 @@
-import Size from "./Size";
-import Vector2 from "./Vector2";
-import Vector3 from "./Vector3";
-import Vector4 from "./Vector4";
-import Buffer from "./Buffer";
+import Size from "./Size"
+import Vector2 from "./Vector2"
+import Vector3 from "./Vector3"
+import Vector4 from "./Vector4"
+import Buffer from "./Buffer"
 
 export default class Rectangle implements Size {
 

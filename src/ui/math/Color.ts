@@ -1,5 +1,5 @@
-import { clamp } from ".";
-import Vector3 from "./Vector3";
+import { clamp } from "."
+import Vector3 from "./Vector3"
 
 export default class Color implements Iterable<number> {
 

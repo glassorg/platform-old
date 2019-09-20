@@ -1,10 +1,10 @@
-import Context from "../../Context";
-import Model from "../../../data/Model";
-import Key from "../../../data/Key";
-import State from "../../../data/State";
-import { Render } from "../../Component";
-import { div, span } from "../";
-import "./TabControl.css";
+import Context from "../../Context"
+import Model from "../../../data/Model"
+import Key from "../../../data/Key"
+import State from "../../../data/State"
+import { Render } from "../../Component"
+import { div, span } from "../"
+import "./TabControl.css"
 
 @Model.class()
 class TabControlState extends State {

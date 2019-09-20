@@ -1,4 +1,4 @@
-import Rectangle from "../math/Rectangle";
+import Rectangle from "../math/Rectangle"
 
 export default class Sprite {
 

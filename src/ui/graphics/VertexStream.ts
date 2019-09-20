@@ -1,6 +1,6 @@
-import VertexBuffer from "./VertexBuffer";
-import * as GL from "./GL";
-import VertexFormat from "./VertexFormat";
+import VertexBuffer from "./VertexBuffer"
+import * as GL from "./GL"
+import VertexFormat from "./VertexFormat"
 
 
 export default class VertexStream {

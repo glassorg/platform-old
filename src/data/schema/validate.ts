@@ -1,5 +1,5 @@
 import { Type, Schema } from "./Schema"
-import { getSubSchema } from "./functions";
+import { getSubSchema } from "./functions"
 
 function isValidType(type: Type, value): boolean {
     if (typeof type === "string") {

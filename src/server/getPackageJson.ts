@@ -1,6 +1,6 @@
-import fs from "fs";
-import path from "path";
-import { memoize } from "../utility/common";
+import fs from "fs"
+import path from "path"
+import { memoize } from "../utility/common"
 
 const getPackageJson = memoize((dir = process.cwd()) => {
     let file = path.join(dir, "package.json")

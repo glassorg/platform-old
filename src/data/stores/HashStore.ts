@@ -1,6 +1,6 @@
-import Serializer from "../Serializer";
-import Model from "../Model";
-import LocalStore from "./LocalStore";
+import Serializer from "../Serializer"
+import Model from "../Model"
+import LocalStore from "./LocalStore"
 
 class HashStorage implements Storage {
     private hash: { [name: string]: string | null }

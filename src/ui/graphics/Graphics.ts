@@ -1,5 +1,5 @@
-import Color from "../math/Color";
-import Matrix4 from "../math/Matrix4";
+import Color from "../math/Color"
+import Matrix4 from "../math/Matrix4"
 
 export default abstract class Graphics {
 

@@ -1,6 +1,6 @@
 import test from "ava"
-import Matrix4 from "../Matrix4";
-import Vector3 from "../Vector3";
+import Matrix4 from "../Matrix4"
+import Vector3 from "../Vector3"
 
 test("Matrix4", assert => {
     let transform = Matrix4.transformation(

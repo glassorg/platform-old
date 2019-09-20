@@ -1,5 +1,5 @@
-import * as crypto from "../utility/crypto";
-import * as webServer from "./webServer";
+import * as crypto from "../utility/crypto"
+import * as webServer from "./webServer"
 
 export function getJwtSignature() {
     return webServer.instance.config.secrets!.jwtSignature.toString()

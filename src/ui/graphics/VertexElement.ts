@@ -1,4 +1,4 @@
-import * as GL from "./GL";
+import * as GL from "./GL"
 
 export default class VertexElement {
 

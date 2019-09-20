@@ -45,7 +45,7 @@ function createCurvedPath(args, radius = 16) {
         let [c1x, c1y] = lerp(sx, sy, cx, cy, kappa);
         let [c2x, c2y] = lerp(ex, ey, cx, cy, kappa);
         if (isNaN(c1x) || isNaN(c1y) || isNaN(c2x) || isNaN(c2y)) {
-            return "M 0 0";
+            return "M 0 0"
         }
 
         path += `L ${sx} ${sy} C ${c1x} ${c1y} ${c2x} ${c2y} ${ex} ${ey}`;

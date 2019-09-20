@@ -1,5 +1,5 @@
-import Key from "./Key";
-import State from "./State";
+import Key from "./Key"
+import State from "./State"
 
 export type Unwatched = () => void
 

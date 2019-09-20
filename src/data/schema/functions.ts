@@ -1,4 +1,4 @@
-import { Schema } from "./Schema";
+import { Schema } from "./Schema"
 
 function getSubSchemaInternal(schema: Schema, property: string | number | Array<string | number>): Schema | undefined {
     if (schema != null && property != null) {

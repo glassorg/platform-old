@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import { IdentityRequest } from "../../server/IdentityProvider";
+import { Request, Response } from "express"
+import { IdentityRequest } from "../../server/IdentityProvider"
 
 export function foo(req: Request, res: Response) {
     res.type("text/json").send(JSON.stringify({ message: "Hello from server foo function" }))

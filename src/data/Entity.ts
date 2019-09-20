@@ -1,10 +1,10 @@
-import Model, { ModelClass } from "./Model";
-import { ModelKey } from "./Key";
-import * as schema from "./schema";
-import TimeStamp from "./TimeStamp";
-import { getPath } from "../utility/common";
-import Patch, { createPatch } from "./Patch";
-import Store from "./Store";
+import Model, { ModelClass } from "./Model"
+import { ModelKey } from "./Key"
+import * as schema from "./schema"
+import TimeStamp from "./TimeStamp"
+import { getPath } from "../utility/common"
+import Patch, { createPatch } from "./Patch"
+import Store from "./Store"
 
 export default abstract class Entity extends Model {
     
@@ -24,7 +24,7 @@ export default abstract class Entity extends Model {
     @Model.property(TimeStamp, { id: ":" })
     updated?: TimeStamp
 
-    @Model.property(TimeStamp, { id: ";" })
+    @Model.property(TimeStamp, { id: "" })
     deleted?: TimeStamp
 
     //  function for patching a descendant object
