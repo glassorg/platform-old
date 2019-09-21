@@ -6,6 +6,7 @@ import Spacing from "./Spacing"
 import BoundingShape from "./BoundingShape"
 import Line from "./Line"
 import Capsule from "./Capsule"
+import Plane from "./Plane"
 
 export default class Rectangle implements Size, BoundingShape {
 
@@ -45,17 +46,24 @@ export default class Rectangle implements Size, BoundingShape {
         return new Rectangle(this.x + b.left, this.y + b.top, this.width - b.left - b.right, this.height - b.top - b.bottom)
     }
 
-    intersects(capsule: Capsule) {
-        // let alpha =
-        return false
+    intersects(capsule: Capsule): boolean {
+        throw new Error("kpi")
     }
 
     /**
      * Returns the closest point to the line which lies within this bounding shape.
      * If multiple points intersect the line the point closest to 'a' is preferred.
      */
-    getClosestPoint(line: Line) {
-        return Vector3.zero
+    getClosestPoint(line: Line): Vector3 {
+        throw new Error("kpi")
+    }
+
+    /**
+     * Returns the plane this Rectangle lies on.
+     * The plane intersects the origin and the normal is in the positive z direction.
+     */
+    getPlane() {
+        return new Plane(new Vector3(0, 0, 1), 0)
     }
 
 }
