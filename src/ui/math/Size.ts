@@ -1,4 +1,4 @@
-import Buffer from "./Buffer"
+import Spacing from "./Spacing"
 
 export default class Size {
 
@@ -10,11 +10,17 @@ export default class Size {
         this.height = height
     }
 
-    add(b: Buffer) {
+    add(b: Spacing) {
+        if (!b || b.isZero) {
+            return this
+        }
         return new Size(this.width + b.left + b.right, this.height + b.top + b.bottom)
     }
 
-    subtract(b: Buffer) {
+    subtract(b: Spacing) {
+        if (!b || b.isZero) {
+            return this
+        }
         return new Size(this.width - b.left - b.right, this.height - b.top - b.bottom)
     }
 
