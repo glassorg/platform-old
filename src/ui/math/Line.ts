@@ -31,7 +31,9 @@ export default class Line {
      * @param position 
      */
     getAlpha(position: Vector3) {
-        throw new Error("kpi")
+        let ab = this.b.subtract(this.a)
+        let ap = position.subtract(this.a)
+        return ab.dot(ap) / ab.lengthSquared()
     }
 
     toString() {
