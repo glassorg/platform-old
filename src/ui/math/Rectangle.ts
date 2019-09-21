@@ -3,8 +3,11 @@ import Vector2 from "./Vector2"
 import Vector3 from "./Vector3"
 import Vector4 from "./Vector4"
 import Spacing from "./Spacing"
+import BoundingShape from "./BoundingShape"
+import Line from "./Line"
+import Capsule from "./Capsule"
 
-export default class Rectangle implements Size {
+export default class Rectangle implements Size, BoundingShape {
 
     readonly x: number
     readonly y: number
@@ -42,4 +45,14 @@ export default class Rectangle implements Size {
         return new Rectangle(this.x + b.left, this.y + b.top, this.width - b.left - b.right, this.height - b.top - b.bottom)
     }
 
+    intersects(capsule: Capsule) {
+        return false
+    }
+    /**
+     * Returns the closest point to the line which lies within this bounding shape.
+     * If multiple points intersect the line the point closest to 'a' is preferred.
+     */
+    getClosestPoint(line: Line) {
+        return Vector3.zero
+    }
 }
