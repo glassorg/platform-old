@@ -5,22 +5,30 @@ import Pickable, { isPickable } from "./Pickable"
 import Capsule from "../../math/Capsule"
 import Rectangle from "../../math/Rectangle"
 import Vector3 from "../../math/Vector3"
-import Dock, { dockLayout } from "./Dock"
+import Dock, { layout } from "./Dock"
+import Spacing from "../../math/Spacing"
+import Size from "../../math/Size"
 
 type LayoutFunction = (container: Control) => void
 
 export default class Control extends Node implements Pickable {
 
-    x: number = 0
-    y: number = 0
-    width: number = 100
-    height: number = 50
-    backColor: Color = Color.transparent
-    foreColor: Color = Color.black
+    x = 0
+    y = 0
+    width = 100
+    height = 50
+    backColor = Color.transparent
+    foreColor = Color.black
+    margin = Spacing.zero
+    padding = Spacing.zero
+    minimumSize?: Size
+    maximumSize?: Size
+    optimumSize?: Size
+
     /**
      * Layout function for positioning children.
      */
-    layoutChildren: LayoutFunction = dockLayout
+    layoutChildren: LayoutFunction = layout
     /**
      * Layout options for self.
      */
@@ -51,8 +59,9 @@ export default class Control extends Node implements Pickable {
         }
     }
 
-    get position() { return new Vector3(this.x, this.y) }
+    get size() { return new Size(this.width, this.height) }
     get bounds() { return new Rectangle(this.x, this.y, this.width, this.height) }
+    get position() { return new Vector3(this.x, this.y) }
 
     pick(ray: Capsule) {
         let position = ray.a.center

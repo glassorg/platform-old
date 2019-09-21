@@ -52,8 +52,9 @@ export default class Graphics3D extends Graphics {
             new VertexBuffer(this, this.program.vertexShader.vertexFormat)
         )
 
-        gl.enable(GL.BLEND);
-        gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
+        gl.enable(GL.BLEND)
+        gl.enable(GL.DEPTH_TEST)
+        gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 
         this.updateScreenSize()
     }

@@ -10,7 +10,8 @@ import { getPosition } from "../html/functions"
 import Capsule from "../math/Capsule"
 import Sphere from "../math/Sphere"
 import Node from "./scene/Node"
-import Dock, { dockLayout } from "./scene/Dock"
+import Dock, { layout } from "./scene/Dock"
+import WindowSize from "../input/WindowSize"
 
 function bindPointerEvents(canvas: HTMLCanvasElement) {
     let pointerTarget: Pickable | null = null
@@ -82,7 +83,7 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
         if (graphics != null) {
             graphics.begin()
             // layout any children using the Dock layout.
-            dockLayout(canvas)
+            layout(canvas as any)
             for (let node: any = canvas.firstChild; node != null; node = node.nextSibling) {
                 if (node instanceof Node) {
                     node.draw(graphics)
