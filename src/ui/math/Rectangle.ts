@@ -46,8 +46,10 @@ export default class Rectangle implements Size, BoundingShape {
     }
 
     intersects(capsule: Capsule) {
+        // let alpha =
         return false
     }
+
     /**
      * Returns the closest point to the line which lies within this bounding shape.
      * If multiple points intersect the line the point closest to 'a' is preferred.
@@ -55,4 +57,5 @@ export default class Rectangle implements Size, BoundingShape {
     getClosestPoint(line: Line) {
         return Vector3.zero
     }
+
 }

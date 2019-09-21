@@ -64,25 +64,25 @@ export default class Control extends Node {
     get bounds() { return new Rectangle(this.x, this.y, this.width, this.height) }
     get position() { return new Vector3(this.x, this.y) }
 
-    pick(ray: Capsule) {
-        let position = ray.a.center
-        // this assumes that the parent bounds clips any rendered children.
-        if (this.bounds.contains(position)) {
-            //  check children for intersection.
-            let childRay = ray.translate(this.position.negate())
-            //  we iterate children from last to first since later children are on top.
-            for (let child = this.lastChild; child != null; child = child.previousSibling) {
-                // if (isPickable(child)) {
-                //     let picked = child.pick(childRay)
-                //     if (picked != null) {
-                //         return picked
-                //     }
-                // }
-            }
-            return this
-        }
-        return null
-    }
+    // pick(ray: Capsule) {
+    //     let position = ray.a.center
+    //     // this assumes that the parent bounds clips any rendered children.
+    //     if (this.bounds.contains(position)) {
+    //         //  check children for intersection.
+    //         let childRay = ray.translate(this.position.negate())
+    //         //  we iterate children from last to first since later children are on top.
+    //         for (let child = this.lastChild; child != null; child = child.previousSibling) {
+    //             // if (isPickable(child)) {
+    //             //     let picked = child.pick(childRay)
+    //             //     if (picked != null) {
+    //             //         return picked
+    //             //     }
+    //             // }
+    //         }
+    //         return this
+    //     }
+    //     return null
+    // }
 
     onpointerover?: (e: PointerEvent) => void
     onpointerout?: (e: PointerEvent) => void
