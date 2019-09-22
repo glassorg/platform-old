@@ -27,17 +27,17 @@ export default class Matrix4 {
             a.m01 * b.m00 + a.m11 * b.m01 + a.m21 * b.m02 + a.m31 * b.m03,
             a.m02 * b.m00 + a.m12 * b.m01 + a.m22 * b.m02 + a.m32 * b.m03,
             a.m03 * b.m00 + a.m13 * b.m01 + a.m23 * b.m02 + a.m33 * b.m03,
-            
+
             a.m00 * b.m10 + a.m10 * b.m11 + a.m20 * b.m12 + a.m30 * b.m13,
             a.m01 * b.m10 + a.m11 * b.m11 + a.m21 * b.m12 + a.m31 * b.m13,
             a.m02 * b.m10 + a.m12 * b.m11 + a.m22 * b.m12 + a.m32 * b.m13,
             a.m03 * b.m10 + a.m13 * b.m11 + a.m23 * b.m12 + a.m33 * b.m13,
-            
+
             a.m00 * b.m20 + a.m10 * b.m21 + a.m20 * b.m22 + a.m30 * b.m23,
             a.m01 * b.m20 + a.m11 * b.m21 + a.m21 * b.m22 + a.m31 * b.m23,
             a.m02 * b.m20 + a.m12 * b.m21 + a.m22 * b.m22 + a.m32 * b.m23,
             a.m03 * b.m20 + a.m13 * b.m21 + a.m23 * b.m22 + a.m33 * b.m23,
-            
+
             a.m00 * b.m30 + a.m10 * b.m31 + a.m20 * b.m32 + a.m30 * b.m33,
             a.m01 * b.m30 + a.m11 * b.m31 + a.m21 * b.m32 + a.m31 * b.m33,
             a.m02 * b.m30 + a.m12 * b.m31 + a.m22 * b.m32 + a.m32 * b.m33,
@@ -126,16 +126,16 @@ export default class Matrix4 {
         let { x, y, z } = axis
         let len = Math.hypot(x, y, z)
         let s, c, t
-      
+
         if (len < epsilon) {
             throw new Error()
         }
-      
+
         len = 1 / len
         x *= len
         y *= len
         z *= len
-      
+
         s = Math.sin(angle)
         c = Math.cos(angle)
         t = 1 - c;
@@ -175,6 +175,18 @@ export default class Matrix4 {
             0, 1, 0, 0,
             0, 0, 1, 0,
             x, y, z, 1
+        )
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_model_view_projection#Perspective_Matrix
+    static perspective(fov: number, aspect: number, near: number, far: number) {
+        let f = Math.tan(Math.PI * 0.5 - fov * 0.5)
+        let rangeInv = 1 / (near - far)
+        return new Matrix4(
+            f / aspect, 0, 0, 0,
+            0, f, 0, 0,
+            0, 0, (near + far) * rangeInv, -1,
+            0, 0, near * far * rangeInv * 2, 0
         )
     }
 
