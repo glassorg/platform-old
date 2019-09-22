@@ -25,7 +25,7 @@ export default class Plane implements BoundingShape {
         )
     }
 
-    intersects(capsule: Capsule): boolean {
+    intersectsCapsule(capsule: Capsule): boolean {
         throw new Error("kpi")
     }
 

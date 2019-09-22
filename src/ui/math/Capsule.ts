@@ -16,7 +16,7 @@ export default class Capsule {
         this.b = b
     }
 
-    get line() {
+    line() {
         return new Line(this.a.center, this.b.center)
     }
 
@@ -25,7 +25,11 @@ export default class Capsule {
      * @param alpha 
      */
     getRadius(alpha = 0.5) {
-        return this.a.center.lerp(this.b.center, alpha)
+        return this.a.radius * (1 - alpha) + this.b.radius * alpha
+    }
+
+    addRadius(value: number) {
+        return value === 0 ? this : new Capsule(this.a.addRadius(value), this.b.addRadius(value))
     }
 
     translate(v: Vector3) {

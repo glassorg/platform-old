@@ -27,4 +27,8 @@ export default class Sphere {
         )
     }
 
+    addRadius(value: number) {
+        return value === 0 ? this : new Sphere(this.center, this.radius + value)
+    }
+
 }
