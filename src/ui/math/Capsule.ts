@@ -2,11 +2,12 @@ import Line from "./Line"
 import Sphere from "./Sphere"
 import Matrix4 from "./Matrix4"
 import Vector3 from "./Vector3"
+import ISupported from "./ISupported"
 
 /**
  * Represents a swept sphere with potentially different radius at the starting and ending points.
  */
-export default class Capsule {
+export default class Capsule implements ISupported {
 
     readonly a: Sphere
     readonly b: Sphere
@@ -40,6 +41,15 @@ export default class Capsule {
             this.a.transform(m),
             this.b.transform(m)
         )
+    }
+
+    // Returns the furthest point along a direction.
+    support(v: Vector3) {
+        let supportA = this.a.support(v)
+        let supportB = this.b.support(v)
+        return supportA.dot(v) > supportB.dot(v) ?
+            supportA :
+            supportB
     }
 
 }
