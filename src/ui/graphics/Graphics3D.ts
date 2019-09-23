@@ -53,7 +53,8 @@ export default class Graphics3D extends Graphics {
         )
 
         gl.enable(GL.BLEND)
-        // gl.enable(GL.DEPTH_TEST)
+        gl.enable(GL.DEPTH_TEST)
+        gl.depthFunc(GL.LEQUAL)
         gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 
         this.updateScreenSize()

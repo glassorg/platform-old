@@ -22,7 +22,7 @@ export default class Screen extends Control {
             g.uniforms.projection = new Matrix4(
                 2 / this.width, 0, 0, -1,
                 0, -2 / this.height, 0, 1,
-                0, 0, 1, 0,
+                0, 0, -1, 1,
                 0, 0, 0, 1
             )
         }
