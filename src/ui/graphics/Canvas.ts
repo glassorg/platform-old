@@ -14,26 +14,28 @@ import Dock, { layout } from "./scene/Dock"
 import WindowSize from "../input/WindowSize"
 
 function bindPointerEvents(canvas: HTMLCanvasElement) {
-    // let pointerTarget: Pickable | null = null
+    let pointerTarget: Node | null = null
     function pick(e: PointerEvent) {
         let firstChild = canvas.firstChild
-        // if (isPickable(firstChild)) {
-        //     let position = getPosition(e)
-        //     let front = new Vector3(position.x, position.y, 0)
-        //     let back = new Vector3(position.x, position.y, 1)
-        //     let ray = new Capsule(new Sphere(front, 0), new Sphere(back, 0))
-        //     let picked = firstChild.pick(ray)
-        //     if (pointerTarget !== picked) {
-        //         if (pointerTarget && pointerTarget.onpointerout) {
-        //             pointerTarget.onpointerout(e)
-        //         }
-        //         pointerTarget = picked
-        //         if (pointerTarget && pointerTarget.onpointerover) {
-        //             pointerTarget.onpointerover(e)
-        //         }
-        //     }
-        //     return pointerTarget
-        // }
+        if (firstChild instanceof Node) {
+            let position = getPosition(e)
+            let front = new Vector3(position.x, position.y, 0)
+            let back = new Vector3(position.x, position.y, 1)
+            let ray = new Capsule(new Sphere(front, 0), new Sphere(back, 0))
+            let picked = firstChild.pick(ray)
+            if (picked) {
+                if (pointerTarget !== picked.node) {
+                    if (pointerTarget && pointerTarget.onpointerout) {
+                        pointerTarget.onpointerout(e)
+                    }
+                    pointerTarget = picked.node
+                    if (pointerTarget && pointerTarget.onpointerover) {
+                        pointerTarget.onpointerover(e)
+                    }
+                }
+            }
+            return pointerTarget
+        }
         return null
     }
 
@@ -42,7 +44,7 @@ function bindPointerEvents(canvas: HTMLCanvasElement) {
         canvas.addEventListener(event, (e: any) => {
             let target = pick(e)
             if (target && target[event]) {
-                // target[event](e)
+                target[event](e)
             }
         })
     }

@@ -6,6 +6,8 @@ import Spacing from "./Spacing"
 import BoundingShape from "./BoundingShape"
 import Line from "./Line"
 import Capsule from "./Capsule"
+import Plane from "./Plane"
+import { clamp } from "."
 
 export default class Rectangle implements Size, BoundingShape {
 
@@ -45,17 +47,44 @@ export default class Rectangle implements Size, BoundingShape {
         return new Rectangle(this.x + b.left, this.y + b.top, this.width - b.left - b.right, this.height - b.top - b.bottom)
     }
 
-    intersects(capsule: Capsule) {
-        // let alpha =
-        return false
+    intersectsCapsule(capsule: Capsule): Vector3 | null {
+        let line = capsule.line()
+        let point = this.getPlane().getClosestPoint(line)
+        if (this.contains(point)) {
+            return point
+        }
+        let alpha = line.getAlpha(point)
+        let radius = capsule.getRadius(alpha)
+        let dx = Math.min(Math.abs(point.x - this.left), Math.abs(point.x - this.right))
+        let dy = Math.min(Math.abs(point.y - this.top), Math.abs(point.y - this.bottom))
+        return (radius * radius) <= (dx * dx + dy * dy) ? point : null
+    }
+
+    intersectsLine(line: Line): boolean {
+        let point = this.getPlane().getClosestPoint(line)
+        return this.contains(point)
     }
 
     /**
      * Returns the closest point to the line which lies within this bounding shape.
      * If multiple points intersect the line the point closest to 'a' is preferred.
      */
-    getClosestPoint(line: Line) {
-        return Vector3.zero
+    getClosestPoint(line: Line): Vector3 {
+        let point = this.getPlane().getClosestPoint(line)
+        if (this.intersectsLine(line)) {
+            return point
+        }
+        let x = clamp(point.x, this.left, this.right)
+        let y = clamp(point.y, this.top, this.bottom)
+        return new Vector3(x, y, 0)
+    }
+
+    /**
+     * Returns the plane this Rectangle lies on.
+     * The plane intersects the origin and the normal is in the positive z direction.
+     */
+    getPlane() {
+        return new Plane(new Vector3(0, 0, 1), 0)
     }
 
 }

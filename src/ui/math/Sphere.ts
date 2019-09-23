@@ -33,4 +33,8 @@ export default class Sphere implements ISupported {
         return v.normalize().scale(this.radius).add(this.center)
     }
 
+    addRadius(value: number) {
+        return value === 0 ? this : new Sphere(this.center, this.radius + value)
+    }
+
 }

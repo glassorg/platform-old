@@ -38,6 +38,10 @@ export default class Plane implements BoundingShape {
         return Math.sign(maxDist) != Math.sign(minDist)
     }
 
+    intersectsCapsule(capsule: Capsule) {
+        return this.intersects(capsule)
+    }
+
     getClosestPoint(line: Line): Vector3 {
         let point = this.getClosestPointToOrigin()
         let ap = point.subtract(line.a)
