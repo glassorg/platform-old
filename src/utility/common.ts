@@ -36,7 +36,7 @@ export function map(collection: object | any[], convert: (item, index) => any) {
     return result
 }
 
-export function memoize<A extends (arg) => any>(fn: A, cache: Map<any,any> = new Map()): A {
+export function memoize<A extends (arg) => any>(fn: A, cache: Map<any, any> = new Map()): A {
     return (function(this, arg) {
         let result = cache.get(arg)
         if (result === undefined) {
@@ -106,5 +106,24 @@ export function traverse(value, schema: Schema, callback: Callback, ancestors: a
             }
             ancestors.pop()
         }
+    }
+}
+
+export function argmax<T>(values: T[], func: (value: T) => number) {
+    if (values.length == 0)
+        throw new Error("Values must be non-empty.")
+    let indexOfMax = 0
+    let max = func(values[0])
+    for (let i = 1; i < values.length; i++) {
+        let value = func(values[i])
+        if (value > max) {
+            indexOfMax = i
+            max = value
+        }
+    }
+    return {
+        index: indexOfMax,
+        value: max,
+        argument: values[indexOfMax]
     }
 }
