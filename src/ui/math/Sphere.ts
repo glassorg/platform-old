@@ -1,8 +1,9 @@
 import Vector3 from "./Vector3"
 import Vector4 from "./Vector4"
 import Matrix4 from "./Matrix4"
+import ISupported from "./ISupported"
 
-export default class Sphere {
+export default class Sphere implements ISupported {
 
     readonly center: Vector3
     readonly radius: number
@@ -25,6 +26,11 @@ export default class Sphere {
             this.center.transform(m),
             Vector3.zero.transform(m).subtract(new Vector3(this.radius)).length()
         )
+    }
+
+    // Returns the furthest point along a direction.
+    support(v: Vector3) {
+        return v.normalize().scale(this.radius).add(this.center)
     }
 
     addRadius(value: number) {

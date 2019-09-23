@@ -1,4 +1,5 @@
 import Vector3 from "./Vector3"
+import ISupported from "./ISupported"
 
 /**
  * Represents a line and/or a line segment.
@@ -7,7 +8,7 @@ import Vector3 from "./Vector3"
  * are consider on the line segment and can be represented with normalized values
  * between zero and one.
  */
-export default class Line {
+export default class Line implements ISupported {
 
     a: Vector3
     b: Vector3
@@ -34,6 +35,12 @@ export default class Line {
         let ab = this.b.subtract(this.a)
         let ap = position.subtract(this.a)
         return ab.dot(ap) / ab.lengthSquared()
+    }
+
+    support(v: Vector3) {
+        return v.dot(this.a) > v.dot(this.b) ?
+            this.a :
+            this.b
     }
 
     toString() {
