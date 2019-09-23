@@ -39,15 +39,15 @@ function bindPointerEvents(canvas: HTMLCanvasElement) {
         return null
     }
 
-    // add some event routing
-    for (let event of ["pointerdown", "pointerup", "pointermove"]) {
-        canvas.addEventListener(event, (e: any) => {
-            let target = pick(e)
-            if (target && target[event]) {
-                target[event](e)
-            }
-        })
-    }
+    // // add some event routing
+    // for (let event of ["pointerdown", "pointerup", "pointermove"]) {
+    //     canvas.addEventListener(event, (e: any) => {
+    //         let target = pick(e)
+    //         if (target && target[event]) {
+    //             target[event](e)
+    //         }
+    //     })
+    // }
 }
 
 const contextSymbol = Symbol("context")

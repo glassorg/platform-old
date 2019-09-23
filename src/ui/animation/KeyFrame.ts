@@ -1,5 +1,5 @@
 
-export default class KeyFrame<T = number> {
+export default class KeyFrame<T> {
 
     time: number
     value: T
