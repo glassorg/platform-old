@@ -2,15 +2,15 @@ import KeyFrameAnimation from "./KeyFrameAnimation"
 import KeyFrame from "./KeyFrame"
 import { getOperations } from "./Operations"
 
-type Animation<T> = (time: number) => T
+export type Animation<T> = (time: number) => T
 
 type KeyFrameArray<T = number> = [number, T] | [number, T, "smooth" | "linear" | "none"]
 
-export function fromKeyFrames<T>(frames: KeyFrame<T>[]) {
+export function fromKeyFrames<T>(frames: KeyFrame<T>[]): Animation<T> {
     return KeyFrameAnimation.create(frames)
 }
 
-export function fromArray<T>(frames: KeyFrameArray<T>[]) {
+export function fromArray<T>(frames: KeyFrameArray<T>[]): Animation<T> {
     return KeyFrameAnimation.create(frames.map(values => new (KeyFrame as any)(...values)))
 }
 
@@ -27,7 +27,7 @@ export function scale<T>(a: Animation<T>, b: Animation<number>): Animation<T> {
     }        
 }
 
-export function add<T>(...animations: Animation<T>[]) {
+export function add<T>(...animations: Animation<T>[]): Animation<T> {
     return (time: number) => {
         let values = animations.map(a => a(time))
         let ops = getOperations((values[0] as any).constructor)
@@ -35,7 +35,7 @@ export function add<T>(...animations: Animation<T>[]) {
     }
 }
 
-export function subtract<T>(a: Animation<T>, b: Animation<T>) {
+export function subtract<T>(a: Animation<T>, b: Animation<T>): Animation<T> {
     return (time: number) => {
         let aValue = a(time)
         let bValue = b(time)
@@ -43,5 +43,3 @@ export function subtract<T>(a: Animation<T>, b: Animation<T>) {
         return ops.subtract(aValue, bValue)
     }
 }
-
-export default Animation
