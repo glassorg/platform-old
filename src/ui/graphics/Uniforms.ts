@@ -2,6 +2,7 @@ import Graphics3D from "./Graphics3D"
 import Matrix4 from "../math/Matrix4"
 import Vector2 from "../math/Vector2"
 import Vector3 from "../math/Vector3"
+import { equals } from "./functions"
 
 export class Uniforms {
     [property: string]: any
@@ -31,19 +32,6 @@ export class Uniforms {
     transform(m: Matrix4) {
         this.model = m.multiply(this.model)
     }
-}
-
-function equals(a, b) {
-    if (a === b) {
-        return true
-    }
-    if (a == null || b == null) {
-        return false
-    }
-    if (typeof a.equals === "function") {
-        return a.equals(b) ? true : false
-    }
-    return false
 }
 
 export function setUniform(g: Graphics3D, uniform: WebGLActiveInfo, location: WebGLUniformLocation, value) {

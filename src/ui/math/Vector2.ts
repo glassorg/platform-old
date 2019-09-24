@@ -1,4 +1,5 @@
 import Vector3 from "./Vector3"
+import { equivalent } from "."
 
 export default class Vector2 {
 
@@ -61,6 +62,15 @@ export default class Vector2 {
     normalize() {
         let invLength = 1 / this.length()
         return new Vector2(this.x * invLength, this.y * invLength);
+    }
+
+    equals(v: Vector2) {
+        return this.x === v.x && this.y === v.y
+    }
+
+    equivalent(v: Vector2) {
+        return equivalent(this.x, v.x)
+            && equivalent(this.y, v.y)
     }
 
     static zero = Object.freeze(new Vector2(0, 0))

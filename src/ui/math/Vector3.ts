@@ -51,6 +51,10 @@ export default class Vector3 {
         )
     }
 
+    equals(v: Vector3) {
+        return this.x === v.x && this.y === v.y && this.z === v.z
+    }
+
     equivalent(v: Vector3) {
         return equivalent(this.x, v.x)
             && equivalent(this.y, v.y)

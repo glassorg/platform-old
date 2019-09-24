@@ -43,6 +43,10 @@ export default class Vector4 {
         return new Vector4(- this.x, - this.y, - this.z, - this.w)
     }
 
+    equals(v: Vector4) {
+        return this.x === v.x && this.y === v.y && this.z === v.z && this.w === v.w
+    }
+
     equivalent(v: Vector4) {
         return equivalent(this.x, v.x)
             && equivalent(this.y, v.y)

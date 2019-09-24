@@ -66,8 +66,22 @@ export default class Control extends Node {
     }
 
     get size() { return new Size(this.width, this.height) }
+    set size(value) {
+        this.width = value.width
+        this.height = value.height
+    }
     get bounds() { return new Rectangle(this.x, this.y, this.width, this.height) }
+    set bounds(value) {
+        this.x = value.x
+        this.y = value.y
+        this.width = value.width
+        this.height = value.height
+    }
     get position() { return new Vector3(this.x, this.y) }
+    set position(value) {
+        this.x = value.x
+        this.y = value.y
+    }
 
     //  pick children in reverse because we render the latter ones on top of the former
     protected get pickChildrenReverse() { return true }

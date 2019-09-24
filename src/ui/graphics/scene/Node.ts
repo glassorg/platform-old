@@ -10,6 +10,18 @@ export default class Node extends VirtualNode {
     bounds?: BoundingShape
     pickable = Pickable.Children
 
+    update(g: Graphics): boolean {
+        let animating = false
+        for (let node = this.firstChild; node != null; node = node.nextSibling) {
+            if (node instanceof Node) {
+                if (node.update(g)) {
+                    animating = true
+                }
+            }
+        }
+        return animating
+    }
+
     draw(g: Graphics) {
         for (let node = this.firstChild; node != null; node = node.nextSibling) {
             if (node instanceof Node) {

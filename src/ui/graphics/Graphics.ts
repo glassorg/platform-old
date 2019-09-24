@@ -3,6 +3,8 @@ import Matrix4 from "../math/Matrix4"
 
 export default abstract class Graphics {
 
+    // timing
+    time = 0
     // properties
     abstract get width()
     abstract get height()

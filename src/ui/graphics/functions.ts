@@ -1,5 +1,18 @@
 import * as GL from "./GL"
 
+export function equals(a, b) {
+    if (a === b) {
+        return true
+    }
+    if (a == null || b == null) {
+        return false
+    }
+    if (typeof a.equals === "function") {
+        return a.equals(b) ? true : false
+    }
+    return false
+}
+
 const bluePixelData = new Uint8Array([0, 0, 255, 255])
 export function createTexture(gl: WebGL2RenderingContext, src: string, onload: () => void) {
     // Create a texture.

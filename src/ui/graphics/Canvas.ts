@@ -64,7 +64,7 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
     bindPointerEvents(canvas)
 
     let graphics: Graphics
-    function repaint(time) {
+    function repaint() {
         if (graphics == null) {
             if (dimensions === 2) {
                 let context = canvas.getContext("2d")
@@ -83,8 +83,21 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
             }
         }
         if (graphics != null) {
+            let time = Date.now()
+            if (start == null) {
+                start = time
+            }
+            graphics.time = (time - start) / 1000
             graphics.begin()
             // layout any children using the Dock layout.
+            let animating = false
+            for (let node: any = canvas.firstChild; node != null; node = node.nextSibling) {
+                if (node instanceof Node) {
+                    if (node.update(graphics)) {
+                        animating = true
+                    }
+                }
+            }
             layout(canvas as any)
             for (let node: any = canvas.firstChild; node != null; node = node.nextSibling) {
                 if (node instanceof Node) {
@@ -93,9 +106,13 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
             }
             graphics.end()
             dirty = false
+            if (animating) {
+                (canvas as any).dirty = true
+            }
         }
     }
     let dirty = false
+    let start: number | null = null
     Object.defineProperties(extendElementAsVirtualNodeRoot(canvas), {
         dirty: {
             get() { return dirty },
