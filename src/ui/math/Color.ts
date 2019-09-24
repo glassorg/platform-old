@@ -1,5 +1,6 @@
 import { clamp } from "."
 import Vector3 from "./Vector3"
+import Vector4 from "./Vector4"
 
 export default class Color implements Iterable<number> {
 
@@ -42,12 +43,23 @@ export default class Color implements Iterable<number> {
         return `rgba(${this.red * 255},${this.green * 255},${this.blue * 255},${this.alpha})`
     }
 
+    equals(c: Color) {
+        return this.red === c.red
+            && this.green === c.green
+            && this.blue === c.blue
+            && this.alpha === c.alpha
+    }
+
     scale(f: number) {
         return new Color(this.red * f, this.green * f, this.blue * f, this.alpha)
     }
 
     opacity(alpha: number) {
         return new Color(this.red, this.green, this.blue, alpha)
+    }
+
+    toVector4() {
+        return new Vector4(this.red, this.green, this.blue, this.alpha)
     }
 
     lerp(color: Color, alpha: number) {

@@ -14,7 +14,6 @@ export default class KeyFrameAnimation<T> {
         this.ops = getOperations(type)
         this.frames = frames
         this.loop = equals(frames[0].value, frames[frames.length - 1].value)
-        console.log(this.loop, frames[0].value, frames[frames.length - 1].value)
     }
 
     private getIndexOfP1(time: number) {

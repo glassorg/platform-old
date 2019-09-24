@@ -1,6 +1,7 @@
 import Matrix4 from "./Matrix4"
 import { equivalent } from "."
 import Vector3 from "./Vector3"
+import Color from "./Color"
 
 export default class Vector4 {
 
@@ -65,6 +66,10 @@ export default class Vector4 {
 
     toVector3() {
         return new Vector3(this.x, this.y, this.z)
+    }
+
+    toColor() {
+        return new Color(this.x, this.y, this.z, this.w)
     }
 
     transform(m: Matrix4) {
