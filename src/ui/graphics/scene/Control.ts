@@ -55,6 +55,7 @@ export default class Control extends Node {
         if (this.firstChild) {
             this.layoutChildren(this);
             if (this.x !== 0 || this.y !== 0) {
+                // alter this to use an actual full transform matrix or not
                 g.translate(this.x, this.y);
                 super.draw(g);
                 g.translate(-this.x, -this.y);

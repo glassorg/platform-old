@@ -157,10 +157,10 @@ export default class Graphics3D extends Graphics {
     }
 
     fillRectangle(x: number, y: number, width: number, height: number, color: Color, depth: number = 0) {
-        let a = new Vector3(x, y, depth).transform(this.uniforms.model)
-        let b = new Vector3(x + width, y, depth).transform(this.uniforms.model)
-        let c = new Vector3(x, y + height, depth).transform(this.uniforms.model)
-        let d = new Vector3(x + width, y + height, depth).transform(this.uniforms.model)
+        let a = new Vector3(x, y, depth).transform(this.uniforms.modelView)
+        let b = new Vector3(x + width, y, depth).transform(this.uniforms.modelView)
+        let c = new Vector3(x, y + height, depth).transform(this.uniforms.modelView)
+        let d = new Vector3(x + width, y + height, depth).transform(this.uniforms.modelView)
         this.vertexStream.write(
             ...a, ...color,
             ...b, ...color,

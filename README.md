@@ -37,6 +37,7 @@ Main glass library
     X   Change default2D shader to actually use modelViewProjection matrix
     X   Change Scene to Screen and make it set the Projection Matrix to 2D.
     X   Create a View or Camera class to handle the View Matrix
+    X   Created horizontal and vertical flex layout
         Handle Virtual Node Transforms using Matrices
         Use Transforms while Picking to transform the Pick Capsule
         Use Point from input as event source instead of pointer events.
