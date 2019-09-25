@@ -36,18 +36,21 @@ export default class Node extends VirtualNode {
             return null
         }
 
+        if (this.pickable & Pickable.Children) {
+            let bounds = this.bounds
+            if (bounds == null || bounds.intersectsCapsule(ray)) {
+                let result = this.pickChildren(ray)
+                if (result != null) {
+                    return result
+                }
+            }
+        }
+
         if (this.pickable & Pickable.Self) {
             let result = this.pickSelf(ray)
             if (result != null) {
                 return result
             }
-        }
-
-        if (this.pickable & Pickable.Children) {
-            let bounds = this.bounds
-            if (bounds == null || bounds.intersectsCapsule(ray)) {
-                return this.pickChildren(ray)
-            }    
         }
 
         return null
