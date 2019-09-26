@@ -7,7 +7,7 @@ import BoundingShape from "./BoundingShape"
 import Line from "./Line"
 import Capsule from "./Capsule"
 import Plane from "./Plane"
-import { clamp } from "."
+import { clamp, epsilon } from "."
 
 export default class Rectangle implements Size, BoundingShape {
 
@@ -48,16 +48,16 @@ export default class Rectangle implements Size, BoundingShape {
     }
 
     intersectsCapsule(capsule: Capsule): Vector3 | null {
+        //  TODO: Fix this shit
         let line = capsule.line()
-        let point = this.getPlane().getClosestPoint(line)
-        if (this.contains(point)) {
-            return point
-        }
-        let alpha = line.getAlpha(point)
+        let pointInRect = this.getClosestPoint(line)
+        let alpha = line.getAlpha(pointInRect)
         let radius = capsule.getRadius(alpha)
-        let dx = Math.min(Math.abs(point.x - this.left), Math.abs(point.x - this.right))
-        let dy = Math.min(Math.abs(point.y - this.top), Math.abs(point.y - this.bottom))
-        return (radius * radius) <= (dx * dx + dy * dy) ? point : null
+        let pointInLine = line.getPosition(alpha)
+        return pointInRect.subtract(pointInLine).length() <= (radius + epsilon) ? pointInRect : null
+        // let dx = Math.min(Math.abs(pointInRect.x - this.left), Math.abs(pointInRect.x - this.right))
+        // let dy = Math.min(Math.abs(pointInRect.y - this.top), Math.abs(pointInRect.y - this.bottom))
+        // return (radius * radius) <= (dx * dx + dy * dy) ? pointInRect : null
     }
 
     intersectsLine(line: Line): boolean {
@@ -71,7 +71,7 @@ export default class Rectangle implements Size, BoundingShape {
      */
     getClosestPoint(line: Line): Vector3 {
         let point = this.getPlane().getClosestPoint(line)
-        if (this.intersectsLine(line)) {
+        if (this.contains(point)) {
             return point
         }
         let x = clamp(point.x, this.left, this.right)

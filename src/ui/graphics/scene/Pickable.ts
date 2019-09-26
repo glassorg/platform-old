@@ -1,7 +1,7 @@
 
 enum Pickable {
-    None = 0,
-    Self = 1,
-    Children = 2,
+    none = 0,
+    self = 1,
+    children = 2,
 }
 export default Pickable

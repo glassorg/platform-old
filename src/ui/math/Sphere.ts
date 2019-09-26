@@ -22,10 +22,9 @@ export default class Sphere implements ISupported {
 
     transform(m: Matrix4) {
         // to transform the radius we will transform two points radius distance apart and then use their new distance
-        return new Sphere(
-            this.center.transform(m),
-            Vector3.zero.transform(m).subtract(new Vector3(this.radius)).length()
-        )
+        let center = this.center.transform(m)
+        let surface = new Vector3(this.center.x, this.center.y, this.center.z + this.radius).transform(m)
+        return new Sphere(center, center.subtract(surface).length())
     }
 
     // Returns the furthest point along a direction.

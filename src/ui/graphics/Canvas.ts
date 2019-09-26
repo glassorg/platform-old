@@ -23,15 +23,15 @@ function bindPointerEvents(canvas: HTMLCanvasElement) {
             let back = new Vector3(position.x, position.y, 1)
             let ray = new Capsule(new Sphere(front, 0), new Sphere(back, 0))
             let picked = firstChild.pick(ray)
-            if (picked) {
-                if (pointerTarget !== picked.node) {
-                    if (pointerTarget && pointerTarget.onpointerout) {
-                        pointerTarget.onpointerout(e)
-                    }
-                    pointerTarget = picked.node
-                    if (pointerTarget && pointerTarget.onpointerover) {
-                        pointerTarget.onpointerover(e)
-                    }
+            // console.log("picked: ", picked ? { id: picked.node.id, x: picked.position.x, y: picked.position.y } : null)
+            let pickedNode = picked ? picked.node : null
+            if (pointerTarget !== pickedNode) {
+                if (pointerTarget && pointerTarget.onpointerout) {
+                    pointerTarget.onpointerout(e)
+                }
+                pointerTarget = pickedNode
+                if (pointerTarget && pointerTarget.onpointerover) {
+                    pointerTarget.onpointerover(e)
                 }
             }
             return pointerTarget
@@ -39,15 +39,15 @@ function bindPointerEvents(canvas: HTMLCanvasElement) {
         return null
     }
 
-    // // add some event routing
-    // for (let event of ["pointerdown", "pointerup", "pointermove"]) {
-    //     canvas.addEventListener(event, (e: any) => {
-    //         let target = pick(e)
-    //         if (target && target[event]) {
-    //             target[event](e)
-    //         }
-    //     })
-    // }
+    // add some event routing
+for (let event of ["pointerdown", "pointerup", "pointermove"]) {
+        canvas.addEventListener(event, (e: any) => {
+            let target = pick(e)
+            if (target && target[event]) {
+                target[event](e)
+            }
+        })
+    }
 }
 
 const contextSymbol = Symbol("context")
