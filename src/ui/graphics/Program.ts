@@ -28,7 +28,7 @@ export default class Program {
     }
 
     public static readonly default3D: Program = new Program(
-        new VertexShader(VertexFormat.positionColor, PositionColor3D_VertexShader, true),
+        new VertexShader(VertexFormat.positionColor, PositionColor3D_VertexShader),
         new FragmentShader(Color_FragmentShader)
     )
 

@@ -12,6 +12,8 @@ import BoundingShape from "../../math/BoundingShape"
 import Line from "../../math/Line"
 import Pickable from "./Pickable"
 import PickResult from "./PickResult"
+import Matrix4 from "../../math/Matrix4"
+import { equals } from "../functions"
 
 type LayoutFunction = (container: Control) => void
 
@@ -41,8 +43,8 @@ export default class Control extends Node {
     layout?: any
 
     draw(g: Graphics) {
-        this.drawBackground(g);
-        this.drawChildren(g);
+        this.drawBackground(g)
+        this.drawChildren(g)
     }
 
     protected drawBackground(g: Graphics) {
@@ -51,18 +53,37 @@ export default class Control extends Node {
         }
     }
 
+    updateTransform() {
+        //  TODO: Cache and don't multiply later if transforms
+        let localTransform = (this.x !== 0 || this.y !== 0 ) ? Matrix4.translation(this.x, this.y, 0) : null
+        let parentTransform = this.parentNode instanceof Node ? this.parentNode.transform : null
+        let transform =
+            localTransform != null
+                ? parentTransform != null
+                    ? parentTransform.multiply(localTransform)
+                    : localTransform
+                : parentTransform != null
+                    ? parentTransform
+                    : Matrix4.identity
+        if (this.transform !== transform) {
+            this.transform = transform
+        }
+    }
+
+    update(g: Graphics) {
+        // before updating children, make a transform if we need to.
+        this.updateTransform()
+        return super.update(g)
+    }
+
     protected drawChildren(g: Graphics) {
         if (this.firstChild) {
-            this.layoutChildren(this);
-            if (this.x !== 0 || this.y !== 0) {
-                // alter this to use an actual full transform matrix or not
-                g.translate(this.x, this.y);
-                super.draw(g);
-                g.translate(-this.x, -this.y);
-            }
-            else {
-                super.draw(g);
-            }
+            this.layoutChildren(this)
+            // alter this to use an actual full transform matrix or not
+            let saveTransform = g.transform
+            g.transform = this.transform
+            super.draw(g)
+            g.transform = saveTransform
         }
     }
 

@@ -9,12 +9,8 @@ export class Uniforms {
     modelView: Matrix4 = Matrix4.identity
     projection: Matrix4 = Matrix4.identity
     screen: Vector2 = new Vector2(800, 600)
-    //  the mul order may be opposite
     get modelViewProjection(): Matrix4 {
-        return this.modelView.multiply(this.projection)
-    }
-    get viewProjection(): Matrix4 {
-        return this.view.multiply(this.projection)
+        return this.projection.multiply(this.modelView)
     }
     translate(dx: number, dy: number, dz: number = 0) {
         this.transform(Matrix4.translation(dx, dy, dz))
@@ -26,7 +22,9 @@ export class Uniforms {
         this.transform(Matrix4.scaling(sx, sy, sz))
     }
     transform(m: Matrix4) {
-        this.modelView = m.multiply(this.modelView)
+        //  pretty sure this is the correct order
+        this.modelView = this.modelView.multiply(m)
+        // this.modelView = m.multiply(this.modelView)
     }
 }
 

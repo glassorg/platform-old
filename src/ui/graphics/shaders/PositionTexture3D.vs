@@ -5,6 +5,6 @@ in vec2 textureCoordinates;
 
 out vec2 vs_textureCoordinates;
 void main() {
-    gl_Position = vec4(position, 1) * modelViewProjection;
+    gl_Position = modelViewProjection * vec4(position, 1);
     vs_textureCoordinates = textureCoordinates;
 }

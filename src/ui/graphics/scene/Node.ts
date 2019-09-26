@@ -4,11 +4,13 @@ import Capsule from "../../math/Capsule"
 import BoundingShape from "../../math/BoundingShape"
 import Pickable from "./Pickable"
 import PickResult from "./PickResult"
+import Matrix4 from "../../math/Matrix4"
 
 export default class Node extends VirtualNode {
     
     bounds?: BoundingShape
     pickable = Pickable.Children
+    transform = Matrix4.identity
 
     update(g: Graphics): boolean {
         let animating = false

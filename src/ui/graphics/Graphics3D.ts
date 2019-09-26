@@ -86,20 +86,14 @@ export default class Graphics3D extends Graphics {
         return this.gl.canvas.height
     }
 
-    translate(dx: number, dy: number, dz: number) {
-        this.uniforms.translate(dx, dy, dz)
+    set transform(m: Matrix4) {
+        if (!(m instanceof Matrix4)) {
+            throw new Error("transform must be a Matrix4")
+        }
+        this.uniforms.modelView = m
     }
-
-    rotate(angle: number) {
-        this.uniforms.rotate(angle)
-    }
-
-    scale(sx: number, sy: number, sz: number) {
-        this.uniforms.scale(sx, sy, sz)
-    }
-
-    transform(m: Matrix4) {
-        this.uniforms.transform(m)
+    get transform() {
+        return this.uniforms.modelView
     }
 
     clear(color: Color = Color.transparent, depth: number = 1) {
@@ -136,6 +130,11 @@ export default class Graphics3D extends Graphics {
             gl.vertexAttribPointer(location, element.size, element.type, element.normalize, element.stride, element.offset)
             gl.enableVertexAttribArray(location)
         }
+    }
+
+    private getUniformLocation(name: string) {
+        const program = this.getWebGLProgram(this.program)
+        return this.gl.getUniformLocation(program, name)
     }
 
     bindUniforms() {
@@ -187,7 +186,9 @@ export default class Graphics3D extends Graphics {
     }
 
     flush(property?: string) {
-        if (this.vertexStream && (property !== "model" || !this.program.vertexShader.pretransformed)) {
+        //  if a uniform property changes, but the current program doesn't care
+        //  then we don't flush.
+        if (this.vertexStream && (property == null || this.getUniformLocation(property) != null)) {
             this.vertexStream.flush()
         }
     }
