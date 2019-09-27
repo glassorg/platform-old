@@ -15,6 +15,9 @@ export function equals(a, b) {
 
 const bluePixelData = new Uint8Array([0, 0, 255, 255])
 export function createTexture(gl: WebGL2RenderingContext, src: string, onload: () => void) {
+    if (src == null) {
+        throw new Error("src is required")
+    }
     // Create a texture.
     var texture = gl.createTexture()
     if (texture == null)

@@ -46,3 +46,5 @@ Main glass library
         2D Canvas usage from within 3D.
         Text Rendering within Canvas 2D.
         3D Effects.
+    
+        Need ability to create/delete a Texture and update it's src

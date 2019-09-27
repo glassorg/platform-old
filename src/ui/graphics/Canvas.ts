@@ -11,7 +11,6 @@ import Capsule from "../math/Capsule"
 import Sphere from "../math/Sphere"
 import Node from "./scene/Node"
 import Dock, { layout } from "./scene/Dock"
-import WindowSize from "../input/WindowSize"
 
 function bindPointerEvents(canvas: HTMLCanvasElement) {
     let pointerTarget: Node | null = null

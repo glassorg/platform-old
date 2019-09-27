@@ -79,7 +79,7 @@ export default class Graphics2D extends Graphics {
     end() {
     }
 
-    fillRectangle(x: number, y: number, width: number, height: number, color: Color) {
+    fillRectangle(x: number, y: number, width: number, height: number, color: Color, texture) {
         this.context.fillStyle = color.toString()
         this.context.fillRect(x, y, width, height)
     }

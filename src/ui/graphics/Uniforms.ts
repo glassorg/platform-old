@@ -3,6 +3,7 @@ import Matrix4 from "../math/Matrix4"
 import Vector2 from "../math/Vector2"
 import Vector3 from "../math/Vector3"
 import { equals } from "./functions"
+import Texture from "./Texture"
 
 export class Uniforms {
     [property: string]: any
@@ -11,20 +12,6 @@ export class Uniforms {
     screen: Vector2 = new Vector2(800, 600)
     get modelViewProjection(): Matrix4 {
         return this.projection.multiply(this.modelView)
-    }
-    translate(dx: number, dy: number, dz: number = 0) {
-        this.transform(Matrix4.translation(dx, dy, dz))
-    }
-    rotate(angle: number) {
-        this.transform(Matrix4.rotation(new Vector3(0, 0, 1), angle)!)
-    }
-    scale(sx: number, sy: number = sx, sz: number = sx) {
-        this.transform(Matrix4.scaling(sx, sy, sz))
-    }
-    transform(m: Matrix4) {
-        //  pretty sure this is the correct order
-        this.modelView = this.modelView.multiply(m)
-        // this.modelView = m.multiply(this.modelView)
     }
 }
 
@@ -50,8 +37,11 @@ export function setUniform(g: Graphics3D, uniform: WebGLActiveInfo, location: We
         gl.uniform1fv(location, value)
     }
     else if (uniform.type === gl.SAMPLER_2D) {
+        if (value == null) {
+            value = Texture.default
+        }
         let texture = g.getWebGLTexture(value)
-        let index = g.bindTexture(texture)
+        let index = g.bindTexture(texture, uniform.name)
         gl.uniform1i(location, index)
     }
     else {

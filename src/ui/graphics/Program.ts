@@ -6,6 +6,9 @@ import Color_FragmentShader from "./shaders/Color.fs"
 import PositionColor2D_VertexShader from "./shaders/PositionColor2D.vs"
 import PositionTexture3D_VertexShader from "./shaders/PositionTexture3D.vs"
 import Texture_FragmentShader from "./shaders/Texture.fs"
+import PositionColorTexture3D_VertexShader from "./shaders/PositionColorTexture3D.vs"
+import PositionColorTexture2D_VertexShader from "./shaders/PositionColorTexture2D.vs"
+import ColorTexture_FragmentShader from "./shaders/ColorTexture.fs"
 
 /**
  * Shader program declaration.
@@ -28,12 +31,17 @@ export default class Program {
     }
 
     public static readonly default3D: Program = new Program(
-        new VertexShader(VertexFormat.positionColor, PositionColor3D_VertexShader),
-        new FragmentShader(Color_FragmentShader)
+        new VertexShader(VertexFormat.positionColorTexture, PositionColorTexture3D_VertexShader),
+        new FragmentShader(ColorTexture_FragmentShader)
     )
 
+    // public static readonly default3D: Program = new Program(
+    //     new VertexShader(VertexFormat.positionColor, PositionColor3D_VertexShader),
+    //     new FragmentShader(Color_FragmentShader)
+    // )
+
     public static readonly default2D: Program = new Program(
-        new VertexShader(VertexFormat.positionColor, PositionColor2D_VertexShader),
+        new VertexShader(VertexFormat.positionColorTexture, PositionColorTexture2D_VertexShader),
         Program.default3D.fragmentShader
     )
 

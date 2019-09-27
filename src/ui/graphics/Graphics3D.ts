@@ -12,6 +12,7 @@ import VertexStream from "./VertexStream"
 import Vector2 from "../math/Vector2"
 import Matrix4 from "../math/Matrix4"
 import Vector3 from "../math/Vector3"
+import Texture from "./Texture"
 
 export default class Graphics3D extends Graphics {
 
@@ -62,17 +63,22 @@ export default class Graphics3D extends Graphics {
         this.updateScreenSize()
     }
 
-    public bindTexture(texture: WebGLTexture): number {
-        for (let i = 0; i < this.boundTextureUnits.length; i++) {
-            if (this.boundTextureUnits[i] === texture) {
-                return i
-            }
+    boundLocations: { [name: string]: number } = {}
+    getTextureUnitByUniformName(name: string) {
+        // each uniform name will end up with it's own unique texture unit
+        let location = this.boundLocations[name]
+        if (location == null) {
+            location = this.boundLocations[name] = Object.keys(this.boundLocations).length
         }
-        let i = this.boundTextureUnits.length
-        this.boundTextureUnits[i] = texture
-        this.gl.activeTexture(GL.TEXTURE0 + i)
+        return location
+    }
+
+    public bindTexture(texture: WebGLTexture, name): number {
+        let unit = this.getTextureUnitByUniformName(name)
+        this.boundTextureUnits[unit] = texture
+        this.gl.activeTexture(GL.TEXTURE0 + unit)
         this.gl.bindTexture(GL.TEXTURE_2D, texture)
-        return i
+        return unit
     }
 
     private updateScreenSize() {
@@ -150,7 +156,7 @@ export default class Graphics3D extends Graphics {
             const attribute = gl.getActiveUniform(program, i)!
             const location = gl.getUniformLocation(program, attribute.name)!
             let value = this.uniforms[attribute.name]
-            if (value.toArray)
+            if (value && value.toArray)
                 value = value.toArray()
             // set uniform value, need abstraction for writing uniforms
             setUniform(this, attribute, location, value)
@@ -175,18 +181,19 @@ export default class Graphics3D extends Graphics {
         return deps
     }
 
-    fillRectangle(x: number, y: number, width: number, height: number, color: Color, depth: number = 0) {
+    fillRectangle(x: number, y: number, width: number, height: number, color: Color, texture: any = Texture.default, depth: number = 0) {
         let a = new Vector3(x, y, depth).transform(this.uniforms.modelView)
         let b = new Vector3(x + width, y, depth).transform(this.uniforms.modelView)
         let c = new Vector3(x, y + height, depth).transform(this.uniforms.modelView)
         let d = new Vector3(x + width, y + height, depth).transform(this.uniforms.modelView)
+        this.uniforms.colorTexture = texture
         this.vertexStream.write(
-            ...a, ...color,
-            ...b, ...color,
-            ...c, ...color,
-            ...c, ...color,
-            ...b, ...color,
-            ...d, ...color,
+            ...a, ...color, 0, 0,
+            ...b, ...color, 1, 0,
+            ...c, ...color, 0, 1,
+            ...c, ...color, 0, 1,
+            ...b, ...color, 1, 0,
+            ...d, ...color, 1, 1,
         )
     }
 
