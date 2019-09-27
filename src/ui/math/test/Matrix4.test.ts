@@ -20,19 +20,11 @@ test("Matrix4 / Vector Associativity", assert => {
     let x = new Vector3(1, 0, 0)
     let y = new Vector3(0, 1, 0)
     let z = new Vector3(0, 0, 1)
-    let xPrime = x.transform(
-        Matrix4.rotation(y, Math.PI / 2)
-    ).transform(
-        Matrix4.rotation(z, Math.PI / 2)
-    ) // = Rz (Ry x)
-    let xPrime2 = x.transform(
-        Matrix4.rotation(z, Math.PI / 2)
-            .multiply(Matrix4.rotation(y, Math.PI / 2))
-    ) // = (Rz Ry) x
-    let xPrime3 = x.transform(
-        Matrix4.rotation(y, Math.PI / 2)
-            .multiply(Matrix4.rotation(z, Math.PI / 2))
-    ) // = (Ry Rz) x
+    let roty = Matrix4.rotation(y, Math.PI / 2)
+    let rotz = Matrix4.rotation(z, Math.PI / 2)
+    let xPrime = x.transform(roty).transform(rotz) // = Rz (Ry x)
+    let xPrime2 = x.transform(rotz.multiply(roty)) // = (Rz Ry) x
+    let xPrime3 = x.transform(roty.multiply(rotz)) // = (Ry Rz) x
 
     assert.true(xPrime.equivalent(xPrime2))
     assert.false(xPrime3.equivalent(xPrime2))
