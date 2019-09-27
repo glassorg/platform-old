@@ -31,7 +31,7 @@ export default class Control extends Node {
     minimumSize?: Size
     maximumSize?: Size
     optimumSize?: Size
-    localTransformValid?: boolean
+    private transformValid?: boolean
 
     /**
      * Layout function for positioning children.
@@ -44,7 +44,7 @@ export default class Control extends Node {
 
     set x(value) {
         if (this._x !== value) {
-            this.localTransformValid = false
+            this.transformValid = false
             this._x = value
         }
     }
@@ -53,7 +53,7 @@ export default class Control extends Node {
     }
     set y(value) {
         if (this._y !== value) {
-            this.localTransformValid = false
+            this.transformValid = false
             this._y = value
         }
     }
@@ -63,37 +63,31 @@ export default class Control extends Node {
 
     draw(g: Graphics) {
         this.drawBackground(g)
-        this.drawChildren(g)
+        super.draw(g)
     }
 
     protected drawBackground(g: Graphics) {
         if (this.backColor.isVisible) {
-            g.fillRectangle(this.x, this.y, this.width, this.height, this.backColor);
+            g.fillRectangle(0, 0, this.width, this.height, this.backColor);
         }
     }
 
     protected calculateLocalTransform() {
-        return (this.firstChild && (this.x !== 0 || this.y !== 0) ) ? Matrix4.translation(this.x, this.y, 0) : null
+        return (this.x !== 0 || this.y !== 0) ? Matrix4.translation(this.x, this.y, 0) : null
     }
 
-    _localTransform?: Matrix4 | null
-    get localTransform() {
-        if (!this.localTransformValid) {
-            this._localTransform = this.calculateLocalTransform()
-            this.localTransformValid = true
+    _transform?: Matrix4 | null
+    get transform() {
+        if (!this.transformValid) {
+            this._transform = this.calculateLocalTransform()
+            this.transformValid = true
         }
-        return this._localTransform
+        return this._transform
     }
 
-    protected drawChildren(g: Graphics) {
-        if (this.firstChild) {
-            this.layoutChildren(this)
-            // alter this to use an actual full transform matrix or not
-            let saveTransform = g.transform
-            g.transform = this.worldTransform
-            super.draw(g)
-            g.transform = saveTransform
-        }
+    updateChildren(g: Graphics) {
+        this.layoutChildren(this)
+        return super.updateChildren(g)
     }
 
     get size() { return new Size(this.width, this.height) }
@@ -113,6 +107,7 @@ export default class Control extends Node {
         this.x = value.x
         this.y = value.y
     }
+    get boundingShape() { return new Rectangle(0, 0, this.width, this.height) }
 
     _pickable?: Pickable
     get pickable() {
@@ -136,7 +131,7 @@ export default class Control extends Node {
         if (this.pickRadius) {
             ray = ray.addRadius(this.pickRadius)
         }
-        let intersection = this.bounds.intersectsCapsule(ray)
+        let intersection = this.boundingShape.intersectsCapsule(ray)
         return intersection ? new PickResult(this, intersection) : null
     }
 

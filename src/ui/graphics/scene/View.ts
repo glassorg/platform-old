@@ -10,12 +10,11 @@ export default class View extends Control {
     projection: Matrix4 = Matrix4.identity
     layout = Dock.fill
 
-    draw(g: Graphics) {
-        this.drawBackground(g)
-        if (g instanceof Graphics3D){
-            g.uniforms.projection = this.projection
-        }
-        this.drawChildren(g)
+    drawChildren(g: Graphics) {
+        let saveProjection = g.uniforms.projection
+        g.uniforms.projection = this.projection
+        super.drawChildren(g)
+        g.uniforms.projection = saveProjection
     }
 
 }

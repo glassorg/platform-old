@@ -12,8 +12,9 @@ export default abstract class Graphics {
     abstract begin()
     abstract end()
     // transformation
-    abstract get transform(): Matrix4
-    abstract set transform(value: Matrix4)
+    abstract uniforms: { modelView: Matrix4, projection: Matrix4 }
+    // abstract get transform(): Matrix4
+    // abstract set transform(value: Matrix4)
     // drawing
     abstract clear(color?: Color, depth?: number)
     abstract fillRectangle(x: number, y: number, width: number, height: number, color: Color)

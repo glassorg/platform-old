@@ -203,16 +203,16 @@ export default class Context {
 
     //  need a way to request a notification after normal rendering
     requestAnimationFrame(callback: (time) => void) {
-        // if (this.isRendering) {
-        //     console.log("isRendering")
-        //     this.postRenderCallbacks.add(callback)
-        // } else {
-        //     console.log("is not rendering")
+        if (this.isRendering) {
+            console.log("isRendering")
+            this.postRenderCallbacks.add(callback)
+        } else {
+            console.log("is not rendering")
             window.requestAnimationFrame(callback)
-        // }
+        }
     }
 
-    // postRenderCallbacks = new Set<Function>()
+    postRenderCallbacks = new Set<Function>()
     isRendering: boolean = false
     private static currentStack: Context[] = []
     static get current() {
@@ -243,12 +243,12 @@ export default class Context {
                 }
             }
         }
-        // if (this.postRenderCallbacks.size > 0) {
-        //     for (let callback of this.postRenderCallbacks) {
-        //         callback(time)
-        //     }
-        //     this.postRenderCallbacks.clear()
-        // }
+        if (this.postRenderCallbacks.size > 0) {
+            for (let callback of this.postRenderCallbacks) {
+                callback(time)
+            }
+            this.postRenderCallbacks.clear()
+        }
     }
 
     render<T>(type: Render<T>, properties?: T, forceRenderBecauseStateChanged = false): INode {

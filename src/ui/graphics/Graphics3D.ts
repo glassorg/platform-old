@@ -42,6 +42,8 @@ export default class Graphics3D extends Graphics {
             return createProgram(this.gl, vs, fs)
         })
         this.getWebGLTexture = memoize((name: string) => createTexture(this.gl, name, () => (gl.canvas as any).dirty = true))
+        let getUniformDependencies = this.getUniformDependencies
+        this.getUniformDependencies = memoize((program: Program) => getUniformDependencies.call(this, program))
 
         //  set the default program for now
         this.program = Program.default2D
@@ -155,6 +157,24 @@ export default class Graphics3D extends Graphics {
         }
     }
 
+    getUniformDependencies(program: Program) {
+        let deps: { [name: string]: boolean } = {}
+        const gl = this.gl
+        const glProgram = this.getWebGLProgram(program)
+        const count = this.gl.getProgramParameter(glProgram, GL.ACTIVE_UNIFORMS)
+        for (let i = 0; i < count; ++i) {
+            const {name} = gl.getActiveUniform(glProgram, i)!
+            if (name === "modelViewProjection") {
+                deps.modelView = true
+                deps.projection = true
+            }
+            else {
+                deps[name] = true
+            }
+        }
+        return deps
+    }
+
     fillRectangle(x: number, y: number, width: number, height: number, color: Color, depth: number = 0) {
         let a = new Vector3(x, y, depth).transform(this.uniforms.modelView)
         let b = new Vector3(x + width, y, depth).transform(this.uniforms.modelView)
@@ -186,9 +206,8 @@ export default class Graphics3D extends Graphics {
     }
 
     flush(property?: string) {
-        //  if a uniform property changes, but the current program doesn't care
-        //  then we don't flush.
-        if (this.vertexStream && (property == null || this.getUniformLocation(property) != null)) {
+        //  if a uniform property changes, but the current program doesn't care then we don't flush.
+        if (this.vertexStream && (property == null || this.getUniformDependencies(this.program)[property])) {
             this.vertexStream.flush()
         }
     }

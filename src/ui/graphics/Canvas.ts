@@ -104,7 +104,7 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
                 }
                 for (let node: any = canvas.firstChild; node != null; node = node.nextSibling) {
                     if (node instanceof Node) {
-                        node.draw(graphics)
+                        node.render(graphics)
                     }
                 }
                 graphics.end()

@@ -8,55 +8,86 @@ import Matrix4 from "../../math/Matrix4"
 
 export default class Node extends VirtualNode {
 
-    bounds?: BoundingShape
+    boundingShape?: BoundingShape
     pickable?: Pickable
     // the worldTransform, transforms from child space to world space
     //  worldTransform
     worldTransform = Matrix4.identity
     //  localTransform
-    localTransform?: Matrix4 | null
+    transform?: Matrix4 | null
 
     protected calculateWorldTransform(parentTransform, localTransform) {
-        return Matrix4.multiply(parentTransform, localTransform) || Matrix4.identity
+        return Matrix4.multiply(localTransform, parentTransform) || Matrix4.identity
     }
 
-    update(g: Graphics): boolean {
+    public update(g: Graphics): boolean {
         let animating = false
-        if (this.firstChild != null) {
-            // update worldTransform
-            let localTransform = this.localTransform
-            let parentTransform = this.parentNode instanceof Node ? this.parentNode.worldTransform : null
-            let worldTransform = this.calculateWorldTransform(localTransform, parentTransform)
-            if (this.worldTransform !== worldTransform) {
-                this.worldTransform = worldTransform
-            }
-    
-            // update children
-            for (let node = this.firstChild; node != null; node = node.nextSibling!) {
-                if (node instanceof Node) {
-                    if (node.update(g)) {
-                        animating = true
-                    }
+        if (this.updateSelf(g)) {
+            animating = true
+        }
+        if (this.updateChildren(g)) {
+            animating = true
+        }
+        return animating
+    }
+
+    protected updateSelf(g: Graphics) {
+        let localTransform = this.transform
+        let parentTransform = this.parentNode instanceof Node ? this.parentNode.worldTransform : null
+        let worldTransform = this.calculateWorldTransform(localTransform, parentTransform)
+        if (this.worldTransform !== worldTransform) {
+            this.worldTransform = worldTransform
+        }
+        return false
+    }
+
+    protected updateChildren(g: Graphics) {
+        let animating = false
+        for (let node = this.firstChild; node != null; node = node.nextSibling!) {
+            if (node instanceof Node) {
+                if (node.update(g)) {
+                    animating = true
                 }
             }
         }
         return animating
     }
 
-    draw(g: Graphics) {
-        for (let node = this.firstChild; node != null; node = node.nextSibling) {
-            if (node instanceof Node) {
-                node.draw(g)
-            }
-        }
+    public render(g: Graphics) {
+        //  convert to uniforms
+        let saveTransform = g.uniforms.modelView
+        g.uniforms.modelView = this.worldTransform
+        this.draw(g)
+        g.uniforms.modelView = saveTransform
+    }
+
+    protected draw(g: Graphics) {
+        this.drawChildren(g)
         this.dirty = false
     }
 
-    pick(ray: Capsule): PickResult | null {
-        let pickable = this.pickable || 0
+    protected drawChildren(g: Graphics) {
+        for (let node = this.firstChild; node != null; node = node.nextSibling) {
+            if (node instanceof Node) {
+                node.render(g)
+            }
+        }
+    }
+
+    public pick(ray: Capsule): PickResult | null {
+        let pickable = this.pickable
+        if (pickable == null) {
+            pickable = Pickable.children
+        }
+        if (pickable !== Pickable.none) {
+            let { transform: localTransform } = this
+            if (localTransform) {
+                ray = ray.transform(localTransform.inverse())
+            }
+        }
         if (pickable & Pickable.children) {
-            let bounds = this.bounds
-            if (bounds == null || bounds.intersectsCapsule(ray)) {
+            let boundingShape = this.boundingShape
+            if (boundingShape == null || boundingShape.intersectsCapsule(ray)) {
                 let result = this.pickChildren(ray)
                 if (result != null) {
                     return result
@@ -80,12 +111,6 @@ export default class Node extends VirtualNode {
 
     protected get pickChildrenReverse() { return false }
     protected pickChildren(ray: Capsule): PickResult | null {
-        // //  check children for intersection.
-        // let childRay = ray.translate(this.position.negate())
-        let { localTransform } = this
-        if (localTransform) {
-            ray = ray.transform(localTransform.inverse())
-        }
         // //  we iterate children from last to first since later children are on top.
         let reverse = this.pickChildrenReverse
         for (let child = reverse ? this.lastChild : this.firstChild;

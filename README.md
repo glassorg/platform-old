@@ -34,11 +34,15 @@ Main glass library
 
 
 ## Todo
-    X   Change default2D shader to actually use modelViewProjection matrix
+    X   Change default2D shader to actually use modelViewProjection matrix.
     X   Change Scene to Screen and make it set the Projection Matrix to 2D.
-    X   Create a View or Camera class to handle the View Matrix
-    X   Created horizontal and vertical flex layout
-    X   Handle Virtual Node Transforms using Matrices
-    X   Use Transforms while Picking to transform the Pick Capsule
-        Use Point from input as event source instead of pointer events.
-        Create and use an arbitrary Transform Node and test input.
+    X   Create a View or Camera class to handle the View Matrix.
+    X   Created horizontal and vertical flex layout.
+    X   Handle Virtual Node Transforms using Matrices.
+    X   Use Transforms while Picking to transform the Pick Capsule.
+    X   Use Transform as LocalTransform for Control.
+    X   Create and use an arbitrary Transform Node and test input.
+        Sprites and Image Usage in 2D and 3D.
+        2D Canvas usage from within 3D.
+        Text Rendering within Canvas 2D.
+        3D Effects.
