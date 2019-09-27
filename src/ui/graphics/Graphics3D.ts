@@ -86,20 +86,14 @@ export default class Graphics3D extends Graphics {
         return this.gl.canvas.height
     }
 
-    translate(dx: number, dy: number, dz: number) {
-        this.uniforms.translate(dx, dy, dz)
+    set transform(m: Matrix4) {
+        if (!(m instanceof Matrix4)) {
+            throw new Error("transform must be a Matrix4")
+        }
+        this.uniforms.modelView = m
     }
-
-    rotate(angle: number) {
-        this.uniforms.rotate(angle)
-    }
-
-    scale(sx: number, sy: number, sz: number) {
-        this.uniforms.scale(sx, sy, sz)
-    }
-
-    transform(m: Matrix4) {
-        this.uniforms.transform(m)
+    get transform() {
+        return this.uniforms.modelView
     }
 
     clear(color: Color = Color.transparent, depth: number = 1) {
@@ -138,6 +132,11 @@ export default class Graphics3D extends Graphics {
         }
     }
 
+    private getUniformLocation(name: string) {
+        const program = this.getWebGLProgram(this.program)
+        return this.gl.getUniformLocation(program, name)
+    }
+
     bindUniforms() {
         const gl = this.gl
         const program = this.getWebGLProgram(this.program)
@@ -157,10 +156,10 @@ export default class Graphics3D extends Graphics {
     }
 
     fillRectangle(x: number, y: number, width: number, height: number, color: Color, depth: number = 0) {
-        let a = new Vector3(x, y, depth).transform(this.uniforms.model)
-        let b = new Vector3(x + width, y, depth).transform(this.uniforms.model)
-        let c = new Vector3(x, y + height, depth).transform(this.uniforms.model)
-        let d = new Vector3(x + width, y + height, depth).transform(this.uniforms.model)
+        let a = new Vector3(x, y, depth).transform(this.uniforms.modelView)
+        let b = new Vector3(x + width, y, depth).transform(this.uniforms.modelView)
+        let c = new Vector3(x, y + height, depth).transform(this.uniforms.modelView)
+        let d = new Vector3(x + width, y + height, depth).transform(this.uniforms.modelView)
         this.vertexStream.write(
             ...a, ...color,
             ...b, ...color,
@@ -187,7 +186,9 @@ export default class Graphics3D extends Graphics {
     }
 
     flush(property?: string) {
-        if (this.vertexStream && (property !== "model" || !this.program.vertexShader.pretransformed)) {
+        //  if a uniform property changes, but the current program doesn't care
+        //  then we don't flush.
+        if (this.vertexStream && (property == null || this.getUniformLocation(property) != null)) {
             this.vertexStream.flush()
         }
     }

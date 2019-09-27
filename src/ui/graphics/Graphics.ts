@@ -6,16 +6,14 @@ export default abstract class Graphics {
     // timing
     time = 0
     // properties
-    abstract get width()
-    abstract get height()
+    abstract get width(): number
+    abstract get height(): number
     // render lifecycle
     abstract begin()
     abstract end()
     // transformation
-    abstract translate(dx: number, dy: number, dz?: number)
-    abstract rotate(angle: number)
-    abstract scale(sx: number, sy?: number, sz?: number)
-    abstract transform(matrix: Matrix4)
+    abstract get transform(): Matrix4
+    abstract set transform(value: Matrix4)
     // drawing
     abstract clear(color?: Color, depth?: number)
     abstract fillRectangle(x: number, y: number, width: number, height: number, color: Color)

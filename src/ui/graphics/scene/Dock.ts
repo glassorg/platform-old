@@ -13,26 +13,26 @@ enum Dock {
 const options = {
     top(child: Control, bounds: Rectangle) {
         let height = (child.optimumSize || child.size).add(child.margin).height
-        Object.assign(child, new Rectangle(bounds.x, bounds.y, bounds.width, height).subtract(child.margin))
+        child.bounds = new Rectangle(bounds.x, bounds.y, bounds.width, height).subtract(child.margin)
         return new Rectangle(bounds.x, bounds.y + height, bounds.width, bounds.height - height)
     },
     bottom(child: Control, bounds: Rectangle) {
         let height = (child.optimumSize || child.size).add(child.margin).height
-        Object.assign(child, new Rectangle(bounds.x, bounds.bottom - height, bounds.width, height).subtract(child.margin))
+        child.bounds = new Rectangle(bounds.x, bounds.bottom - height, bounds.width, height).subtract(child.margin)
         return new Rectangle(bounds.x, bounds.y, bounds.width, bounds.height - height)
     },
     left(child: Control, bounds: Rectangle) {
         let width = (child.optimumSize || child.size).add(child.margin).width
-        Object.assign(child, new Rectangle(bounds.x, bounds.y, width, bounds.height).subtract(child.margin))
+        child.bounds = new Rectangle(bounds.x, bounds.y, width, bounds.height).subtract(child.margin)
         return new Rectangle(bounds.x + width, bounds.y, bounds.width - width, bounds.height)
     },
     right(child: Control, bounds: Rectangle) {
         let width = (child.optimumSize || child.size).add(child.margin).width
-        Object.assign(child, new Rectangle(bounds.right - width, bounds.y, width, bounds.height).subtract(child.margin))
+        child.bounds = new Rectangle(bounds.right - width, bounds.y, width, bounds.height).subtract(child.margin)
         return new Rectangle(bounds.x, bounds.y, bounds.width - width, bounds.height)
     },
     fill(child: Control, bounds: Rectangle) {
-        Object.assign(child, bounds.subtract(child.margin))
+        child.bounds = bounds.subtract(child.margin)
         return bounds
     },
     none(child: Control, bounds: Rectangle) {

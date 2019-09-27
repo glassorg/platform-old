@@ -23,15 +23,15 @@ function bindPointerEvents(canvas: HTMLCanvasElement) {
             let back = new Vector3(position.x, position.y, 1)
             let ray = new Capsule(new Sphere(front, 0), new Sphere(back, 0))
             let picked = firstChild.pick(ray)
-            if (picked) {
-                if (pointerTarget !== picked.node) {
-                    if (pointerTarget && pointerTarget.onpointerout) {
-                        pointerTarget.onpointerout(e)
-                    }
-                    pointerTarget = picked.node
-                    if (pointerTarget && pointerTarget.onpointerover) {
-                        pointerTarget.onpointerover(e)
-                    }
+            // console.log("picked: ", picked ? { id: picked.node.id, x: picked.position.x, y: picked.position.y } : null)
+            let pickedNode = picked ? picked.node : null
+            if (pointerTarget !== pickedNode) {
+                if (pointerTarget && pointerTarget.onpointerout) {
+                    pointerTarget.onpointerout(e)
+                }
+                pointerTarget = pickedNode
+                if (pointerTarget && pointerTarget.onpointerover) {
+                    pointerTarget.onpointerover(e)
                 }
             }
             return pointerTarget
@@ -39,19 +39,19 @@ function bindPointerEvents(canvas: HTMLCanvasElement) {
         return null
     }
 
-    // // add some event routing
-    // for (let event of ["pointerdown", "pointerup", "pointermove"]) {
-    //     canvas.addEventListener(event, (e: any) => {
-    //         let target = pick(e)
-    //         if (target && target[event]) {
-    //             target[event](e)
-    //         }
-    //     })
-    // }
+    // add some event routing
+for (let event of ["pointerdown", "pointerup", "pointermove"]) {
+        canvas.addEventListener(event, (e: any) => {
+            let target = pick(e)
+            if (target && target[event]) {
+                target[event](e)
+            }
+        })
+    }
 }
 
 const contextSymbol = Symbol("context")
-function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement, dimensions: 2 | 3) {
+function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement, dimensions: 2 | 3, testPerformance = 0) {
     let previousContext = canvas[contextSymbol]
     if (previousContext != null) {
         if (previousContext !== c) {
@@ -88,23 +88,33 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
                 start = time
             }
             graphics.time = (time - start) / 1000
-            graphics.begin()
             // layout any children using the Dock layout.
-            let animating = false
-            for (let node: any = canvas.firstChild; node != null; node = node.nextSibling) {
-                if (node instanceof Node) {
-                    if (node.update(graphics)) {
-                        animating = true
+            let animating = testPerformance ? true : false
+            let count = testPerformance || 1
+            let testStart = Date.now()
+            for (let i = 0; i < count; i++) {
+                graphics.begin()
+                layout(canvas as any)
+                for (let node: any = canvas.firstChild; node != null; node = node.nextSibling) {
+                    if (node instanceof Node) {
+                        if (node.update(graphics)) {
+                            animating = true
+                        }
                     }
                 }
-            }
-            layout(canvas as any)
-            for (let node: any = canvas.firstChild; node != null; node = node.nextSibling) {
-                if (node instanceof Node) {
-                    node.draw(graphics)
+                for (let node: any = canvas.firstChild; node != null; node = node.nextSibling) {
+                    if (node instanceof Node) {
+                        node.draw(graphics)
+                    }
                 }
+                graphics.end()
             }
-            graphics.end()
+            let testStop = Date.now()
+            if (testPerformance) {
+                let testSeconds = (testStop - testStart) / 1000
+                let fps = Math.round(count / (testSeconds))
+                console.log(`${fps} FPS, ${dimensions}D, ${animating}`)
+            }
             dirty = false
             if (animating) {
                 (canvas as any).dirty = true
@@ -136,13 +146,14 @@ export default Context.component(function Canvas(c: Context, p: {
     height?: number,
     class?: string,
     style?: string,
+    testPerformance?: number
 }) {
-    let { dimensions, content, ...rest } = p
+    let { dimensions, content, testPerformance, ...rest } = p
     let canvas = c.begin(html.canvas, rest)
-        let repaint = ensureRootRepaintableVirtualNode(c, canvas, dimensions = dimensions || 2)
+        let repaint = ensureRootRepaintableVirtualNode(c, canvas, dimensions = dimensions || 2, testPerformance)
         content(c)
         if (repaint) {
-            repaint(0)
+            repaint()
         }
     c.end(html.canvas)
 })

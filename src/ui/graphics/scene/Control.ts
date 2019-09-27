@@ -12,14 +12,15 @@ import BoundingShape from "../../math/BoundingShape"
 import Line from "../../math/Line"
 import Pickable from "./Pickable"
 import PickResult from "./PickResult"
+import Matrix4 from "../../math/Matrix4"
+import { equals } from "../functions"
 
 type LayoutFunction = (container: Control) => void
 
 export default class Control extends Node {
 
-    x = 0
-    y = 0
-    z = 0
+    private _x = 0
+    private _y = 0
     width = 100
     height = 50
     backColor = Color.transparent
@@ -30,6 +31,7 @@ export default class Control extends Node {
     minimumSize?: Size
     maximumSize?: Size
     optimumSize?: Size
+    localTransformValid?: boolean
 
     /**
      * Layout function for positioning children.
@@ -40,9 +42,28 @@ export default class Control extends Node {
      */
     layout?: any
 
+    set x(value) {
+        if (this._x !== value) {
+            this.localTransformValid = false
+            this._x = value
+        }
+    }
+    get x() {
+        return this._x
+    }
+    set y(value) {
+        if (this._y !== value) {
+            this.localTransformValid = false
+            this._y = value
+        }
+    }
+    get y() {
+        return this._y
+    }
+
     draw(g: Graphics) {
-        this.drawBackground(g);
-        this.drawChildren(g);
+        this.drawBackground(g)
+        this.drawChildren(g)
     }
 
     protected drawBackground(g: Graphics) {
@@ -51,17 +72,27 @@ export default class Control extends Node {
         }
     }
 
+    protected calculateLocalTransform() {
+        return (this.firstChild && (this.x !== 0 || this.y !== 0) ) ? Matrix4.translation(this.x, this.y, 0) : null
+    }
+
+    _localTransform?: Matrix4 | null
+    get localTransform() {
+        if (!this.localTransformValid) {
+            this._localTransform = this.calculateLocalTransform()
+            this.localTransformValid = true
+        }
+        return this._localTransform
+    }
+
     protected drawChildren(g: Graphics) {
         if (this.firstChild) {
-            this.layoutChildren(this);
-            if (this.x !== 0 || this.y !== 0) {
-                g.translate(this.x, this.y);
-                super.draw(g);
-                g.translate(-this.x, -this.y);
-            }
-            else {
-                super.draw(g);
-            }
+            this.layoutChildren(this)
+            // alter this to use an actual full transform matrix or not
+            let saveTransform = g.transform
+            g.transform = this.worldTransform
+            super.draw(g)
+            g.transform = saveTransform
         }
     }
 
@@ -81,6 +112,22 @@ export default class Control extends Node {
     set position(value) {
         this.x = value.x
         this.y = value.y
+    }
+
+    _pickable?: Pickable
+    get pickable() {
+        let value = this._pickable
+        if (value == null) {
+            value = Pickable.children
+            if (this.backColor.isVisible) {
+                value |= Pickable.self
+            }
+        }
+        return value
+
+    }
+    set pickable(value: Pickable) {
+        this._pickable = value
     }
 
     //  pick children in reverse because we render the latter ones on top of the former

@@ -1,7 +1,4 @@
 import Node from "./Node";
-import KeyFrameAnimation from "../../animation/KeyFrameAnimation";
-import KeyFrame from "../../animation/KeyFrame";
-import Animation from "../../animation";
 import Graphics from "../Graphics";
 
 export default class Animator<T> extends Node {

@@ -28,6 +28,7 @@ export function extendElementAsVirtualNodeRoot<T>(element: T): T & INode {
 
 export default class VirtualNode implements INode {
 
+    id?: string
     parentNode: INode | null = null
     firstChild: INode | null = null
     lastChild: INode | null = null

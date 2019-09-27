@@ -20,10 +20,10 @@ export default class Screen extends Control {
             //  we always initialize a screen to a 2d pixel based projection
             //  with top-left origin
             g.uniforms.projection = new Matrix4(
-                2 / this.width, 0, 0, -1,
-                0, -2 / this.height, 0, 1,
-                0, 0, -1, 1,
-                0, 0, 0, 1
+                2 / this.width, 0, 0, 0,
+                0, -2 / this.height, 0, 0,
+                0, 0, -1, 0,
+                -1, 1, 1, 1
             )
         }
 
