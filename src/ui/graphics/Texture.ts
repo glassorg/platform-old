@@ -1,5 +1,6 @@
 import { createTexture } from "./functions"
 import TextureBase from "./TextureBase"
+import Rectangle from "../math/Rectangle"
 
 export default class Texture extends TextureBase {
 
@@ -8,11 +9,11 @@ export default class Texture extends TextureBase {
     readonly glTexture: WebGLTexture
     readonly width: number
     readonly height: number
-    private dynamic: boolean
-    private readonly image: HTMLImageElement
+    private readonly image?: HTMLImageElement
 
     // the default image url is a white 1x1 pixel image.
     static default = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQYV2P4////fwAJ+wP9BUNFygAAAABJRU5ErkJggg=="
+    static defaultUV = new Rectangle(0, 0, 1, 1)
 
     constructor(gl: WebGL2RenderingContext, id: string, src?: string)
     constructor(gl: WebGL2RenderingContext, id: string, glTexture: WebGLTexture, width: number, height: number)
@@ -20,13 +21,13 @@ export default class Texture extends TextureBase {
         super()
         this.id = id
         this.gl = gl
-        this.dynamic = typeof glTextureOrSrc === "string" && id !== glTextureOrSrc
+        let dynamic = typeof glTextureOrSrc === "string" && id !== glTextureOrSrc
         if (typeof glTextureOrSrc == "string") {
             this.width = 1
             this.height = 1
             this.glTexture = createTexture(gl, glTextureOrSrc, (image) => {
                 let self = this as any
-                if (this.dynamic) {
+                if (dynamic) {
                     self.image = image
                 }
                 self.width = image.width;
@@ -40,8 +41,8 @@ export default class Texture extends TextureBase {
         }
     }
 
-    update(dataUrl: string) {
-        if (!this.dynamic) {
+    update(dataUrl: string, onload?: (image: HTMLImageElement) => void) {
+        if (this.image == null) {
             throw new Error("Only dynamic textures can be updated")
         }
         if (this.image != null) {
@@ -49,7 +50,9 @@ export default class Texture extends TextureBase {
                 let { gl } = this
                 gl.bindTexture(gl.TEXTURE_2D, this.glTexture)
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, this.image)
-                console.log("updated....")
+                if (onload) {
+                    onload(this.image!)
+                }
             }
             this.image.src = dataUrl
         }
