@@ -17,7 +17,7 @@ export default class Node extends VirtualNode {
     transform?: Matrix4 | null
 
     protected calculateWorldTransform(parentTransform, localTransform) {
-        return Matrix4.multiply(localTransform, parentTransform) || Matrix4.identity
+        return Matrix4.multiply(parentTransform, localTransform) || Matrix4.identity
     }
 
     public update(g: Graphics): boolean {
@@ -34,7 +34,7 @@ export default class Node extends VirtualNode {
     protected updateSelf(g: Graphics) {
         let localTransform = this.transform
         let parentTransform = this.parentNode instanceof Node ? this.parentNode.worldTransform : null
-        let worldTransform = this.calculateWorldTransform(localTransform, parentTransform)
+        let worldTransform = this.calculateWorldTransform(parentTransform, localTransform)
         if (this.worldTransform !== worldTransform) {
             this.worldTransform = worldTransform
         }
