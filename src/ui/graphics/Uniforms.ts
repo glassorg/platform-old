@@ -4,6 +4,7 @@ import Vector2 from "../math/Vector2"
 import Vector3 from "../math/Vector3"
 import { equals } from "./functions"
 import Texture from "./Texture"
+import TextureBase from "./TextureBase"
 
 export class Uniforms {
     [property: string]: any
@@ -17,7 +18,7 @@ export class Uniforms {
 
 export function setUniform(g: Graphics3D, uniform: WebGLActiveInfo, location: WebGLUniformLocation, value) {
     let { gl } = g
-    if (value != null && value.length == null) {
+    if (value != null && typeof value === "number") {
         value = [value]
     }
 
@@ -40,7 +41,7 @@ export function setUniform(g: Graphics3D, uniform: WebGLActiveInfo, location: We
         if (value == null) {
             value = Texture.default
         }
-        let texture = g.getWebGLTexture(value)
+        let texture = value instanceof TextureBase ? value.glTexture : g.getWebGLTexture(value)
         let index = g.bindTexture(texture, uniform.name)
         gl.uniform1i(location, index)
     }

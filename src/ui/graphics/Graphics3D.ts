@@ -63,6 +63,22 @@ export default class Graphics3D extends Graphics {
         this.updateScreenSize()
     }
 
+    private cachedTextures: { [name: string]: Texture} = {}
+    createTexture(id: string, src?: string)
+    createTexture(id: string, glTexture: WebGLTexture, width: number, height: number)
+    createTexture(id: string, glTextureOrSrc: WebGLTexture | string = id, width?: number, height?: number) {
+        //  we cache IF the id is the same as the name
+        let cache = id === glTextureOrSrc
+        let texture = cache ? this.cachedTextures[id] : null
+        if (texture == null) {
+            texture = new Texture(this.gl, id, glTextureOrSrc, width!, height!)
+            if (cache) {
+                this.cachedTextures[id] = texture
+            }
+        }
+        return texture
+    }
+
     boundLocations: { [name: string]: number } = {}
     getTextureUnitByUniformName(name: string) {
         // each uniform name will end up with it's own unique texture unit

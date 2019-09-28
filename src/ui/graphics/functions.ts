@@ -13,27 +13,39 @@ export function equals(a, b) {
     return false
 }
 
+function isPowerOf2(value) {
+    return (value & (value - 1)) == 0;
+}
+
 const bluePixelData = new Uint8Array([0, 0, 255, 255])
-export function createTexture(gl: WebGL2RenderingContext, src: string, onload: () => void) {
+export function createTexture(gl: WebGL2RenderingContext, src: string, onload: (image: HTMLImageElement) => void) {
     if (src == null) {
         throw new Error("src is required")
     }
-    // Create a texture.
+    //  Create a texture.
     var texture = gl.createTexture()
     if (texture == null)
         throw new Error("gl.createTexture failed")
     gl.bindTexture(gl.TEXTURE_2D, texture)
-    // Fill the texture with a 1x1 blue pixel.
+    //  Fill the texture with a 1x1 blue pixel.
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, bluePixelData)
-    // Asynchronously load an image
+    //  Asynchronously load an image
     var image = new Image()
     image.onload = function() {
-        // Now that the image has loaded make copy it to the texture.
+        //  Now that the image has loaded, copy it to the texture.
         gl.bindTexture(gl.TEXTURE_2D, texture)
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, image)
-        gl.generateMipmap(gl.TEXTURE_2D)
+        if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+            gl.generateMipmap(gl.TEXTURE_2D)
+        }
+        else {
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        }
+
         if (onload)
-            onload()
+            onload(image)
     }
     image.src = src
     return texture
