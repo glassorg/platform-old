@@ -18,5 +18,7 @@ export default abstract class Graphics {
     // drawing
     abstract clear(color?: Color, depth?: number)
     abstract fillRectangle(x: number, y: number, width: number, height: number, color: Color, texture)
+    // request redraw
+    abstract invalidate()
 
 }

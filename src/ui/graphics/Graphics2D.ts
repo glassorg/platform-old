@@ -79,6 +79,11 @@ export default class Graphics2D extends Graphics {
     end() {
     }
 
+    invalidate() {
+        let canvas = this.context.canvas as any
+        canvas.dirty = true
+    }
+
     fillRectangle(x: number, y: number, width: number, height: number, color: Color, texture) {
         this.context.fillStyle = color.toString()
         this.context.fillRect(x, y, width, height)

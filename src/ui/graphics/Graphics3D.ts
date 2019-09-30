@@ -13,6 +13,7 @@ import Vector2 from "../math/Vector2"
 import Matrix4 from "../math/Matrix4"
 import Vector3 from "../math/Vector3"
 import Texture from "./Texture"
+import TextureBase from "./TextureBase"
 
 export default class Graphics3D extends Graphics {
 
@@ -42,7 +43,7 @@ export default class Graphics3D extends Graphics {
             let fs = this.getWebGLFragmentShader(program.fragmentShader)
             return createProgram(this.gl, vs, fs)
         })
-        this.getWebGLTexture = memoize((name: string) => createTexture(this.gl, name, () => (gl.canvas as any).dirty = true))
+        this.getWebGLTexture = memoize((name: string) => createTexture(this.gl, name, () => this.invalidate()))
         let getUniformDependencies = this.getUniformDependencies
         this.getUniformDependencies = memoize((program: Program) => getUniformDependencies.call(this, program))
 
@@ -61,6 +62,11 @@ export default class Graphics3D extends Graphics {
         gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 
         this.updateScreenSize()
+    }
+
+    invalidate() {
+        let canvas = this.gl.canvas as any
+        canvas.dirty = true
     }
 
     private cachedTextures: { [name: string]: Texture} = {}
@@ -197,19 +203,20 @@ export default class Graphics3D extends Graphics {
         return deps
     }
 
-    fillRectangle(x: number, y: number, width: number, height: number, color: Color, texture: any = Texture.default, depth: number = 0) {
+    fillRectangle(x: number, y: number, width: number, height: number, color: Color, texture: TextureBase | string = Texture.default, depth: number = 0) {
         let a = new Vector3(x, y, depth).transform(this.uniforms.modelView)
         let b = new Vector3(x + width, y, depth).transform(this.uniforms.modelView)
         let c = new Vector3(x, y + height, depth).transform(this.uniforms.modelView)
         let d = new Vector3(x + width, y + height, depth).transform(this.uniforms.modelView)
+        let uv = typeof texture === "string" ? Texture.defaultUV : texture
         this.uniforms.colorTexture = texture
         this.vertexStream.write(
-            ...a, ...color, 0, 0,
-            ...b, ...color, 1, 0,
-            ...c, ...color, 0, 1,
-            ...c, ...color, 0, 1,
-            ...b, ...color, 1, 0,
-            ...d, ...color, 1, 1,
+            ...a, ...color, uv.left, uv.top,
+            ...b, ...color, uv.right, uv.top,
+            ...c, ...color, uv.left, uv.bottom,
+            ...c, ...color, uv.left, uv.bottom,
+            ...b, ...color, uv.right, uv.top,
+            ...d, ...color, uv.right, uv.bottom,
         )
     }
 
