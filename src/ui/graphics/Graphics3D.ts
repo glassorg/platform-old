@@ -28,7 +28,7 @@ export default class Graphics3D extends Graphics {
     private getWebGLProgram: (program: Program) => WebGLProgram
     public getWebGLTexture: (name: string) => WebGLTexture
 
-    private stream: DataStream
+    public stream: DataStream
     private boundTextureUnits: WebGLTexture[] = []
 
     constructor(gl: WebGL2RenderingContext) {
