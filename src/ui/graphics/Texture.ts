@@ -49,7 +49,7 @@ export default class Texture extends TextureBase {
             this.image.onload = () => {
                 let { gl } = this
                 gl.bindTexture(gl.TEXTURE_2D, this.glTexture)
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, this.image)
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, this.image!)
                 if (onload) {
                     onload(this.image!)
                 }

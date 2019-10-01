@@ -14,6 +14,9 @@ import Matrix4 from "../math/Matrix4"
 import Vector3 from "../math/Vector3"
 import Texture from "./Texture"
 import TextureBase from "./TextureBase"
+import DataStream from "./DataStream"
+import IndexStream from "./IndexStream"
+import IndexBuffer from "./IndexBuffer"
 
 export default class Graphics3D extends Graphics {
 
@@ -25,7 +28,7 @@ export default class Graphics3D extends Graphics {
     private getWebGLProgram: (program: Program) => WebGLProgram
     public getWebGLTexture: (name: string) => WebGLTexture
 
-    private vertexStream: VertexStream
+    private stream: DataStream
     private boundTextureUnits: WebGLTexture[] = []
 
     constructor(gl: WebGL2RenderingContext) {
@@ -52,14 +55,17 @@ export default class Graphics3D extends Graphics {
 
         //  we need to flush and change the vertex format for stream buffers
         //  when changing program
-        this.vertexStream = new VertexStream(
-            new VertexBuffer(this, this.program.vertexShader.vertexFormat)
+        // this.stream = new VertexStream(
+        //     new VertexBuffer(this, this.program.vertexShader.vertexFormat)
+        // )
+        this.stream = new IndexStream(
+            new IndexBuffer(this, this.program.vertexShader.vertexFormat)
         )
 
         gl.enable(GL.BLEND)
+        gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
         gl.enable(GL.DEPTH_TEST)
         gl.depthFunc(GL.LEQUAL)
-        gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
 
         this.updateScreenSize()
     }
@@ -210,14 +216,12 @@ export default class Graphics3D extends Graphics {
         let d = new Vector3(x + width, y + height, depth).transform(this.uniforms.modelView)
         let uv = typeof texture === "string" ? Texture.defaultUV : texture
         this.uniforms.colorTexture = texture
-        this.vertexStream.write(
+        this.stream.writeQuads([
             ...a, ...color, uv.left, uv.top,
             ...b, ...color, uv.right, uv.top,
             ...c, ...color, uv.left, uv.bottom,
-            ...c, ...color, uv.left, uv.bottom,
-            ...b, ...color, uv.right, uv.top,
             ...d, ...color, uv.right, uv.bottom,
-        )
+        ])
     }
 
     private _program!: Program
@@ -229,21 +233,21 @@ export default class Graphics3D extends Graphics {
             this.flush()
             this._program = value
             this.gl.useProgram(this.getWebGLProgram(value))
-            if (this.vertexStream) {
-                this.vertexStream.buffer.vertexFormat = value.vertexShader.vertexFormat
+            if (this.stream) {
+                this.stream.vertexFormat = value.vertexShader.vertexFormat
             }
         }
     }
 
     flush(property?: string) {
         //  if a uniform property changes, but the current program doesn't care then we don't flush.
-        if (this.vertexStream && (property == null || this.getUniformDependencies(this.program)[property])) {
-            this.vertexStream.flush()
+        if (this.stream && (property == null || this.getUniformDependencies(this.program)[property])) {
+            this.stream.flush()
         }
     }
 
     write(...components: number[]) {
-        this.vertexStream.write(...components)
+        this.stream.write(components)
     }
 
 }
