@@ -81,17 +81,8 @@ export default class IndexStream extends DataStream {
     }
 
     write(components: number[]) {
-        switch(this.buffer.primitive) {
-            case Primitive.triangles:
-                this.writeTriangles(components)
-                break
-            case Primitive.points:
-                this.writePoints(components)
-                break
-            case Primitive.lines:
-                this.writeLines(components)
-                break
-        }
+        // when someone uses this write, we don't really want to error check them
+        this.writeInternal(components, pointOffsets, this.buffer.primitive, 1)
     }
 
     writePoints(components: number[]) {
