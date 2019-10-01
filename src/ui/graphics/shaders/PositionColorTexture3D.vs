@@ -1,8 +1,8 @@
 uniform mat4 modelViewProjection;
 
 in vec3 position;
-in vec2 textureCoordinates;
 in vec4 color;
+in vec2 textureCoordinates;
 
 out vec4 vs_color;
 out vec2 vs_textureCoordinates;

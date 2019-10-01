@@ -204,10 +204,8 @@ export default class Context {
     //  need a way to request a notification after normal rendering
     requestAnimationFrame(callback: (time) => void) {
         if (this.isRendering) {
-            console.log("isRendering")
             this.postRenderCallbacks.add(callback)
         } else {
-            console.log("is not rendering")
             window.requestAnimationFrame(callback)
         }
     }
