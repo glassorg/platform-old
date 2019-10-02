@@ -17,6 +17,7 @@ import TextureBase from "./TextureBase"
 import DataStream from "./DataStream"
 import IndexStream from "./IndexStream"
 import IndexBuffer from "./IndexBuffer"
+import { BufferUsage } from "./DataBuffer"
 
 export default class Graphics3D extends Graphics {
 
@@ -59,7 +60,7 @@ export default class Graphics3D extends Graphics {
         //     new VertexBuffer(this, this.program.vertexShader.vertexFormat)
         // )
         this.stream = new IndexStream(
-            new IndexBuffer(this, this.program.vertexShader.vertexFormat)
+            new IndexBuffer(this, this.program.vertexShader.vertexFormat, BufferUsage.streamDraw)
         )
 
         gl.enable(GL.BLEND)

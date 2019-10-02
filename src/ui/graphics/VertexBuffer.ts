@@ -1,7 +1,7 @@
 import VertexFormat from "./VertexFormat"
 import * as GL from "./GL"
 import Graphics3D from "./Graphics3D"
-import DataBuffer, { DataType } from "./DataBuffer"
+import DataBuffer, { DataType, BufferUsage } from "./DataBuffer"
 import Primitive from "./Primitive"
 
 export default class VertexBuffer extends DataBuffer {
@@ -14,7 +14,7 @@ export default class VertexBuffer extends DataBuffer {
     constructor(
         graphics: Graphics3D,
         vertexFormat: VertexFormat,
-        usage: number = GL.STREAM_DRAW,
+        usage: BufferUsage,
         primitive: number = Primitive.triangles
     )
     {

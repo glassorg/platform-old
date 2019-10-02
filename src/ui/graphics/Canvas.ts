@@ -129,7 +129,9 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
                 if (value !== dirty) {
                     dirty = value
                     if (value) {
-                        c.requestAnimationFrame(repaint)
+                        //  was using c.requestAnimationFrame
+                        //  wasn't firing the first time on rendering repaint
+                        requestAnimationFrame(repaint)
                     }
                 }
             }

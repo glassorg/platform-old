@@ -88,6 +88,10 @@ export default class VertexFormat {
         new VertexElement("position", 3),
         new VertexElement("textureCoordinates", 2)
     )
+    static readonly positionNormal = new VertexFormat(
+        new VertexElement("position", 3),
+        new VertexElement("normal", 3),
+    )
     static readonly positionColorTexture = new VertexFormat(
         new VertexElement("position", 3),
         new VertexElement("color", 4),

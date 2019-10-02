@@ -2,7 +2,7 @@ import VertexFormat from "./VertexFormat"
 
 export default abstract class DataStream {
 
-    abstract flush(draw?: boolean)
+    abstract flush(drawIfStream?: boolean)
     abstract vertexFormat: VertexFormat
 
     abstract write(components: number[])

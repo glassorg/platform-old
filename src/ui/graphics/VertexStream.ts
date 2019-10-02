@@ -2,6 +2,7 @@ import VertexBuffer from "./VertexBuffer"
 import * as GL from "./GL"
 import VertexFormat from "./VertexFormat"
 import DataStream from "./DataStream"
+import { BufferUsage } from "./DataBuffer"
 
 const sizeOfFloat = 4
 
@@ -34,7 +35,7 @@ export default class VertexStream extends DataStream {
     flush(draw = true) {
         if (this.size > 0) {
             this.buffer.setData(this.floatData, this.size)
-            if (draw) {
+            if (draw && this.buffer.usage === BufferUsage.streamDraw) {
                 this.buffer.draw()
             }
             this.size = 0

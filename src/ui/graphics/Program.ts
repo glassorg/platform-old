@@ -1,20 +1,22 @@
 import VertexFormat from "./VertexFormat"
 import VertexShader from "./VertexShader"
 import FragmentShader from "./FragmentShader"
-import PositionColor3D_VertexShader from "./shaders/PositionColor3D.vs"
-import Color_FragmentShader from "./shaders/Color.fs"
-import PositionColor2D_VertexShader from "./shaders/PositionColor2D.vs"
-import PositionTexture3D_VertexShader from "./shaders/PositionTexture3D.vs"
-import Texture_FragmentShader from "./shaders/Texture.fs"
-import PositionColorTexture3D_VertexShader from "./shaders/PositionColorTexture3D.vs"
-import PositionColorTexture2D_VertexShader from "./shaders/PositionColorTexture2D.vs"
-import ColorTexture_FragmentShader from "./shaders/ColorTexture.fs"
+import PositionColor3D_VertexShader from "./effects/PositionColor3D.vs"
+import Color_FragmentShader from "./effects/Color.fs"
+import PositionColor2D_VertexShader from "./effects/PositionColor2D.vs"
+import PositionTexture3D_VertexShader from "./effects/PositionTexture3D.vs"
+import Texture_FragmentShader from "./effects/Texture.fs"
+import PositionColorTexture3D_VertexShader from "./effects/PositionColorTexture3D.vs"
+import PositionColorTexture2D_VertexShader from "./effects/PositionColorTexture2D.vs"
+import ColorTexture_FragmentShader from "./effects/ColorTexture.fs"
+import Effect from "./effects/Effect"
+import Graphics3D from "./Graphics3D"
 
 /**
  * Shader program declaration.
  * Specifies the shader sources and the vertex format.
  */
-export default class Program {
+export default class Program implements Effect {
 
     public readonly id: string
     public readonly vertexShader: VertexShader
@@ -24,6 +26,14 @@ export default class Program {
         this.id = `${vertexShader}:${fragmentShader}`
         this.vertexShader = vertexShader
         this.fragmentShader = fragmentShader
+    }
+
+    // a Program implements the most basic Effect interface
+    render(g: Graphics3D, callback: (g: Graphics3D) => void) {
+        let saveProgram = g.program
+        g.program = this
+        callback(g)
+        g.program = saveProgram
     }
 
     toString() {

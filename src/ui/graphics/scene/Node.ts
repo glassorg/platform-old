@@ -5,16 +5,27 @@ import BoundingShape from "../../math/BoundingShape"
 import Pickable from "./Pickable"
 import PickResult from "./PickResult"
 import Matrix4 from "../../math/Matrix4"
+import Effect from "../effects/Effect"
+import Program from "../Program"
 
 export default class Node extends VirtualNode {
 
     boundingShape?: BoundingShape
     pickable?: Pickable
-    // the worldTransform, transforms from child space to world space
+    //  the worldTransform, transforms from child space to world space
     //  worldTransform
     worldTransform = Matrix4.identity
     //  localTransform
     transform?: Matrix4 | null
+    //  effect to use when rendering this node
+    _effect?: Effect | null
+
+    public get effect() {
+        return this._effect || null
+    }
+    public set effect(value) {
+        this._effect = value
+    }
 
     protected calculateWorldTransform(parentTransform, localTransform) {
         return Matrix4.multiply(parentTransform, localTransform) || Matrix4.identity
@@ -57,7 +68,12 @@ export default class Node extends VirtualNode {
         //  convert to uniforms
         let saveTransform = g.uniforms.modelView
         g.uniforms.modelView = this.worldTransform
-        this.draw(g)
+        if (this._effect == null) {
+            this.draw(g)
+        }
+        else {
+            this._effect.render(g as any, this.draw.bind(this))
+        }
         g.uniforms.modelView = saveTransform
     }
 

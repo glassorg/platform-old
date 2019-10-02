@@ -3,6 +3,7 @@ import IndexBuffer from "./IndexBuffer"
 import VertexStream from "./VertexStream"
 import Primitive from "./Primitive"
 import DataStream from "./DataStream"
+import { BufferUsage } from "./DataBuffer"
 
 const sizeOfUint16 = 2
 
@@ -41,7 +42,7 @@ export default class IndexStream extends DataStream {
         if (this.size > 0) {
             this.vertices.flush(false)
             this.buffer.setData(this.data, this.size)
-            if (draw) {
+            if (draw && this.buffer.usage === BufferUsage.streamDraw) {
                 this.buffer.draw()
             }
             this.size = 0

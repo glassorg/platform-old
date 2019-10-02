@@ -32,6 +32,9 @@ Main glass library
 
     Hot reloading? https://stackoverflow.com/questions/46262816/cordova-hot-reloading-on-device-without-ionic
 
+## Coordinate System
+    The default coordinate system is right handed with +z pointing towards the viewer.
+    The projection transformation turns it into a left handed system as +z points away from the viewer.
 
 ## Todo
     X   Change default2D shader to actually use modelViewProjection matrix.

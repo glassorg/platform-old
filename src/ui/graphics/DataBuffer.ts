@@ -8,6 +8,12 @@ export enum DataType {
     Index = GL.ELEMENT_ARRAY_BUFFER,
 }
 
+export enum BufferUsage {
+    staticDraw = GL.STATIC_DRAW,
+    dynamicDraw = GL.DYNAMIC_DRAW,
+    streamDraw = GL.STREAM_DRAW,
+}
+
 export default abstract class DataBuffer {
 
     /**
@@ -36,7 +42,7 @@ export default abstract class DataBuffer {
      */
     public readonly type: DataType
 
-    constructor(graphics: Graphics3D, usage: number = GL.STREAM_DRAW, type: DataType, primitive: Primitive) {
+    constructor(graphics: Graphics3D, usage: BufferUsage, type: DataType, primitive: Primitive) {
         this.graphics = graphics
         this.usage = usage
         this.type = type
@@ -46,6 +52,8 @@ export default abstract class DataBuffer {
         this.glBuffer = glBuffer
         this.primitive = primitive
     }
+
+    abstract draw()
 
     bind() {
         this.graphics.gl.bindBuffer(this.type, this.glBuffer)
