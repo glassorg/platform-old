@@ -17,7 +17,10 @@ import TextureBase from "./TextureBase"
 import DataStream from "./DataStream"
 import IndexStream from "./IndexStream"
 import IndexBuffer from "./IndexBuffer"
-import { BufferUsage } from "./DataBuffer"
+import DataBuffer, { BufferUsage } from "./DataBuffer"
+import VertexElement from "./VertexElement"
+import InstanceStream from "./InstanceStream"
+import InstanceBuffer from "./InstanceBuffer"
 
 export default class Graphics3D extends Graphics {
 
@@ -28,8 +31,12 @@ export default class Graphics3D extends Graphics {
     private getWebGLFragmentShader: (shader: FragmentShader) => WebGLShader
     private getWebGLProgram: (program: Program) => WebGLProgram
     public getWebGLTexture: (name: string) => WebGLTexture
+    public getModel: (factory: (g: Graphics3D) => DataBuffer) => DataBuffer
 
-    public stream: DataStream
+    public vertexStream: VertexStream
+    public indexStream: IndexStream
+    public instanceStream: InstanceStream
+
     private boundTextureUnits: WebGLTexture[] = []
 
     constructor(gl: WebGL2RenderingContext) {
@@ -50,18 +57,19 @@ export default class Graphics3D extends Graphics {
         this.getWebGLTexture = memoize((name: string) => createTexture(this.gl, name, () => this.invalidate()))
         let getUniformDependencies = this.getUniformDependencies
         this.getUniformDependencies = memoize((program: Program) => getUniformDependencies.call(this, program))
+        this.getModel = memoize(factory => factory(this))
 
-        //  set the default program for now
-        this.program = Program.default2D
-
-        //  we need to flush and change the vertex format for stream buffers
-        //  when changing program
-        // this.stream = new VertexStream(
-        //     new VertexBuffer(this, this.program.vertexShader.vertexFormat)
-        // )
-        this.stream = new IndexStream(
-            new IndexBuffer(this, this.program.vertexShader.vertexFormat, BufferUsage.streamDraw)
+        let initialProgram = Program.default3D
+        this.vertexStream = new VertexStream(
+            new VertexBuffer(this, BufferUsage.streamDraw, initialProgram.vertexShader.vertexFormat)
         )
+        this.indexStream = new IndexStream(
+            new IndexBuffer(this, BufferUsage.streamDraw, initialProgram.vertexShader.vertexFormat)
+        )
+        this.instanceStream = new InstanceStream(
+            new InstanceBuffer(this, BufferUsage.streamDraw, initialProgram.vertexShader.vertexFormat, null as any)
+        )
+        this.program = initialProgram
 
         gl.enable(GL.BLEND)
         gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
@@ -150,8 +158,7 @@ export default class Graphics3D extends Graphics {
         this.flush()
     }
 
-    bindAttributes() {
-        const vertexFormat = this.program.vertexShader.vertexFormat
+    bindAttributes(vertexBuffers: VertexBuffer[]) {
         const gl = this.gl
         const program = this.getWebGLProgram(this.program)
         //  automatically set vertex attribute pointers
@@ -161,17 +168,25 @@ export default class Graphics3D extends Graphics {
         for (let i = 0; i < count; ++i) {
             const attribute = gl.getActiveAttrib(program, i)!
             const location = gl.getAttribLocation(program, attribute.name)
-            const element = vertexFormat.elements[attribute.name]
-            if (element == null)
+            // find the buffer that stores this attribute
+            let element: VertexElement | undefined
+            let elementBuffer: VertexBuffer | undefined
+            for (let vertexBuffer of vertexBuffers) {
+                element = vertexBuffer.vertexFormat.elements[attribute.name]
+                if (element != null) {
+                    elementBuffer = vertexBuffer
+                    break
+                }
+            }
+            if (element == null) {
                 throw new Error(`VertexElement not found: ${attribute.name}`)
-            gl.vertexAttribPointer(location, element.size, element.type, element.normalize, element.stride, element.offset)
+            }
+            elementBuffer!.bind()
             gl.enableVertexAttribArray(location)
+            gl.vertexAttribPointer(location, element.size, element.type, element.normalize, element.stride, element.offset)
+            //  divisor is used for instanced rendering
+            gl.vertexAttribDivisor(location, elementBuffer!.vertexDivisor)
         }
-    }
-
-    private getUniformLocation(name: string) {
-        const program = this.getWebGLProgram(this.program)
-        return this.gl.getUniformLocation(program, name)
     }
 
     bindUniforms() {
@@ -217,7 +232,7 @@ export default class Graphics3D extends Graphics {
         let d = new Vector3(x + width, y + height, depth).transform(this.uniforms.modelView)
         let uv = typeof texture === "string" ? Texture.defaultUV : texture
         this.uniforms.colorTexture = texture
-        this.stream.writeQuads([
+        this.indexStream.writeQuads([
             ...a, ...color, uv.left, uv.top,
             ...b, ...color, uv.right, uv.top,
             ...c, ...color, uv.left, uv.bottom,
@@ -234,34 +249,28 @@ export default class Graphics3D extends Graphics {
             this.flush()
             this._program = value
             this.gl.useProgram(this.getWebGLProgram(value))
-            if (this.stream) {
-                this.stream.vertexFormat = value.vertexShader.vertexFormat
+            let isInstancedShader = value.vertexShader.vertexFormats.length > 1
+            if (isInstancedShader) {
+                this.instanceStream.vertexFormat = value.vertexShader.vertexFormat
+            }
+            else {
+                this.indexStream.vertexFormat = value.vertexShader.vertexFormat
+                this.vertexStream.vertexFormat = value.vertexShader.vertexFormat
             }
         }
     }
 
     flush(property?: string) {
         //  if a uniform property changes, but the current program doesn't care then we don't flush.
-        if (this.stream && (property == null || this.getUniformDependencies(this.program)[property])) {
-            this.stream.flush()
+        if (property == null || this.getUniformDependencies(this.program)[property]) {
+            this.vertexStream.flush()
+            this.indexStream.flush()
+            this.instanceStream.flush()
         }
     }
 
     write(...components: number[]) {
-        this.stream.write(components)
+        this.vertexStream.write(components)
     }
 
 }
-
-//      Graphics3D
-//          .uniforms: { [name: string]: number[] }
-//          .program: Program
-//              .vertexShader: VertexShader
-//              .fragmentShader: FragmentShader
-//          .stream(...components: number[])
-
-//  uniforms
-//      ModelView
-//      Projection
-//      Screen
-//      project * view * model <- applied reverse order

@@ -4,7 +4,8 @@ import * as GL from "./GL"
 enum Primitive {
     triangles = GL.TRIANGLES,
     points = GL.POINTS,
-    lines = GL.LINES
+    lines = GL.LINES,
+    models = -1
 }
 
 export default Primitive

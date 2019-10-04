@@ -1,21 +1,29 @@
 import Node from "./Node"
 import DataBuffer from "../DataBuffer"
 import Graphics3D from "../Graphics3D"
+import IndexBuffer from "../IndexBuffer"
 
 export default class Geometry extends Node {
 
-    buffer!: DataBuffer
+    buffer!: IndexBuffer
     load?: (g: Graphics3D) => DataBuffer
+    instance?: number[]
 
     draw(g: Graphics3D) {
         if (this.buffer == null) {
-            // TODO: also dispose of this dynamically loaded buffer.
             if (this.load == null) {
                 throw new Error("You must specify either buffer or load property")
             }
-            this.buffer = this.load(g)
+            this.buffer = g.getModel(this.load) as IndexBuffer
         }
-        this.buffer.draw()
+
+        if (this.instance) {
+            g.instanceStream.writeInstance(this.buffer, this.instance)
+        }
+        else {
+            this.buffer.draw()
+        }
+
         super.draw(g)
     }
 

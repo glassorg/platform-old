@@ -11,8 +11,8 @@ export default class IndexBuffer extends DataBuffer {
 
     constructor(
         graphics: Graphics3D,
-        vertices: VertexBuffer | VertexFormat,
         usage: BufferUsage,
+        vertices: VertexBuffer | VertexFormat,
         primitive = Primitive.triangles,
     )
     {
@@ -20,15 +20,14 @@ export default class IndexBuffer extends DataBuffer {
         this.vertices
             = vertices instanceof VertexBuffer
             ? vertices
-            : new VertexBuffer(graphics, vertices, usage, primitive)
+            : new VertexBuffer(graphics, usage, vertices, primitive)
     }
 
     draw() {
         if (this.size > 0) {
-            this.bind()
-            this.vertices.bind()
-            this.graphics.bindAttributes()
+            this.graphics.bindAttributes([this.vertices])
             this.graphics.bindUniforms()
+            this.bind()
             this.graphics.gl.drawElements(this.primitive, this.size, GL.UNSIGNED_SHORT, 0)
         }
     }

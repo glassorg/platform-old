@@ -11,6 +11,9 @@ import Capsule from "../math/Capsule"
 import Sphere from "../math/Sphere"
 import Node from "./scene/Node"
 import Dock, { layout } from "./scene/Dock"
+import State from "../../data/State"
+import Store from "../../data/Store"
+import Key from "../../data/Key"
 
 function bindPointerEvents(canvas: HTMLCanvasElement) {
     let pointerTarget: Node | null = null
@@ -50,7 +53,7 @@ for (let event of ["pointerdown", "pointerup", "pointermove"]) {
 }
 
 const contextSymbol = Symbol("context")
-function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement, dimensions: 2 | 3, testPerformance = 0) {
+function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement, dimensions: 2 | 3) {
     let previousContext = canvas[contextSymbol]
     if (previousContext != null) {
         if (previousContext !== c) {
@@ -83,45 +86,47 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
         }
         if (graphics != null) {
             let time = Date.now()
+            frame++
             if (start == null) {
                 start = time
             }
             graphics.time = (time - start) / 1000
             // layout any children using the Dock layout.
-            let animating = testPerformance ? true : false
-            let count = testPerformance || 1
-            let testStart = Date.now()
-            for (let i = 0; i < count; i++) {
-                graphics.begin()
-                layout(canvas as any)
-                for (let node: any = canvas.firstChild; node != null; node = node.nextSibling) {
-                    if (node instanceof Node) {
-                        if (node.update(graphics)) {
-                            animating = true
-                        }
+            let animating = false
+            graphics.begin()
+            layout(canvas as any)
+            for (let node: any = canvas.firstChild; node != null; node = node.nextSibling) {
+                if (node instanceof Node) {
+                    if (node.update(graphics)) {
+                        animating = true
                     }
                 }
-                for (let node: any = canvas.firstChild; node != null; node = node.nextSibling) {
-                    if (node instanceof Node) {
-                        node.render(graphics)
-                    }
+            }
+            for (let node: any = canvas.firstChild; node != null; node = node.nextSibling) {
+                if (node instanceof Node) {
+                    node.render(graphics)
                 }
-                graphics.end()
             }
-            let testStop = Date.now()
-            if (testPerformance) {
-                let testSeconds = (testStop - testStart) / 1000
-                let fps = Math.round(count / (testSeconds))
-                console.log(`${fps} FPS, ${dimensions}D, ${animating}`)
-            }
+            graphics.end()
             dirty = false
             if (animating) {
                 (canvas as any).dirty = true
+            }
+
+            // update fps state
+            let checkFPSFrames = 100
+            if (frame % checkFPSFrames == 0 && canvas.id.length > 0) {
+                let seconds = (time - (frameStart || start)) / 1000
+                frameStart = time
+                let fps = Math.round(checkFPSFrames / seconds)
+                Store.default.patch(Key.create(CanvasState, canvas.id), { fps })
             }
         }
     }
     let dirty = false
     let start: number | null = null
+    let frame = 0
+    let frameStart: number | null = null
     Object.defineProperties(extendElementAsVirtualNodeRoot(canvas), {
         dirty: {
             get() { return dirty },
@@ -140,18 +145,41 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
     return repaint
 }
 
+@State.class()
+export class CanvasState extends State {
+
+    @State.property({ type: "integer", default: 0 })
+    fps!: number
+
+}
+
+export const FPS = Context.component(function FPS(c: Context, p: { id: string }) {
+    let state = c.store.get(Key.create(CanvasState, p.id))
+    html.div({
+        style: `
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: green;
+            z-index: 1;
+            font-size: 18px;
+        `,
+        content: `${state.fps} FPS`
+    })
+})
+
 export default Context.component(function Canvas(c: Context, p: {
+    id?: string,
     dimensions?: 2 | 3,
     content: (c: Context) => void,
     width?: number,
     height?: number,
     class?: string,
-    style?: string,
-    testPerformance?: number
+    style?: string
 }) {
-    let { dimensions, content, testPerformance, ...rest } = p
+    let { dimensions, content, ...rest } = p
     let canvas = c.begin(html.canvas, rest)
-        let repaint = ensureRootRepaintableVirtualNode(c, canvas, dimensions = dimensions || 2, testPerformance)
+        let repaint = ensureRootRepaintableVirtualNode(c, canvas, dimensions = dimensions || 2)
         content(c)
         if (repaint) {
             repaint()

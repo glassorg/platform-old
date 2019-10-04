@@ -13,8 +13,8 @@ export default class VertexBuffer extends DataBuffer {
 
     constructor(
         graphics: Graphics3D,
-        vertexFormat: VertexFormat,
         usage: BufferUsage,
+        vertexFormat: VertexFormat,
         primitive: number = Primitive.triangles
     )
     {
@@ -22,10 +22,18 @@ export default class VertexBuffer extends DataBuffer {
         this.vertexFormat = vertexFormat
     }
 
+    /**
+     * Used for instanced rendering.
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/vertexAttribDivisor
+     */
+    get vertexDivisor() {
+        //  0 means this contains normal non instanced vertex attributes
+        return 0
+    }
+
     draw() {
         if (this.size > 0) {
-            this.bind()
-            this.graphics.bindAttributes()
+            this.graphics.bindAttributes([this])
             this.graphics.bindUniforms()
             let vertexCount = this.size / this.vertexFormat!.components
             this.graphics.gl.drawArrays(this.primitive, 0, vertexCount)

@@ -5,7 +5,7 @@ import Primitive from "./Primitive"
 
 export enum DataType {
     Vertex = GL.ARRAY_BUFFER,
-    Index = GL.ELEMENT_ARRAY_BUFFER,
+    Index = GL.ELEMENT_ARRAY_BUFFER
 }
 
 export enum BufferUsage {

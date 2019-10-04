@@ -77,7 +77,7 @@ export default class Node extends VirtualNode {
         g.uniforms.modelView = saveTransform
     }
 
-    protected draw(g: Graphics) {
+    public draw(g: Graphics) {
         this.drawChildren(g)
         this.dirty = false
     }
