@@ -27,10 +27,18 @@ export default class Rectangle implements Size, BoundingShape {
     get left() { return this.x }
     get bottom() { return this.y + this.height }
     get right() { return this.x + this.width }
+    get topLeft() { return new Vector2(this.x, this.y) }
+    get bottomRight() { return new Vector2(this.right, this.bottom) }
+    get topRight() { return new Vector2(this.right, this.bottom) }
+    get bottomLeft() { return new Vector2(this.left, this.bottom) }
 
-    contains(point: Vector2 | Vector3 | Vector4) {
-        return point.x >= this.left && point.x <= this.right
-            && point.y >= this.top && point.y <= this.bottom
+    contains(x: number, y: number) {
+        return x >= this.left && x <= this.right
+            && y >= this.top && y <= this.bottom
+    }
+
+    containsPoint(point: Vector2 | Vector3 | Vector4) {
+        return this.contains(point.x, point.y)
     }
 
     add(b: Spacing) {
@@ -62,7 +70,7 @@ export default class Rectangle implements Size, BoundingShape {
 
     intersectsLine(line: Line): boolean {
         let point = this.getPlane().getClosestPoint(line)
-        return this.contains(point)
+        return this.containsPoint(point)
     }
 
     /**
@@ -71,7 +79,7 @@ export default class Rectangle implements Size, BoundingShape {
      */
     getClosestPoint(line: Line): Vector3 {
         let point = this.getPlane().getClosestPoint(line)
-        if (this.contains(point)) {
+        if (this.containsPoint(point)) {
             return point
         }
         let x = clamp(point.x, this.left, this.right)
@@ -85,6 +93,37 @@ export default class Rectangle implements Size, BoundingShape {
      */
     getPlane() {
         return new Plane(new Vector3(0, 0, 1), 0)
+    }
+
+    combine(b: Rectangle) {
+        if (b === this || this.containsRectangle(b)) {
+            return this
+        }
+        if (b.containsRectangle(this)) {
+            return b
+        }
+        let left = Math.min(this.left, b.left)
+        let right = Math.max(this.right, b.right)
+        let top = Math.min(this.top, b.top)
+        let bottom = Math.max(this.bottom, b.bottom)
+        return new Rectangle(left, top, right - left, bottom - top)
+    }
+
+    containsRectangle(b: Rectangle) {
+        return this.contains(b.left, b.top) && this.contains(b.right, b.bottom)
+    }
+
+    static empty = Object.freeze(new Rectangle(0, 0, 0, 0))
+
+    static getBounds(rectangles: Rectangle[]) {
+        if (rectangles.length === 0) {
+            return Rectangle.empty
+        }
+        let result = rectangles[0]
+        for (let i = 1; i < rectangles.length; i++) {
+            result = result.combine(rectangles[i])
+        }
+        return result
     }
 
 }

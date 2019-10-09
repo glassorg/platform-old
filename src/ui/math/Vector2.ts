@@ -1,5 +1,6 @@
 import Vector3 from "./Vector3"
 import { equivalent } from "."
+import Rectangle from "./Rectangle"
 
 export default class Vector2 {
 
@@ -74,6 +75,26 @@ export default class Vector2 {
     }
 
     static zero = Object.freeze(new Vector2(0, 0))
+
+    static getBounds(points: Vector2[]) {
+        if (points.length == 0) {
+            return new Rectangle(0, 0, 0, 0)
+        }
+        let minX, maxX, minY, maxY;
+        for (let {x, y} of points) {
+            if (minX == null) {
+                minX = maxX = x
+                minY = maxY = y
+            }
+            else {
+                minX = Math.min(minX, x)
+                maxX = Math.max(maxX, x)
+                minY = Math.min(minY, y)
+                maxY = Math.max(maxY, y)
+            }
+        }
+        return new Rectangle(minX, minY, maxX - minX, maxY - minY)
+    }
 
     toArray() {
         return [ this.x, this.y ]

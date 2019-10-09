@@ -1,5 +1,6 @@
 import INode from "../INode"
 import Vector2 from "../math/Vector2"
+import Rectangle from "../math/Rectangle";
 
 export default class Point {
 

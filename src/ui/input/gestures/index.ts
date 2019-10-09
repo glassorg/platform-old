@@ -82,7 +82,7 @@ export function recognize(gestures: Gestures) {
         timeoutId = null
         let pointers = Store.default.list(PointerState.all)!
 
-        let uncapturedPointers = pointers.filter(p => p.handler == null)
+        let availablePointers = pointers.filter(p => p.handler == null || gestures[p.handler] && gestures[p.handler].share)
 
         for (let gestureId in gestures) {
             let gesture = gestures[gestureId]
@@ -92,21 +92,27 @@ export function recognize(gestures: Gestures) {
             //  capture a pointer to the current gesture
             function capture(pointer: PointerState) {
                 // actually capture pointer
-                let element = pointer.first.target as HTMLElement
-                element.setPointerCapture(pointer.id)
-                uncapturedPointers.splice(uncapturedPointers.indexOf(pointer), 1)
+                if (gesture.capture) {
+                    let element = gesture.captureElement || pointer.first.target as HTMLElement
+                    element.setPointerCapture(pointer.id)
+                }
+                if (gesture.capture || !gesture.share) {
+                    availablePointers.splice(availablePointers.indexOf(pointer), 1)
+                }
                 captured.push(pointer.patch({ handler: gestureId }))
             }
             //  release a pointer from the current gesture
             function release(pointer: PointerState) {
-                let element = pointer.first.target as HTMLElement
-                element.releasePointerCapture(pointer.id)
+                if (gesture.capture) {
+                    let element = pointer.first.target as HTMLElement
+                    element.releasePointerCapture(pointer.id)
+                }
                 captured.splice(captured.indexOf(pointer), 1)
-                uncapturedPointers.push(pointer.patch({ handler: null }))
+                availablePointers.push(pointer.patch({ handler: null }))
             }
             //  if this gesture hasn't started (captured any pointers)
             if (captured.length == 0) {
-                gesture.start(uncapturedPointers).slice(0).forEach(capture)
+                gesture.start(availablePointers).slice(0).forEach(capture)
                 if (captured.length > 0 && gesture.onStart) {
                     gesture.onStart(captured)
                 }
@@ -114,7 +120,7 @@ export function recognize(gestures: Gestures) {
             if (captured.length > 0) {
                 //  maybe add some new pointers to the gesture handler
                 if (gesture.add) {
-                    for (let pointer of uncapturedPointers) {
+                    for (let pointer of availablePointers) {
                         if (gesture.add(pointer)) {
                             capture(pointer)
                         }
@@ -126,6 +132,12 @@ export function recognize(gestures: Gestures) {
                         if (gesture.remove(pointer)) {
                             release(pointer)
                         }
+                    }
+                }
+                //  maybe finish gesture, possibly because too few pointers
+                if (gesture.finish && gesture.finish(captured)) {
+                    for (let pointer of captured) {
+                        release(pointer)
                     }
                 }
                 //  now lets update

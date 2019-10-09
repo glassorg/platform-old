@@ -6,6 +6,7 @@ import Vector2 from "../math/Vector2"
 import Patch from "../../data/Patch"
 import clonePatch from "../../utility/clonePatch"
 import Point from "./Point"
+import Vector3 from "../math/Vector3"
 
 const maxPoints = 200
 
@@ -96,6 +97,25 @@ export default class PointerState extends Dependent {
      */
     get duration() {
         return this.last.time - this.first.time
+    }
+
+    getPreviousPoint(secondsAgo: number) {
+        let time = this.last.time - secondsAgo
+        for (let i = this.points.length - 1; i >= 0; i--) {
+            let point = this.points[i]
+            if (point.time < time) {
+                console.log("found at " + (this.points.length - i))
+                return point
+            }
+        }
+        return this.first
+    }
+
+    /**
+     * Calculates the rectangular bounds of this pointers full history in a linear time operation.
+     */
+    getBounds() {
+        return Vector2.getBounds(this.points.map(p => p.position))
     }
 
     patch(delta: Patch<PointerState>) {

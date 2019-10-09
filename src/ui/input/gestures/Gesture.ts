@@ -13,9 +13,12 @@ type Gesture = {
     onAdd?: PointerHandler
     remove?: PointerMatcher
     onRemove?: PointerHandler
-    finish?: GestureMatcher
+    finish?: (pointers: PointerState[]) => boolean
     onFinish?: GestureHandler
     onUpdate?: GestureHandler
+    share?: boolean
+    capture?: boolean
+    captureElement?: Element
 }
 
 export default Gesture
