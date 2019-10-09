@@ -1,17 +1,18 @@
 {
     "name": "@glas/platform",
-    "version": "0.1.53",
+    "version": "0.1.54",
     "main": "lib/index.js",
     "repository": "https://github.com/glassorg/platform.git",
     "author": "Kris Nye <krisnye@gmail.com>",
     "license": "MIT",
+    "scripts": {
+        "run": "tsc"
+    },
     "dependencies": {
         "@google-cloud/datastore": "^4.1.1",
         "@google-cloud/firestore": "^2.2.1",
         "@sendgrid/mail": "^6.3.1",
         "@types/compression": "^0.0.36",
-        "@types/gl-matrix": "^2.4.4",
-        "@types/webgl2": "^0.0.4",
         "body-parser": "^1.18.3",
         "compression": "^1.7.4",
         "express": "^4.16.3",
