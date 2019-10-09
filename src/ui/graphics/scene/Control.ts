@@ -14,6 +14,8 @@ import Pickable from "./Pickable"
 import PickResult from "./PickResult"
 import Matrix4 from "../../math/Matrix4"
 import { equals } from "../functions"
+import TextureBase from "../TextureBase"
+import Graphics3D from "../Graphics3D"
 
 type LayoutFunction = (container: Control) => void
 
@@ -23,8 +25,9 @@ export default class Control extends Node {
     private _y = 0
     width = 100
     height = 50
-    backColor = Color.transparent
-    foreColor = Color.black
+    backgroundColor?: Color
+    backgroundImage?: string | TextureBase
+    color = Color.black
     margin = Spacing.zero
     padding = Spacing.zero
     pickRadius?: number
@@ -67,8 +70,8 @@ export default class Control extends Node {
     }
 
     protected drawBackground(g: Graphics) {
-        if (this.backColor.isVisible) {
-            g.fillRectangle(0, 0, this.width, this.height, this.backColor);
+        if (this.backgroundColor || this.backgroundImage) {
+            g.fillRectangle(0, 0, this.width, this.height, this.backgroundColor || Color.white, this.backgroundImage);
         }
     }
 
@@ -109,12 +112,16 @@ export default class Control extends Node {
     }
     get boundingShape() { return new Rectangle(0, 0, this.width, this.height) }
 
+    get isVisible() {
+        return this.backgroundImage || (this.backgroundColor && this.backgroundColor.isVisible)
+    }
+
     _pickable?: Pickable
     get pickable() {
         let value = this._pickable
         if (value == null) {
             value = Pickable.children
-            if (this.backColor.isVisible) {
+            if (this.isVisible) {
                 value |= Pickable.self
             }
         }

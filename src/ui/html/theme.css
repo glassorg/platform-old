@@ -42,6 +42,9 @@
 
     font-family: var(--theme-font-family);
     background: var(--theme-background);
+}
 
+* {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 

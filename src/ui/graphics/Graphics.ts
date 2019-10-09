@@ -17,6 +17,9 @@ export default abstract class Graphics {
     // abstract set transform(value: Matrix4)
     // drawing
     abstract clear(color?: Color, depth?: number)
+    drawImage(image, x: number, y: number, width: number, height: number) {
+        this.fillRectangle(x, y, width, height, Color.white, image)
+    }
     abstract fillRectangle(x: number, y: number, width: number, height: number, color: Color, texture?)
     // request redraw
     abstract invalidate()

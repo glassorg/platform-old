@@ -6,6 +6,8 @@ import Gesture from "./Gesture"
 import Gestures from "./Gestures"
 import Store from "../../../data/Store"
 import { bindEventListeners } from "../../html/functions"
+import GestureState from "./GestureState"
+import Key from "../../../data/Key"
 
 type Matcher = GestureMatcher | PointerMatcher
 
@@ -72,29 +74,27 @@ export function oneForAll(match: PointerMatcher): GestureMatcher {
     }
 }
 
-let previousPointers: PointerState[] = []
-
 export function recognize(gestures: Gestures) {
     type Pointers = { [name: string]: PointerState }
     // crap, what is the correct way to bind these event listeners?
     let timeoutId: any = null
     function update() {
-        console.log("execute update " + Object.keys(gestures).join(", "))
         timeoutId = null
         let pointers = Store.default.list(PointerState.all)!
 
-        let newPointers = pointers.filter(p => p.handler == null)
+        let uncapturedPointers = pointers.filter(p => p.handler == null)
 
         for (let gestureId in gestures) {
             let gesture = gestures[gestureId]
+            let gestureKey = Key.create(GestureState, gestureId)
+            let gestureState = Store.default.get(gestureKey)
             let captured = pointers.filter(p => p.handler === gestureId)
-            console.log(gestureId + " " + captured.length)
             //  capture a pointer to the current gesture
             function capture(pointer: PointerState) {
                 // actually capture pointer
                 let element = pointer.first.target as HTMLElement
                 element.setPointerCapture(pointer.id)
-                newPointers.splice(newPointers.indexOf(pointer), 1)
+                uncapturedPointers.splice(uncapturedPointers.indexOf(pointer), 1)
                 captured.push(pointer.patch({ handler: gestureId }))
             }
             //  release a pointer from the current gesture
@@ -102,11 +102,11 @@ export function recognize(gestures: Gestures) {
                 let element = pointer.first.target as HTMLElement
                 element.releasePointerCapture(pointer.id)
                 captured.splice(captured.indexOf(pointer), 1)
-                newPointers.push(pointer.patch({ handler: null }))
+                uncapturedPointers.push(pointer.patch({ handler: null }))
             }
             //  if this gesture hasn't started (captured any pointers)
             if (captured.length == 0) {
-                gesture.start(newPointers).slice(0).forEach(capture)
+                gesture.start(uncapturedPointers).slice(0).forEach(capture)
                 if (captured.length > 0 && gesture.onStart) {
                     gesture.onStart(captured)
                 }
@@ -114,7 +114,7 @@ export function recognize(gestures: Gestures) {
             if (captured.length > 0) {
                 //  maybe add some new pointers to the gesture handler
                 if (gesture.add) {
-                    for (let pointer of newPointers) {
+                    for (let pointer of uncapturedPointers) {
                         if (gesture.add(pointer)) {
                             capture(pointer)
                         }
@@ -137,7 +137,7 @@ export function recognize(gestures: Gestures) {
             }
             if (captured.length === 0) {
                 //  if there aren't any captured pointers, call finish
-                let previous = previousPointers.filter(p => p.handler === gestureId)
+                let previous = gestureState.captured
                 if (previous.length > 0) {
                     //  this gesture handler had pointers before but doesn't now
                     //  so we call finish with the final pointers
@@ -146,8 +146,8 @@ export function recognize(gestures: Gestures) {
                     }
                 }
             }
+            Store.default.patch(gestureKey, { captured })
         }
-        previousPointers = pointers
     }
     function queueUpdate() {
         if (timeoutId == null) {

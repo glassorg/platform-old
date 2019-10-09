@@ -72,9 +72,9 @@ function getEventListenerTarget(name: string) {
 
 function bindEventListenersInternal(listeners, add = true, boundTargets: any = {}) {
     for (let targetName in listeners) {
-        let target = boundTargets[name]
+        let target = boundTargets[targetName]
         if (target == null) {
-            target = boundTargets[name] = getEventListenerTarget(targetName)
+            target = boundTargets[targetName] = getEventListenerTarget(targetName)
         }
         let targetEventListeners = listeners[targetName]
         for (let eventName in targetEventListeners) {

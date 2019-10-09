@@ -1,6 +1,7 @@
 import Color from "../math/Color"
 import Graphics from "./Graphics"
 import Matrix4 from "../math/Matrix4"
+import { memoize } from "../../utility/common"
 
 class Uniforms {
 
@@ -38,7 +39,15 @@ export default class Graphics2D extends Graphics {
 
         let _modelView = Matrix4.identity
         this._uniforms = new Uniforms(context)
+        this.getImage = memoize((name: string) => {
+            let image = new Image()
+            image.onload = (e) => { this.invalidate() }
+            image.src = name
+            return image
+        }) as any
     }
+
+    getImage = (name: string) => HTMLImageElement
 
     get uniforms() {
         return this._uniforms
@@ -85,8 +94,17 @@ export default class Graphics2D extends Graphics {
     }
 
     fillRectangle(x: number, y: number, width: number, height: number, color: Color, texture) {
-        this.context.fillStyle = color.toString()
-        this.context.fillRect(x, y, width, height)
+        if (typeof texture === "string") {
+            texture = this.getImage(texture)
+        }
+
+        if (texture) {
+            this.context.drawImage(texture, x, y, width, height)
+        }
+        else {
+            this.context.fillStyle = color.toString()
+            this.context.fillRect(x, y, width, height)
+        }
     }
 
 }

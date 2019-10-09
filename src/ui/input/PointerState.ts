@@ -106,6 +106,15 @@ export default class PointerState extends Dependent {
         return patched
     }
 
+    /**
+     * Gets the pointer state for a given pointer after ensuring the internal state is updated.
+     */
+    static forEvent(e: PointerEvent) {
+        updatePointer(e)
+        let key = Key.create(PointerState, e.pointerId.toString())
+        return Store.default.get(key)
+    }
+
     static watched(key: ModelKey<PointerState>) {
         if (!watching) {
             watching = true
