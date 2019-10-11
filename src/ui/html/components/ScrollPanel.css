@@ -3,11 +3,11 @@
     flex: 1 1 auto;
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: row;
 }
 .ScrollPanel > * {
     flex: 1 1 auto;
-    width: 100%;
-    height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;

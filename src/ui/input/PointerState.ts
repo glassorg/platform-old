@@ -18,8 +18,12 @@ function updatePointer(e: PointerEvent) {
         let key = Key.create(PointerState, id.toString())
         let point = new Point(e)
         let state = Store.default.peek(key)
-        let points = state && state.points.slice(Math.max(0, state.points.length - maxPoints)) || []
-        points.push(point)
+        let points = [...state.points, point]
+        let trim = points.length - maxPoints
+        if (trim > 0) {
+            // trim it down, but always leave the first point.
+            points.splice(1, trim)
+        }
         Store.default.patch(key, { id, type, isPrimary, points })
     }
 }
@@ -104,7 +108,6 @@ export default class PointerState extends Dependent {
         for (let i = this.points.length - 1; i >= 0; i--) {
             let point = this.points[i]
             if (point.time < time) {
-                console.log("found at " + (this.points.length - i))
                 return point
             }
         }

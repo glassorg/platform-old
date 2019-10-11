@@ -111,7 +111,7 @@ export function recognize(gestures: Gestures) {
                 availablePointers.push(pointer.patch({ handler: null }))
             }
             //  if this gesture hasn't started (captured any pointers)
-            if (captured.length == 0) {
+            if (captured.length == 0 && availablePointers.length > 0) {
                 gesture.start(availablePointers).slice(0).forEach(capture)
                 if (captured.length > 0 && gesture.onStart) {
                     gesture.onStart(captured)

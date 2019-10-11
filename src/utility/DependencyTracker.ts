@@ -39,11 +39,11 @@ export default class DependencyTracker<Dependent extends Comparable, Dependee ex
     }
 
     getDependents(dependee: Dependee): Set<Dependent> {
-        return this.dependeesToDependents.get(dependee) || empty
+        return this.dependeesToDependents.get(dependee) || empty as Set<Dependent>
     }
 
     getDependees(dependent: Dependent): Set<Dependee> {
-        return this.dependentsToDependees.get(dependent) || empty
+        return this.dependentsToDependees.get(dependent) || empty as Set<Dependee>
     }
 
 }
