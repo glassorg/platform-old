@@ -3,12 +3,12 @@ declare module '*.css' {
     export default content;
 }
 
-declare module '*.fs' {
+declare module '*.frag' {
     const content: string;
     export default content;
 }
 
-declare module '*.vs' {
+declare module '*.vert' {
     const content: string;
     export default content;
 }

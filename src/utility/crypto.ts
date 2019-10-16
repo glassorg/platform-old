@@ -1,7 +1,7 @@
 import s from "sjcl"
 
 const encryptOptions = { count:2048, ks:256 }
-export function id() { return base64Encode(s.random.randomWords(2)) }
+export function id(seed: any = s.random.randomWords(2)) { return base64Encode(seed) }
 export function base64Encode(plainText) { return s.codec.base64url.fromBits(s.codec.utf8String.toBits(plainText)) }
 export function base64Decode(base64EncodedText) { return s.codec.utf8String.fromBits(s.codec.base64url.toBits(base64EncodedText))}
 export function sign(text, key) { return s.codec.base64url.fromBits(new s.misc.hmac(s.codec.utf8String.toBits(key), s.hash.sha256).encrypt(text)) }

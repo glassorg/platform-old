@@ -2,6 +2,8 @@
 .Fab {
     cursor: pointer;
     background: var(--theme-primary);
+    background-repeat: no-repeat;
+    background-position: center;
     touch-action: none;
     display: inline-block;
     width: 60px;
@@ -16,7 +18,7 @@
     margin: var(--theme-margin);
     box-shadow: var(--theme-shadow-2);
     transition:
-        all var(--theme-transition-time-function);
+        box-shadow var(--theme-transition-time-function);
 }
 .Fab:hover {
     box-shadow: var(--theme-shadow-3);
