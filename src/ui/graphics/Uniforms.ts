@@ -50,7 +50,7 @@ export function setUniform(g: Graphics3D, uniform: WebGLActiveInfo, location: We
     }
 }
 
-export function createUniforms(gl: WebGL2RenderingContext, invalidate: (string) => void): Uniforms {
+export function createUniforms(gl: WebGLRenderingContext, invalidate: (string) => void): Uniforms {
     return new Proxy(new Uniforms(), {
         set(obj, prop, value) {
             //  if value is a string then it represents the path to a texture

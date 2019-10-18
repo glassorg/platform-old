@@ -7,7 +7,7 @@ import localize from "./localize"
 import bindComponentToDom from "./html/bindComponentToDom"
 import SoundContext from "./sound/SoundContext"
 
-type ComponentEventHandler = (component: Component) => void
+export type ComponentEventHandler = (component: Component) => void
 
 function quickPropertyEquals(a, b) {
     if (a === b)

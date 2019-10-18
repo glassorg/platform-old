@@ -67,6 +67,7 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
 
     let graphics: Graphics
     function repaint() {
+        rafId = null
         if (graphics == null) {
             if (dimensions === 2) {
                 let context = canvas.getContext("2d")
@@ -77,7 +78,7 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
                 }
             } else {
                 let context = canvas.getContext("webgl2")
-                if (context instanceof WebGL2RenderingContext) {
+                if (context instanceof WebGLRenderingContext) {
                     graphics = new Graphics3D(context)
                 } else {
                     console.error(`Expectd a WebGL2RenderingContext:`, context)
@@ -127,16 +128,17 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
     let start: number | null = null
     let frame = 0
     let frameStart: number | null = null
+    let rafId: number | null = null
     Object.defineProperties(extendElementAsVirtualNodeRoot(canvas), {
         dirty: {
             get() { return dirty },
             set(value: boolean) {
                 if (value !== dirty) {
                     dirty = value
-                    if (value) {
+                    if (value && rafId == null) {
                         //  was using c.requestAnimationFrame
                         //  wasn't firing the first time on rendering repaint
-                        requestAnimationFrame(repaint)
+                        rafId = requestAnimationFrame(repaint)
                     }
                 }
             }
@@ -178,11 +180,9 @@ export default Context.component(function Canvas(c: Context, p: {
     style?: string
 }) {
     let { dimensions, content, ...rest } = p
-    let canvas = c.begin(html.canvas, rest)
+    let canvas: any = c.begin(html.canvas, rest)
         let repaint = ensureRootRepaintableVirtualNode(c, canvas, dimensions = dimensions || 2)
         content(c)
-        if (repaint) {
-            repaint()
-        }
+        canvas.dirty = true
     c.end(html.canvas)
 })
