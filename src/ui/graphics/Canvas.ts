@@ -78,7 +78,7 @@ function ensureRootRepaintableVirtualNode(c: Context, canvas: HTMLCanvasElement,
                 }
             } else {
                 let context = canvas.getContext("webgl2")
-                if (context instanceof WebGLRenderingContext) {
+                if (context instanceof WebGL2RenderingContext) {
                     graphics = new Graphics3D(context)
                 } else {
                     console.error(`Expectd a WebGL2RenderingContext:`, context)

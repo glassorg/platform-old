@@ -871,10 +871,10 @@
   dependencies:
     arrify "^1.0.1"
 
-"@glas/build@^0.1.5":
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/@glas/build/-/build-0.1.5.tgz#0f89bfcf28717537fb372a8f1718ec31e3486f91"
-  integrity sha512-XMhqG+OgllaWtf3vOXe4JdsxwdEAfwCbfeSvqAdw+EW3yQpOIF8ONO1CJG8ZmzuDG85R2AtyJNGl4JqOMPF1pA==
+"@glas/build@^0.2.3":
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@glas/build/-/build-0.2.3.tgz#ed4a347bb284cb84bd63184923660e0e0cd9caa0"
+  integrity sha512-O4UyPU12dBEprIFNj7mH3VaNmW9TZoTb20Vm6mvgzShYw8dqYs+wcXWbVp5BRdwhlo/bllMNDJkrn1kgWfgbHQ==
   dependencies:
     "@google-cloud/translate" "^2.1.3"
     "@types/node" "^10.12.9"
