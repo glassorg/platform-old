@@ -54,13 +54,13 @@ export function createUniforms(gl: WebGL2RenderingContext, invalidate: (string) 
     return new Proxy(new Uniforms(), {
         set(obj, prop, value) {
             //  if value is a string then it represents the path to a texture
-            if (equals(value, Reflect.get(obj, prop))) {
+            if (value === obj[prop as any])
                 return true
-            }
             //  we have to invalidate before changing the value
             //  or else the flushed vertices will be wrong
             invalidate(prop)
-            return Reflect.set(obj, prop, value)
+            obj[prop as any] = value
+            return true
         }
     }) as Uniforms
 }
