@@ -44,7 +44,7 @@ export function createPredicate<T>(query: Query<T>) {
                 let value = where[name]
                 if (isPlainObject(value)) {
                     for (let op in value as any) {
-                        if (!ops[op](model[name], value))
+                        if (!ops[op](model[name], value![op]))
                             return false;
                     }
                 } else {

@@ -140,7 +140,7 @@ export const key: Schema = {
     pattern: Key.regex,
     coerce(value) {
         if (typeof value === "string") {
-            value = Key.parse(Model.serializer.namespace, value)
+            value = Key.parse(value)
         }
         return value
     }

@@ -1,4 +1,5 @@
 import Key from "./Key"
+import defaultNamespace from "./defaultNamespace"
 
 function pretraverse(key, object, visitor) {
     for (let childKey in object) {
@@ -109,6 +110,6 @@ export default class Serializer {
         this.namespace[name] = type
     }
 
-    public static readonly default = new Serializer()
+    public static readonly default = new Serializer(defaultNamespace)
 
 }

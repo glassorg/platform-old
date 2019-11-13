@@ -1,4 +1,4 @@
-import Entity from "../../data/Entity"
+import Record from "../../data/Record"
 import Key, { ModelKey, QueryKey } from "../../data/Key"
 import Database, { ErrorCallback, RowCallback } from "../Database"
 import Namespace from "../../data/Namespace"
@@ -10,7 +10,7 @@ import getPackageJson, { getProjectId } from "../getPackageJson"
 
 const serializedProperty = "_"
 
-export function getIndexedValues(entity: Entity) {
+export function getIndexedValues(entity: Record) {
     let values: any = {}
     let deleted = entity.deleted != null
     common.traverse(entity, entity.constructor as Schema, (value, schema, ancestors, path) => {
@@ -28,7 +28,7 @@ const getSerializer = common.memoize(
     }
 )
 
-function serialize(entity: Entity, namespace: Namespace) {
+function serialize(entity: Record, namespace: Namespace) {
     //  remove the type
     let values = Object.assign({}, entity)
     //  remove the key
@@ -37,7 +37,7 @@ function serialize(entity: Entity, namespace: Namespace) {
 }
 
 function deserialize(key: ModelKey, serialized: string, namespace: Namespace) {
-    let values = getSerializer(namespace).parse(serialized) as Entity
+    let values = getSerializer(namespace).parse(serialized) as Record
     //  restore the key
     values.key = key
     //  restore the type
@@ -83,7 +83,7 @@ function toGoogleQuery(gfirestore: GoogleFirestore, key: Key) {
     return gquery
 }
 
-function toEntity<T extends Entity>(namespace: Namespace, doc: DocumentSnapshot): T | null {
+function toEntity<T extends Record>(namespace: Namespace, doc: DocumentSnapshot): T | null {
     if (!doc.exists) {
         return null
     }
@@ -109,14 +109,14 @@ export default class Firestore extends Database {
         throw new Error("not implemented")
     }
 
-    async get<T extends Entity = Entity>(keys: ModelKey<T>[]): Promise<Array<T | null>> {
+    async get<T extends Record = Record>(keys: ModelKey<T>[]): Promise<Array<T | null>> {
         throw new Error("need to reimplement this for batch get")
         // let docRef = this.gfirestore.doc(key.toString())
         // let doc = await docRef.get()
         // return toEntity<T>(this.namespace, doc) as T | null
     }
 
-    query<T extends Entity>(key: QueryKey<T>): Promise<T[]> {
+    query<T extends Record>(key: QueryKey<T>): Promise<T[]> {
         let gquery = toGoogleQuery(this.gfirestore, key)
         let error: any = null
         return new Promise((resolve, reject) => {
@@ -139,7 +139,7 @@ export default class Firestore extends Database {
     }
 
     //  create, update, delete
-    async put(entities: Entity[]) {
+    async put(entities: Record[]) {
         let batch = this.gfirestore.batch()
         for (let entity of entities) {
             let docRef = this.gfirestore.doc(entity.key.toString())

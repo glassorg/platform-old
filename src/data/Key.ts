@@ -3,6 +3,7 @@ import Model, { ModelClass, ModelSchema } from "./Model"
 import Namespace, { isNamespace } from "./Namespace"
 import { deepFreeze, isPlainObject, isEmptyObject } from "../utility/common"
 import State, { StateSchema, StateClass } from "./State"
+import defaultNamespace from "./defaultNamespace"
 
 export type QueryKey<T = any> = Key<T> & { id: null, query: Query<T> }
 export type ModelKey<T = any> = Key<T> & { id: string, query: null }
@@ -127,14 +128,12 @@ export default class Key<T = any> {
         Object.freeze(this)
     }
 
-    // static create<T extends State>(type: StateClass<T>): StateKey<T>
-    // static create<T = Model>(type: StateSchema<T>): StateKey<T>
-    // static create<T = Model>(type: ModelSchema<T>): ModelKey<T>
     static create<T = Model>(type: ModelClass<T>, id: string): ModelKey<T>
     static create<T = Model>(type: ModelSchema<T>, id: string): ModelKey<T>
     static create<T = Model>(type: ModelClass<T>, query: Query<T>): QueryKey<T>
     static create<T extends State>(type: StateClass<T>, id: string): StateKey<T>
     static create<T = Model>(type: StateSchema<T>, id: string): StateKey<T>
+    static create<T = Model>(type: StateSchema<T>, query: Query<T>): StateKey<T>
     static create<T = Model, P = Model>(parent: ModelKey<P>, type: ModelSchema<T>, id: string): ModelKey<T>
     static create<T = Model, P = Model>(parent: ModelKey<P>, type: ModelClass<T>, id: string): ModelKey<T>
     static create<T = Model, P = Model>(parent: ModelKey<P>, type: ModelClass<T>, query: Query<T>): QueryKey<T>
@@ -142,10 +141,27 @@ export default class Key<T = any> {
         return new Key(parentOrType, typeOrQueryOrId, idOrQuery)
     }
 
-static parse(namespace: Namespace, ...steps: Array<Key | ModelClass | string | Query>) {
+    static parse(key: string)
+    static parse(type: ModelClass,  id: string)
+    static parse(type: ModelClass,  id: Query)
+    static parse(parent: Key, type: ModelClass,  id: string)
+    static parse(parent: Key, type: ModelClass,  id: Query)
+    static parse(namespace: Namespace, key: string)
+    static parse(namespace: Namespace, type: ModelClass,  id: string)
+    static parse(namespace: Namespace, type: ModelClass,  id: Query)
+    static parse(namespace: Namespace, parent: Key, type: ModelClass,  id: string)
+    static parse(namespace: Namespace, parent: Key, type: ModelClass,  id: Query)
+    static parse(...steps: Array<Namespace | Key | ModelClass | string | Query>)
+    static parse(...steps: Array<Namespace | Key | ModelClass | string | Query>) {
         //  get namespace, possibly consuming first step
-        if (!isNamespace(namespace)) {
-            throw new Error("Namespace or Key is required")
+        let namespace: Namespace
+        let first = steps[0]
+        if (isNamespace(first)) {
+            namespace = first
+            steps.shift()
+        }
+        else {
+            namespace = defaultNamespace
         }
 
         //  get the text of the key

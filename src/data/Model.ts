@@ -95,12 +95,8 @@ export default class Model {
         }
     }
 
-    private static _serializer: Serializer.default
     public static get serializer() {
-        if (Model._serializer == null) {
-            Model._serializer = new Serializer.default()
-        }
-        return Model._serializer
+        return Serializer.default.default
     }
 
 }

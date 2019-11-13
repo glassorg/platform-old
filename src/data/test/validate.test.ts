@@ -5,13 +5,14 @@ import Key from "../Key"
 import Model from "../Model"
 import User from "../../model/User"
 import * as schema from "../schema"
+import Record from "../Record"
 
 @Model.class()
-class ValidateAnimal extends Entity {
+class ValidateAnimal extends Record {
 }
 
 @Model.class()
-class ValidatePerson extends Entity {
+class ValidatePerson extends Record {
 
     @Model.property(schema.string, {required: true, coerce(value) { return value.trim() } })
     name!: string

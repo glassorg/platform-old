@@ -2,13 +2,12 @@ const { Datastore: GDatastore } = require("@google-cloud/datastore")
 import { DatastoreKey as GKey } from "@google-cloud/datastore/entity"
 import Key, { QueryKey, ModelKey} from "../../data/Key"
 import Database, { ErrorCallback, RowCallback } from "../Database"
-import Entity from "../../data/Entity"
+import Record from "../../data/Record"
 import { Schema } from "../../data/schema"
 import * as common from "../../utility/common"
 import Namespace from "../../data/Namespace"
 import Serializer, { typeKey } from "../../data/Serializer"
 import * as compression from "../compression"
-import { entity } from "@google-cloud/datastore/build/src/entity"
 import Model from "../../data/Model"
 
 const serializedProperty = "_"
@@ -16,7 +15,7 @@ const excludeFromIndexes = [serializedProperty]
 type GoogleEntity = { [serializedProperty]: string }
 type GoogleEntityUpsert = { key, data: any, excludeFromIndexes: string[] }
 
-function getIndexedValues(entity: Entity) {
+function getIndexedValues(entity: Record) {
     let properties = (entity.constructor as any).properties as { [name: string]: Schema }
     let values: any = {}
 
@@ -38,11 +37,11 @@ const getSerializer = common.memoize(
     }
 )
 
-function serialize(entity: Entity, namespace: Namespace) {
+function serialize(entity: Record, namespace: Namespace) {
     return getSerializer(namespace).stringify(entity)
     let values = JSON.parse(getSerializer(namespace).stringify(entity))
     delete values[typeKey]
-    delete values[Entity.properties.key!.id!.valueOf()]
+    delete values[Record.properties.key!.id!.valueOf()]
     return JSON.stringify(values)
 }
 
@@ -58,7 +57,7 @@ function deserialize(key: ModelKey, serialized: string, namespace: Namespace) {
     // let entity = Object.assign(Object.create(key.type!.prototype), JSON.parse(serialized))
     // entity.key = key
     // return entity
-    let result = getSerializer(namespace).parse(serialized) as Entity
+    let result = getSerializer(namespace).parse(serialized) as Record
     return result
 }
 
@@ -162,7 +161,7 @@ export default class Datastore extends Database {
         this.gdatastore = new GDatastore({ projectId: properties.projectId })
     }
 
-    getGoogleEntity(gdatastore, entity: Entity, key = entity.key): GoogleEntityUpsert {
+    getGoogleEntity(gdatastore, entity: Record, key = entity.key): GoogleEntityUpsert {
         let data = getIndexedValues(entity)
         data[serializedProperty] = compression.deflate.compress(serialize(entity, this.namespace))
         return { key: getGoogleKey(gdatastore, key), data, excludeFromIndexes }
@@ -203,7 +202,7 @@ export default class Datastore extends Database {
         return deserialize(key, decompressed, this.namespace)
     }
 
-    async get<T extends Entity>(keys: ModelKey<T>[]): Promise<Array<T | null>> {
+    async get<T extends Record>(keys: ModelKey<T>[]): Promise<Array<T | null>> {
         let gkeys = keys.map(key => getGoogleKey(this.gdatastore, key))
         let [gentities] = await this.gdatastore.get(gkeys) as GoogleEntity[][]
         gentities = sortEntities(gentities, gkeys)
@@ -229,12 +228,12 @@ export default class Datastore extends Database {
         )
     }
 
-    async query<T extends Entity>(key: QueryKey<T>): Promise<T[]> {
+    async query<T extends Record>(key: QueryKey<T>): Promise<T[]> {
         return new Promise((resolve, reject) => {
             let entities: T[] = []
             this.raw(key, (row) => {
                 if (row) {
-                    let entity = getSerializer(this.namespace).parse(row) as Entity
+                    let entity = getSerializer(this.namespace).parse(row) as Record
                     if (entity) {
                         entities.push(entity as T)
                     }
@@ -249,7 +248,7 @@ export default class Datastore extends Database {
     }
 
     //  create, update, delete
-    async put(entities: Entity | Entity[]) {
+    async put(entities: Record | Record[]) {
         if (!Array.isArray(entities)) {
             entities = [entities]
         }
