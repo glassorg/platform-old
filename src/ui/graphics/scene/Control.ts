@@ -16,26 +16,28 @@ import Matrix4 from "../../math/Matrix4"
 import { equals } from "../functions"
 import TextureBase from "../TextureBase"
 import Graphics3D from "../Graphics3D"
+import Graphics2D from "../Graphics2D"
 
 type LayoutFunction = (container: Control) => void
 
 export default class Control extends Node {
 
-    private _x = 0
-    private _y = 0
-    width = 100
-    height = 50
+    private _x!: number
+    private _y!: number
+    width!: number
+    height!: number
     backgroundColor?: Color
     backgroundImage?: string | TextureBase
-    color = Color.black
-    margin = Spacing.zero
-    padding = Spacing.zero
+    color!: Color
+    margin!: Spacing
+    padding!: Spacing
     pickRadius?: number
     minimumSize?: Size
     maximumSize?: Size
     optimumSize?: Size
     private transformValid?: boolean
-
+    text?: string
+    fontSize?: number
     /**
      * Layout function for positioning children.
      */
@@ -44,6 +46,21 @@ export default class Control extends Node {
      * Layout options for self.
      */
     layout?: any
+
+    //  This assigns the values to the prototype, rather than initializing within the constructor.
+    //  This is more performant AND it means we can check the prototype for default values.
+    //  I do not know why Typescript doesn't do it this way.
+    private static _ = (() => {
+        Object.assign(Control.prototype, {
+            _x: 0,
+            _y: 0,
+            width: 100,
+            height: 50,
+            color: Color.black,
+            margin: Spacing.zero,
+            padding: Spacing.zero,
+        })
+    })()
 
     set x(value) {
         if (this._x !== value) {
@@ -67,6 +84,17 @@ export default class Control extends Node {
     draw(g: Graphics) {
         this.drawBackground(g)
         super.draw(g)
+        if (this.text && g instanceof Graphics2D) {
+            let c = g.context
+            if (this.fontSize) {
+                c.font = `normal ${this.fontSize}px sans-serif`
+            }
+            c.fillStyle = this.color.toString()
+            c.textAlign = "center"
+            c.textBaseline = "middle"
+            // right now only draws centered
+            c.fillText(this.text, this.width / 2, this.height / 2, this.width)
+        }
     }
 
     protected drawBackground(g: Graphics) {

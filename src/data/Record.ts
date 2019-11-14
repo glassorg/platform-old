@@ -4,6 +4,7 @@ import TimeStamp from "./TimeStamp"
 
 export default abstract class Record extends Entity {
 
+    static readonly store: string = "server"
     static additionalProperties = { not: {} }
 
     @Model.property(TimeStamp)
@@ -14,7 +15,5 @@ export default abstract class Record extends Entity {
 
     @Model.property(TimeStamp)
     deleted?: TimeStamp
-
-    static store = "server"
 
 }

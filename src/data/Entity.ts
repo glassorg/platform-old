@@ -1,7 +1,6 @@
-import Model, { ModelClass } from "./Model"
-import { ModelKey } from "./Key"
+import Model from "./Model"
+import Key, { ModelKey } from "./Key"
 import * as schema from "./schema"
-import TimeStamp from "./TimeStamp"
 import { getPath } from "../utility/common"
 import Patch, { createPatch } from "./Patch"
 import Store from "./Store"
@@ -9,6 +8,7 @@ import Store from "./Store"
 @Model.class()
 export default class Entity extends Model {
 
+    static readonly store: string = "memory"
     static additionalProperties = {}
 
     @Model.property(schema.key, {
@@ -21,10 +21,32 @@ export default class Entity extends Model {
     })
     key!: ModelKey
 
+    /**
+     * Gets the key.id value.
+     */
+    get id() {
+        return this.key?.id ?? null
+    }
+    /**
+     * Sets the key.id value. Only valid during construction.
+     */
+    set id(value) {
+        if (this.key != null) {
+            throw new Error("Key and id are immutable after construction")
+        }
+        this.key = Key.create(this.constructor, value)
+    }
+
     //  creates this Entity by patching it into the default store
     create(store: Store = Store.default): this {
         store.patch(this.key, this)
         return this
+    }
+
+    //  deletes this Entity from the default store
+    delete(store: Store = Store.default) {
+        store.delete(this.key)
+        return null
     }
 
     //  function for patching a descendant object

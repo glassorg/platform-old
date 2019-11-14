@@ -7,10 +7,10 @@ test("Entity component system queries", t => {
 
     let store = new MemoryStore()
 
-    let player1 = new Entity({ key: "Entity/player1", player: 1, z: 4 }).create(store)
-    let player2 = new Entity({ key: "Entity/player2", player: 2, color: "red", z: 1 }).create(store)
-    let enemy1 = new Entity({ key: "Entity/enemy1", enemy: 1, z: 3 }).create(store)
-    let enemy2 = new Entity({ key: "Entity/enemy2", enemy: 2, color: "red", z: 2 }).create(store)
+    let player1 = new Entity({ id: "player1", player: 1, z: 4 }).create(store)
+    let player2 = new Entity({ id: "player2", player: 2, color: "red", z: 1 }).create(store)
+    let enemy1 = new Entity({ id: "enemy1", enemy: 1, z: 3 }).create(store)
+    let enemy2 = new Entity({ id: "enemy2", enemy: 2, color: "red", z: 2 }).create(store)
 
     let players = store.list(Key.create(Entity, { where: { player: { "!=": null } } }))
     t.deepEqual(players, [player1, player2])

@@ -42,12 +42,9 @@ function bindPointerEvents(canvas: HTMLCanvasElement) {
     }
 
     // add some event routing
-for (let event of ["pointerdown", "pointerup", "pointermove"]) {
+    for (let event of ["pointerdown", "pointerup", "pointermove"]) {
         canvas.addEventListener(event, (e: any) => {
-            let target = pick(e)
-            if (target && target[event]) {
-                target[event](e)
-            }
+            pick(e)?.[`on${event}`]?.(e)
         })
     }
 }

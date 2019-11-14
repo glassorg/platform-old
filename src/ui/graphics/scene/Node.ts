@@ -33,6 +33,12 @@ export default class Node extends VirtualNode {
 
     public update(g: Graphics): boolean {
         let animating = false
+        let localTransform = this.transform
+        let parentTransform = this.parentNode instanceof Node ? this.parentNode.worldTransform : null
+        let worldTransform = this.calculateWorldTransform(parentTransform, localTransform)
+        if (this.worldTransform !== worldTransform) {
+            this.worldTransform = worldTransform
+        }
         if (this.updateSelf(g)) {
             animating = true
         }
@@ -42,13 +48,7 @@ export default class Node extends VirtualNode {
         return animating
     }
 
-    protected updateSelf(g: Graphics) {
-        let localTransform = this.transform
-        let parentTransform = this.parentNode instanceof Node ? this.parentNode.worldTransform : null
-        let worldTransform = this.calculateWorldTransform(parentTransform, localTransform)
-        if (this.worldTransform !== worldTransform) {
-            this.worldTransform = worldTransform
-        }
+    public updateSelf(g: Graphics) {
         return false
     }
 
@@ -78,8 +78,12 @@ export default class Node extends VirtualNode {
     }
 
     public draw(g: Graphics) {
+        this.drawSelf(g)
         this.drawChildren(g)
         this.dirty = false
+    }
+
+    public drawSelf(g: Graphics) {
     }
 
     protected drawChildren(g: Graphics) {

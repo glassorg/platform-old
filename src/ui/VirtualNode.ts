@@ -116,13 +116,24 @@ type Properties<T> = { [P in keyof T]?: T[P] } & { content?: Content }
 type Render<T> = (properties?: Properties<T> | Content) => void
 type Content = (c: Context) => void
 
+const previousProperties = Symbol("previousProperties")
+
 const getFactoryInstance = memoize(function <T extends VirtualNode>(nodeClass: NodeClass<T>) {
     const factory = {
         create(context: Context): T {
             return new nodeClass
         },
         setProperties(node: T, properties) {
+            let previous = node[previousProperties]
             Object.assign(node, properties)
+            if (previous) {
+                for (let name in previous) {
+                    if (!properties.hasOwnProperty(name)) {
+                        node[name] = node.constructor.prototype[name]
+                    }
+                }
+            }
+            node[previousProperties] = properties
             node.markDirty()
         },
         dispose(node: T): void {
