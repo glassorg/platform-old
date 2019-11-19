@@ -47,7 +47,7 @@ export default class Model {
         }
     }
 
-    static ValidateAndFreezeOnConstruction = typeof window !== "undefined"
+    public static ValidateAndFreezeOnConstruction = true //typeof window !== "undefined"
 
     validate() {
         let errors = validate(this.constructor as Schema, this, this, [this.constructor.name])
