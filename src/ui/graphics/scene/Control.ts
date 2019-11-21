@@ -149,7 +149,7 @@ export default class Control extends Node {
         let value = this._pickable
         if (value == null) {
             value = Pickable.children
-            if (this.isVisible) {
+            if (this.isVisible || this.onpointerdown || this.onpointerup || this.onpointermove) {
                 value |= Pickable.self
             }
         }

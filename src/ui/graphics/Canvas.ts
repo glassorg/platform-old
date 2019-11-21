@@ -15,6 +15,16 @@ import State from "../../data/State"
 import Store from "../../data/Store"
 import Key from "../../data/Key"
 
+type PointerHandlers = "onpointerout" | "onpointerover" | "onpointerdown" | "onpointerup" | "onpointermove"
+function dispatch(target: Node, e: PointerEvent, eventName: PointerHandlers, bubble = true) {
+    if (target != null) {
+        target[eventName]?.(e)
+        if (bubble && target.parentNode instanceof Node) {
+            dispatch(target.parentNode, e, eventName);
+        }
+    }
+}
+
 function bindPointerEvents(canvas: HTMLCanvasElement) {
     let pointerTarget: Node | null = null
     function pick(e: PointerEvent) {
@@ -44,7 +54,11 @@ function bindPointerEvents(canvas: HTMLCanvasElement) {
     // add some event routing
     for (let event of ["pointerdown", "pointerup", "pointermove"]) {
         canvas.addEventListener(event, (e: any) => {
-            pick(e)?.[`on${event}`]?.(e)
+            // bubble these events
+            let eventHandlerName = `on${event}`
+            for (let target: any = pick(e); target instanceof Node; target = target.parentNode) {
+                target[eventHandlerName]?.(e)
+            }
         })
     }
 }
