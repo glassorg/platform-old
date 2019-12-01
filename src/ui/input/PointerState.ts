@@ -63,6 +63,30 @@ export default class PointerState extends Dependent {
         return this.points[this.points.length - 1]
     }
 
+    /**
+     * Returns the closest Point at a given offset along the path.
+     * @param offset If positive then distance from first otherwise from last.
+     */
+    getPointByDistance(offset): Point {
+        let { points } = this
+        let start = offset >= 0 ? 0 : points.length - 1
+        let finish = offset >= 0 ? points.length : -1
+        let step = offset >= 0 ? 1 : -1
+        let distance = 0
+        let lastPoint: Point | null = null
+        for (let i = start; i !== finish; i += step) {
+            let point = points[i]
+            if (lastPoint != null) {
+                distance += lastPoint.position.subtract(point.position).length()
+            }
+            if (distance >= Math.abs(offset)) {
+                return point
+            }
+            lastPoint = point;
+        }
+        return lastPoint!
+    }
+
     get key() {
         return Key.create(PointerState, this.id.toString())
     }

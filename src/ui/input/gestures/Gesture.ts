@@ -16,7 +16,8 @@ type Gesture = {
     finish?: (pointers: PointerState[]) => boolean
     onFinish?: GestureHandler
     onUpdate?: GestureHandler
-    share?: boolean
+    share?: { [gestureId: string]: boolean }
+    steal?: string[]
     capture?: boolean
     captureElement?: Element
 }

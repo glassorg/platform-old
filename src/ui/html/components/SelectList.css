@@ -3,7 +3,7 @@
     position: relative;
     z-index: 0; /* to make it it's own stacking context and not let z index of inner elements expand outside of this container */
 }
-.SelectList > * {
+.SelectList > *:not(.IconButton) {
     width: 100%;
     touch-action: pan-y;
     position: absolute;
@@ -19,6 +19,11 @@
         top var(--theme-transition-time-function),
         box-shadow calc(var(--theme-transition-time) * 2) var(--theme-transition-time-function);
     box-shadow: var(--theme-shadow-1);
+}
+.SelectList > .IconButton {
+    position: absolute;
+    padding-left: var(--theme-padding);
+    padding-right: var(--theme-padding);
 }
 .SelectList > .SelectList_selected {
     background: var(--theme-surface-selection);

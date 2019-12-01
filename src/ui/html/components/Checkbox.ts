@@ -9,6 +9,9 @@ export default Context.component(function Checkbox(c: Context, p: {
     const { value, onclick  } = p
     span({
         class: value ? "Checkbox Checkbox_checked" : "Checkbox",
-        onclick
+        onclick,
+        onpointerdown(e: PointerEvent) {
+            e.stopPropagation()
+        }
     })
 })

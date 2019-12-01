@@ -1,6 +1,6 @@
 import Context from "../../Context"
 import { div, span } from ".."
-import Checkbox from "./Checkbox";
+import Checkbox from "./Checkbox"
 import "./SelectList.css"
 import Key, { QueryKey, ModelKey } from "../../../data/Key"
 import INode from "../../INode"
@@ -12,6 +12,8 @@ import Vector2 from "../../math/Vector2"
 import PointerState from "../../input/PointerState"
 import Store from "../../../data/Store"
 import Rectangle from "../../math/Rectangle"
+import Action from "../../Action"
+import IconButton from "./IconButton"
 
 function getIndexMap<T>(order: T[]) {
     const indexMap = new Map<T,number>()
@@ -71,6 +73,9 @@ export class SelectListState extends State {
     @State.property({ default: {} })
     selectedKeys!: { [name: string]: true }
 
+    @State.property()
+    slideOffset?: number
+
     get dragging() {
         return this.dragStart != null && this.dragPosition != null
     }
@@ -110,15 +115,17 @@ export default Context.component(
         query: QueryKey<T>,
         order: string[],
         item(key: ModelKey<T>): INode,
-        reorder(order: string[]): void
+        reorder(order: string[]): void,
+        swipeLeft?: Action,
+        swipeRight?: Action,
     })
     {
         const key = Key.create(SelectListState, p.id)
         const state = c.store.get(key)
         const itemKeys = c.store.get(p.query)
 
-        function isSelected(itemKey: ModelKey<T>) {
-            return state.selectedKeys[itemKey.toString()]
+        function isSelected(itemKey?: ModelKey<T>) {
+            return itemKey ? state.selectedKeys[itemKey.toString()] : false
         }
 
         function getClearSelectedKeys() {
@@ -148,21 +155,32 @@ export default Context.component(
             let row = getDragRow<T>(document.elementFromPoint(p.x, p.y))
             return row ? sortedElements.indexOf(row) : defaultValue
         }
-        
+
         let dragElements: HTMLElement[] = []
         let staticElements: HTMLElement[] = []
         let sortedElements: HTMLElement[]
         let container = div({
             class: "SelectList",
-            onclick(e: MouseEvent) {
-                if (!state.dragging) {
-                    let [itemKey, entity] = getKeyAndEntity(e.target)
-                    if (itemKey && entity) {
-                        select(itemKey, !entity.selected, true)
-                    }
-                }
-            },
+            // onclick(e: MouseEvent) {
+            //     if (!state.dragging) {
+            //         let [itemKey, entity] = getKeyAndEntity(e.target)
+            //         if (itemKey && entity) {
+            //             select(itemKey, !entity.selected, true)
+            //         }
+            //         console.log('onclick')
+            //     }
+            // },
             content() {
+                let leftButton: HTMLElement | null = null
+                let rightButton: HTMLElement | null = null
+                if (p.swipeLeft) {
+                    leftButton = IconButton({ action: p.swipeLeft, style: `right: 0px;` }) as HTMLElement
+                    leftButton.style.opacity = `${Math.min(1, -(state.slideOffset ?? 0) * 2 / leftButton.parentElement!.clientWidth)}`
+                }
+                if (p.swipeRight) {
+                    rightButton = IconButton({ action: p.swipeRight, style: `left: 0px;` }) as HTMLElement
+                    rightButton.style.opacity = `${Math.min(1, (state.slideOffset ?? 0) * 2 / rightButton.parentElement!.clientWidth)}`
+                }
                 if (itemKeys) {
                     //  first we render the elements in their natural order.
                     let elements: HTMLElement[] = []
@@ -192,6 +210,7 @@ export default Context.component(
                     let y = dragging ? - insertSpacerHeight / 4 : 0;
                     let dragElementIndex = 0
                     let nonDragElementIndex = 0
+                    let selectedCount = 0
                     for (let element of sortedElements) {
                         let itemKey = (element as any).itemKey
                         let isDragElement = draggingKeys[itemKey]
@@ -208,10 +227,23 @@ export default Context.component(
                         }
                         // SelectList_Selected
                         let selected = isSelected(itemKey)
+                        if (selected) {
+                            if (selectedCount == 0) {
+                                for (let button of [leftButton, rightButton]) {
+                                    if (button != null) {
+                                        let size = `${element.clientHeight}px`
+                                        button.style.top = `${y}px`
+                                        // button.style.width = size
+                                        button.style.height = size
+                                    }
+                                }
+                            }
+                            selectedCount++
+                        }
                         element.className = `${selected ? "SelectList_selected" : ""} ${isDragElement ? "SelectList_DragItem" : ""}`
                         element.style.zIndex = `${isDragElement ? sortedElements.length - dragElementIndex : nonDragElementIndex}`
                         element.style.top = `${isDragElement ? dropY : y}px`
-                        element.style.left = `${isDragElement ? dropX : x}px`
+                        element.style.left = `${selected && state.slideOffset ? state.slideOffset : isDragElement ? dropX : x}px`
                         if (isDragElement) {
                             dropX += 5
                             dropY += dropHeight / 2
@@ -234,23 +266,69 @@ export default Context.component(
                 }
             },
             window: gestures.recognize({
+                SelectList_selectSingleGesture: {
+                    start(pointers) {
+                        return pointers.length === 1 ? pointers : []
+                    },
+                    onFinish(pointers) {
+                        let pointer = pointers[0]
+                        if (pointer.distance < 5) {
+                            let [itemKey, entity] = getKeyAndEntity(pointer.first.target as any)
+                            if (itemKey && entity) {
+                                select(itemKey, !entity.selected, true)
+                            }
+                        }
+                    },
+                    share: {
+                        SelectList_slideGesture: true
+                    }
+                },
                 SelectList_slideGesture: {
                     start(pointers) {
-                        return pointers.some(pointer => {
-                            return Math.abs(pointer.last.position.x - pointer.first.position.x) > 10
+                        //  ideally we recognize a significant horizontal drag
+                        //  within the last x distance
+                        return pointers.every(pointer => {
+                            //  if theres only one pointer then the initial target MUST be selected to drag.
+                            // if (pointers.length === 1 && !isSelected(getDragRow<T>(pointer.first.target)?.itemKey)) {
+                            //     return false
+                            // }
+                            let distance = 20
+                            let dot = 0.95
+                            let current = pointer.last.position
+                            let previous = pointer.getPointByDistance(-distance).position
+                            let delta = current.subtract(previous).length()
+                            //  we want to make sure that MOST of the dragging in the last section
+                            //  was horizontal
+                            let horizontal = Math.abs(current.x - previous.x)
+                            return horizontal >= dot * distance && horizontal > dot * delta
                         }) ? pointers : []
                     },
                     onStart(pointers) {
+                        if (pointers.length == 1) {
+                            let [itemKey, entity] = getKeyAndEntity(pointers[0].first.target as any)
+                            if (itemKey && entity && !isSelected(itemKey)) {
+                                select(itemKey, true, true)
+                            }
+                        }
                     },
                     onUpdate(pointers) {
                         let dx = pointers.map(pointer => pointer.last.position.x - pointer.first.position.x).reduce((a, b) => a + b, 0) / pointers.length
-                        console.log("onStart------ slide " + dx)                        
+                        // console.log("onStart------ slide " + dx)
+                        c.store.patch(key, { slideOffset: dx })
                     },
-                    share: true
+                    onFinish() {
+                        c.store.patch(key, { slideOffset: null })
+                    },
+                    // share: true
                 },
                 SelectList_selectRangeGesture: {
                     start(pointers) {
+                        if (pointers.length > 1)
+                            debugger
                         return !state.dragging && pointers.length >= 2 ? pointers : []
+                    },
+                    onStart(pointers) {
+                        console.log("START range: ", pointers)
                     },
                     finish(pointers) {
                         return pointers.length < 2
@@ -277,7 +355,7 @@ export default Context.component(
                         }
                         c.store.patch(key, { selectedKeys })
                     },
-                    share: true,
+                    // share: true,
                     capture: false,
                 },
                 // [dragGestureId]: {

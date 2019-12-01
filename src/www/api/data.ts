@@ -9,6 +9,11 @@ import clonePatch from "../../utility/clonePatch"
 
 const database = webServer.instance.database
 
+function sendError(error, res) {
+    console.log(`api/data/query streaming error`, error)
+    return res.status(500).send("streaming error")
+}
+
 function getKeys(keyStrings: Array<string|string[]>) {
     return keyStrings.map(k => {
         return Array.isArray(k) ? getKeys(k) : Key.parse(database.namespace, k)
@@ -75,7 +80,7 @@ async function putLimited(batch: Batch, patch: boolean) {
             entity = clonePatch(entity, patch)
         } else if (patch != null) {
             // make sure patch is a full instance
-            entity = patch instanceof Entity ? patch : new key.type!(patch as any) as Entity
+            entity = patch instanceof Entity ? patch : new key.type!({ key, ...patch } as any) as Entity
         }
         newEntities.push(entity!)
         response[key.toString()] = patch == null ? null : entity
@@ -92,10 +97,6 @@ export async function get(keyStrings: Array<string|string[]>): Promise<Entity[][
 export function query(req: Request, res: Response & { flush }) {
     let keyString = req.body
     let key: Key
-    let sendError = (error) => {
-        console.log(`api/data/query streaming error`, error)
-        return res.status(500).send("streaming error")
-    }
     try {
         key = Key.parse(database.namespace, keyString)
     } catch (e) {
@@ -116,9 +117,25 @@ export function query(req: Request, res: Response & { flush }) {
                     res.end()
                 }
             },
-            sendError
+            (e) => sendError(e, res)
         )
     } catch (e) {
-        sendError(e)
+        sendError(e, res)
+    }
+}
+
+export default async function(req: Request, res: Response) {
+    let thisPath = "/data/"
+    let path = req.path.slice(req.path.indexOf(thisPath) + thisPath.length)
+    let key = Key.parse(database.namespace, path)
+    try {
+        let [result]: any = await database.all([key])
+        if (Key.isModelKey(key)) {
+            result = result[0] ?? null
+        }
+        res.json(result)
+    }
+    catch (e) {
+        sendError(e, res)
     }
 }

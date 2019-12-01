@@ -152,7 +152,7 @@ export default class Key<T = any> {
     static parse(namespace: Namespace, parent: Key, type: ModelClass,  id: string)
     static parse(namespace: Namespace, parent: Key, type: ModelClass,  id: Query)
     static parse(...steps: Array<Namespace | Key | ModelClass | string | Query>)
-    static parse(...steps: Array<Namespace | Key | ModelClass | string | Query>) {
+    static parse(...steps: Array<Namespace | Key | ModelClass | string | Query>): Key {
         //  get namespace, possibly consuming first step
         let namespace: Namespace
         let first = steps[0]
