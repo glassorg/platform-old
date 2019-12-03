@@ -9,9 +9,9 @@ import clonePatch from "../../utility/clonePatch"
 
 const database = webServer.instance.database
 
-function sendError(error, res) {
+function sendError(error, res, status = 500) {
     console.log(`api/data/query streaming error`, error)
-    return res.status(500).send("streaming error")
+    return res.status(status).send("streaming error")
 }
 
 function getKeys(keyStrings: Array<string|string[]>) {
@@ -120,6 +120,46 @@ export function query(req: Request, res: Response & { flush }) {
             (e) => sendError(e, res)
         )
     } catch (e) {
+        sendError(e, res)
+    }
+}
+
+const dataRegex = /^([^;]+);(base64+),(.*)$/i
+export async function download(req: Request, res: Response) {
+    let thisPath = "/data/download/"
+    let path = req.path.slice(req.path.indexOf(thisPath) + thisPath.length)
+    // let key = Key.parse(database.namespace, path)
+    let index = req.url.indexOf('?')
+    if (index < 0) {
+        sendError(`Missing ? before property path`, res)
+    }
+    let propertyPath = req.url.slice(index + 1)
+    let key = Key.parse(database.namespace, path)
+    if (!Key.isModelKey(key)) {
+        sendError(`Expected model key: ${key}`, res)
+    }
+
+    try {
+        let [[result]]: any = await database.all([key])
+        for (let property of propertyPath.split('/')) {
+            result = result?.[property] ?? null
+        }
+        if (result == null) {
+            sendError("Not Found", res, 404)
+        }
+        else {
+            const parsedPath = dataRegex.exec(result)
+            if (parsedPath != null) {
+                let [,type, encoding, encoded] = parsedPath
+                let buffer = new Buffer(encoded, encoding as any)
+                res.type(type).send(buffer)
+            }
+            else {
+                sendError("Invalid field value", res, 400)
+            }
+        }
+    }
+    catch (e) {
         sendError(e, res)
     }
 }

@@ -62,6 +62,7 @@ export function create(config: Config) {
     // parse identity token
     instance.use(IdentityProvider)
     instance.use(bodyParser.text({ type: "application/json", limit: 10 * 1000 * 1000 }))
+    instance.use(bodyParser.raw({ type: "image/*", limit: 1 * 1000 * 1000 }))    
     instance.use(methodEmulator)
 
     const apiRoot = path.join(projectRoot, "lib/www/api")
