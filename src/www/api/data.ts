@@ -3,7 +3,7 @@ import * as webServer from "../../server/webServer"
 import Firestore from "../../server/gcloud/Firestore"
 import Key from "../../data/Key"
 import Entity from "../../data/Entity"
-import Patch from "../../data/Patch"
+import Patch, { createPatch } from "../../data/Patch"
 import Model from "../../data/Model"
 import clonePatch from "../../utility/clonePatch"
 
@@ -102,7 +102,7 @@ export function query(req: Request, res: Response & { flush }) {
     } catch (e) {
         return res.status(400).send(`Invalid Key: ${keyString}`)
     }
-    if (!Key.isQueryKey(key)) {
+    if (!Key.isSearchKey(key)) {
         return res.status(400).send(`Not a query key: ${key}`)
     }
     res.type("text/plain")
@@ -124,56 +124,57 @@ export function query(req: Request, res: Response & { flush }) {
     }
 }
 
-const dataRegex = /^([^;]+);(base64+),(.*)$/i
-export async function download(req: Request, res: Response) {
-    let thisPath = "/data/download/"
-    let path = req.path.slice(req.path.indexOf(thisPath) + thisPath.length)
-    // let key = Key.parse(database.namespace, path)
-    let index = req.url.indexOf('?')
-    if (index < 0) {
-        sendError(`Missing ? before property path`, res)
-    }
-    let propertyPath = req.url.slice(index + 1)
-    let key = Key.parse(database.namespace, path)
-    if (!Key.isModelKey(key)) {
-        sendError(`Expected model key: ${key}`, res)
-    }
-
-    try {
-        let [[result]]: any = await database.all([key])
-        for (let property of propertyPath.split('/')) {
-            result = result?.[property] ?? null
-        }
-        if (result == null) {
-            sendError("Not Found", res, 404)
-        }
-        else {
-            const parsedPath = dataRegex.exec(result)
-            if (parsedPath != null) {
-                let [,type, encoding, encoded] = parsedPath
-                let buffer = new Buffer(encoded, encoding as any)
-                res.type(type).send(buffer)
-            }
-            else {
-                sendError("Invalid field value", res, 400)
-            }
-        }
-    }
-    catch (e) {
-        sendError(e, res)
-    }
+const dataRegex = /^data:([^;]+);(base64+),(.*)$/i
+function addQuery(path: string, req: Request) {
+    let index = req.url.indexOf("?")
+    return index < 0 ? path : path + decodeURIComponent(req.url.slice(index))
 }
 
 export default async function(req: Request, res: Response) {
     let thisPath = "/data/"
-    let path = req.path.slice(req.path.indexOf(thisPath) + thisPath.length)
+    let path = addQuery(req.path.slice(req.path.indexOf(thisPath) + thisPath.length), req)
+
     let key = Key.parse(database.namespace, path)
     try {
-        let [result]: any = await database.all([key])
-        if (Key.isModelKey(key)) {
-            result = result[0] ?? null
+        if (req.method === "GET") {
+            let [result]: any = await database.all([key])
+            if (Key.isModelKey(key)) {
+                result = result[0] ?? null
+            }
+            // get the sub result if the key specifies a path
+            result = key.get(result)
+            // IF the result is a data url then we stream it directly as content
+            const dataUrl = dataRegex.exec(result)
+            if (dataUrl != null) {
+                let [,type, encoding, encoded] = dataUrl
+                let buffer = new Buffer(encoded, encoding as any)
+                res.type(type).send(buffer)
+            }
+            else {
+                res.json(result)
+            }
         }
-        res.json(result)
+        else if (req.method === "POST" || req.method === "PUT") {
+            let value
+            if (req.method === "POST") {
+                //  json body
+                value = req.body
+            }
+            else {
+                //  uploading binary file
+                let contentType = req.headers["content-type"]
+                let encoding = "base64"
+                let encoded = req.body.toString(encoding)
+                value = `data:${contentType};${encoding},${encoded}`
+            }
+            let applyPatch = key.patch(value)
+            // IF the user
+            let result = await patch({ [key.toString()]: applyPatch })
+            res.json({})
+        }
+        else {
+            sendError(`Method not supported: ${req.method}`, res)
+        }
     }
     catch (e) {
         sendError(e, res)

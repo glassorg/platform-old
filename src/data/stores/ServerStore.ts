@@ -1,4 +1,4 @@
-import Key, { QueryKey, ModelKey } from "../Key"
+import Key, { SearchKey, ModelKey } from "../Key"
 import MemoryStore from "./MemoryStore"
 import { Value } from "../Store"
 import Model, { ModelSchema } from "../Model"
@@ -33,7 +33,7 @@ export default class ServerStore extends MemoryStore {
                 this.watched.add(entity.key.string)
                 super.setValue(entity.key, entity)
             }
-            if (Key.isQueryKey(key) && key.query != null && key.query.limit != null) {
+            if (Key.isSearchKey(key) && key.query != null && key.query.limit != null) {
                 let keys = entities.map(entity => entity.key)
                 super.setValue(key, keys)
             }
@@ -43,7 +43,7 @@ export default class ServerStore extends MemoryStore {
 
         console.log(`ensureLoaded ${key}`)
 
-        if (Key.isQueryKey(key)) {
+        if (Key.isSearchKey(key)) {
             const rowDelimiter = "\n"
             let url = `${this.path}/query/${key}`
             let xhr = new XMLHttpRequest()

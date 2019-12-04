@@ -1,19 +1,19 @@
 
 import Model, { ModelClass } from "../Model"
 import Query, { createPredicate, createSortCompareFunction } from "../Query"
-import Key, { ModelKey, QueryKey } from "../Key"
+import Key, { ModelKey, SearchKey } from "../Key"
 import Store from "../Store"
 
 type Predicate<T> = (value: T) => boolean
 
 export default class Table<T extends Model = Model> {
 
-    public readonly key: QueryKey<T>
+    public readonly key: SearchKey<T>
     private filter: Predicate<T>
     private keys: Map<string, ModelKey<T>> = new Map()
     private cachedKeys: Array<ModelKey<T>> | null = null
 
-    constructor(key: QueryKey<T>) {
+    constructor(key: SearchKey<T>) {
         this.key = key
         this.filter = createPredicate(key.query)
     }

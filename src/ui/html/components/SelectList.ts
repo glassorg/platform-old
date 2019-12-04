@@ -2,7 +2,7 @@ import Context from "../../Context"
 import { div, span } from ".."
 import Checkbox from "./Checkbox"
 import "./SelectList.css"
-import Key, { QueryKey, ModelKey } from "../../../data/Key"
+import Key, { SearchKey, ModelKey } from "../../../data/Key"
 import INode from "../../INode"
 import { getPosition, bindEventListeners } from "../functions"
 import Model, { ModelSchema } from "../../../data/Model"
@@ -112,7 +112,7 @@ const SelectListRow = Context.component(
 export default Context.component(
     function SelectList<T>(c: Context, p: {
         id: string,
-        query: QueryKey<T>,
+        query: SearchKey<T>,
         order: string[],
         item(key: ModelKey<T>): INode,
         reorder(order: string[]): void,

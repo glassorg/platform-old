@@ -1,4 +1,4 @@
-import Key, { ModelKey, QueryKey } from "../Key"
+import Key, { ModelKey, SearchKey } from "../Key"
 import Store, { Listener, Value } from "../Store"
 import Model from "../Model"
 
@@ -43,7 +43,7 @@ export default class CompositeStore extends Store {
     }
 
     get<T = Model>(key: ModelKey<T>, peek?: boolean): T | null | undefined
-    get<T = Model>(key: QueryKey<T>, peek?: boolean): Array<ModelKey<T>> | undefined
+    get<T = Model>(key: SearchKey<T>, peek?: boolean): Array<ModelKey<T>> | undefined
     get(key: Key, peek: boolean = false): Value | undefined {
         return this.getStore(key).get(key, peek)
     }

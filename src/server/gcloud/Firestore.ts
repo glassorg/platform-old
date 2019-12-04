@@ -1,5 +1,5 @@
 import Record from "../../data/Record"
-import Key, { ModelKey, QueryKey } from "../../data/Key"
+import Key, { ModelKey, SearchKey } from "../../data/Key"
 import Database, { ErrorCallback, RowCallback } from "../Database"
 import Namespace from "../../data/Namespace"
 import * as common from "../../utility/common"
@@ -105,7 +105,7 @@ export default class Firestore extends Database {
         this.gfirestore = new GoogleFirestore({ projectId: this.projectId })
     }
 
-    raw(key: QueryKey, callback: RowCallback, error?: ErrorCallback) {
+    raw(key: SearchKey, callback: RowCallback, error?: ErrorCallback) {
         throw new Error("not implemented")
     }
 
@@ -116,7 +116,7 @@ export default class Firestore extends Database {
         // return toEntity<T>(this.namespace, doc) as T | null
     }
 
-    query<T extends Record>(key: QueryKey<T>): Promise<T[]> {
+    query<T extends Record>(key: SearchKey<T>): Promise<T[]> {
         let gquery = toGoogleQuery(this.gfirestore, key)
         let error: any = null
         return new Promise((resolve, reject) => {

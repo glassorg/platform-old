@@ -1,4 +1,4 @@
-import Key, { QueryKey, ModelKey } from "../Key"
+import Key, { SearchKey, ModelKey } from "../Key"
 import MemoryStore from "./MemoryStore"
 import { Value } from "../Store"
 import Model, { ModelSchema } from "../Model"
@@ -19,7 +19,7 @@ export default class LocalStore extends MemoryStore {
     }
 
     ensureLoaded(key: Key) {
-        let checkLoadedKey = Key.isQueryKey(key) ? key.schema : key.string
+        let checkLoadedKey = Key.isSearchKey(key) ? key.schema : key.string
         if (!this.loaded.has(checkLoadedKey)) {
             this.loaded.add(checkLoadedKey)
             if (Key.isModelKey(key)) {

@@ -5,8 +5,8 @@ type Patch<T> = T | null | {
     // any    // TODO later, make this correctly recurse with Patch<T[P]>
 }
 
-export function createPatch(path: Array<string | number>, object) {
-    if (path.length === 0) {
+export function createPatch(path: Readonly<Array<string | number>> | undefined, object) {
+    if (path == null || path.length === 0) {
         return object
     }
     return createPatch(path.slice(0, -1), { [path[path.length - 1]]: object })

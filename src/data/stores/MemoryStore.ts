@@ -1,4 +1,4 @@
-import Key, { QueryKey, ModelKey } from "../Key"
+import Key, { SearchKey, ModelKey } from "../Key"
 import Model from "../Model"
 import clonePatch from "../../utility/clonePatch"
 import Store, { Listener, Value } from "../Store"
@@ -19,7 +19,7 @@ export default class MemoryStore extends Store {
     private readonly readListeners = new Set<Listener>()
     protected readonly watched = new Set<string>()
 
-    private getTable(key: QueryKey) {
+    private getTable(key: SearchKey) {
         let table = this.tables.get(key.string)
         if (table == null) {
             table = new Table(key)
@@ -55,7 +55,7 @@ export default class MemoryStore extends Store {
     }
 
     get<T = Model>(key: ModelKey<T>, peek?: boolean): T | null | undefined
-    get<T = Model>(key: QueryKey<T>, peek?: boolean): Array<ModelKey<T>> | undefined
+    get<T = Model>(key: SearchKey<T>, peek?: boolean): Array<ModelKey<T>> | undefined
     get(key: Key, peek: boolean = false): Value | undefined {
         // if it's a query make sure we have the corresponding table tracking changes
         if (!peek) {
@@ -66,7 +66,7 @@ export default class MemoryStore extends Store {
         // if a ModelClass provides a default value we return that when no value is present.
         if (value == null) {
             // if it's a query key not explicitly cached then we create it.
-            if (Key.isQueryKey(key)) {
+            if (Key.isSearchKey(key)) {
                 return this.getTable(key).getKeys(this)
             }
             value = key.schema.default || value

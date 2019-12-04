@@ -46,8 +46,11 @@ Main glass library
     X   Use Transform as LocalTransform for Control.
     X   Create and use an arbitrary Transform Node and test input.
         Sprites and Image Usage in 2D and 3D.
-        2D Canvas usage from within 3D.
+    X   2D Canvas usage from within 3D.
         Text Rendering within Canvas 2D.
         3D Effects.
     
         Need ability to create/delete a Texture and update it's src
+        Move the field upload implementation into the general platform data/download
+        -> Actually, define new ?query as ?{query} or ?path/to/field
+        -> Then merge the get/put semantics into ?data url with special upload/download of data fields

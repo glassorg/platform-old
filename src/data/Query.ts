@@ -15,14 +15,15 @@ const ops = {
 type Ascending = true
 type Descending = false
 type Primitive = string | number | boolean | null
-type Query<T = Model> = {
+type Query<T = Model> = Readonly<{
     offset?: number
     limit?: number
-    where?: {
-        [property: string]: Primitive | { [p in keyof typeof ops]?: Primitive }
-    }
-    sort?: Array<{ [property: string]: Ascending | Descending }>
-}
+    where?: Readonly<{
+        [property: string]: Primitive | Readonly<{ [p in keyof typeof ops]?: Primitive }>
+    }>
+    sort?: Readonly<Array<Readonly<{ [property: string]: Ascending | Descending }>>>
+    path?: Readonly<Array<string | number>>
+}>
 
 export function getPathValue(object, path?: Array<string | number>) {
     if (path != null && object != null) {

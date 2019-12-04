@@ -1,4 +1,4 @@
-import Key, { ModelKey, QueryKey } from "../data/Key"
+import Key, { ModelKey, SearchKey } from "../data/Key"
 import Entity from "../data/Entity"
 import Namespace from "../data/Namespace"
 
@@ -19,12 +19,12 @@ abstract class Database {
     }
 
     abstract get<T extends Entity = Entity>(keys: ModelKey<T>[]): Promise<Array<T | null>>
-    abstract query<T extends Entity = Entity>(key: QueryKey<T>): Promise<T[]>
-    async all<T extends Entity = Entity>(keys: Array<ModelKey<T>[] | QueryKey<T>>): Promise<T[][]> {
-        return Promise.all(keys.map(key => Key.isModelKey(key) ? this.get([key]) : this.query(key as QueryKey)))
+    abstract query<T extends Entity = Entity>(key: SearchKey<T>): Promise<T[]>
+    async all<T extends Entity = Entity>(keys: Array<Key<T>>): Promise<T[][]> {
+        return Promise.all(keys.map(key => Key.isModelKey(key) ? this.get([key]) : this.query(key as SearchKey)))
     }
     abstract put(values: Entity | Entity[]): Promise<void>
-    abstract raw(key: QueryKey, callback: RowCallback, error?: ErrorCallback)
+    abstract raw(key: SearchKey, callback: RowCallback, error?: ErrorCallback)
 
 }
 

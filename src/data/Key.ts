@@ -4,12 +4,16 @@ import Namespace, { isNamespace } from "./Namespace"
 import { deepFreeze, isPlainObject, isEmptyObject } from "../utility/common"
 import State, { StateSchema, StateClass } from "./State"
 import defaultNamespace from "./defaultNamespace"
+import * as JSONPointer from "./JSONPointer"
+import Patch, { createPatch } from "./Patch"
 
-export type QueryKey<T = any> = Key<T> & { id: null, query: Query<T> }
+export type SearchKey<T = any> = Key<T> & { id: null, query: Query<T> }
 export type ModelKey<T = any> = Key<T> & { id: string, query: null }
 export type StateKey<T = any> = ModelKey<T> & { schema: { default: T } }
 
-function match(regex, map, text): { parent?: string, type?: string, id?: string, query?: string } | null {
+const emptyQuery = Object.freeze({})
+
+function match(regex, map, text): { parent?: string, type?: string, id?: string, query?: string | any  } | null {
     let result = regex.exec(text)
     if (result == null) {
         return null
@@ -26,7 +30,7 @@ function match(regex, map, text): { parent?: string, type?: string, id?: string,
 }
 
 //                  (parent                    )     (type      )   (id       )       (query )
-const keyRegex = /^((([^\/\?#]+\/[^\/\?#]+\/?)+)\/)?(([^\/\?#]+)(\/([^\/\?#]*))?)?(\?(\{.*\}))?$/i
+const keyRegex = /^((([^\/\?#]+\/[^\/\?#]+\/?)+)\/)?(([^\/\?#]+)(\/([^\/\?#]*))?)?(\?(.*))?$/i
 const keyMap = {
     parent: 2,
     type: 5,
@@ -39,11 +43,17 @@ function parse(key): { parent?: string, type?: string, id?: string, query?: any 
     if (result == null) {
         throw new Error(`Invalid key: ${key}`)
     }
-    if (result.query) {
-        try {
-            result.query = JSON.parse(result.query)
-        } catch (e) {
-            throw new Error(`Invalid key query: ${key}, ${e}`)
+    let { query } = result
+    if (query) {
+        if (query[0] === "{") {
+            try {
+                result.query = JSON.parse(query)
+            } catch (e) {
+                throw new Error(`Invalid key query: ${key}, ${e}`)
+            }
+        }
+        else {
+            result.query = { path: JSONPointer.parse(query) }
         }
     }
     return result
@@ -52,9 +62,16 @@ function parse(key): { parent?: string, type?: string, id?: string, query?: any 
 function stringify(steps: any[]) {
     let buffer: string[] = []
     for (let step of steps) {
+        if (Array.isArray(step)) {
+            // ?path/to/a/field => { path: ["path", "to", "a", "field"] }
+            step = { pointer: step }
+        }
+
         if (isPlainObject(step)) {
+            //  query
             buffer.push("?", JSON.stringify(step))
-        } else if (step != null) {
+        }
+        else if (step != null) {
             if (buffer.length > 0) {
                 buffer.push("/")
             }
@@ -82,8 +99,8 @@ export default class Key<T = any> {
         return (slashes % 2 === 1) && keyRegex.test(value)
     }
 
-    public static isQueryKey(value): value is QueryKey {
-        return value instanceof Key && value.query != null
+    public static isSearchKey(value): value is SearchKey {
+        return value instanceof Key && value.id == null
     }
     public static isModelKey(value): value is ModelKey {
         return value instanceof Key && value.id != null
@@ -93,65 +110,85 @@ export default class Key<T = any> {
     public readonly schema: ModelSchema<T>
     public readonly type: ModelClass<T> | null
     public readonly id: string | null
-    public readonly query: Query<T> | null
+    public readonly query: Query<T>
     public readonly string: string
     public readonly path: string
 
     private constructor(
-        parent: ModelKey | ModelSchema<T> | null = null,
-        schema: ModelSchema<T> | string | Query<T> | null = null,
-        idOrQuery: string | Query<T> | null = null,
-        string: string = stringify([parent, schema, idOrQuery])
+        parent: ModelKey | null = null,
+        schema: ModelSchema<T> | null = null,
+        id: string | null = null,
+        query: Query<T> | null = null,
+        string: string = stringify([parent, schema, id, query])
     ) {
         // if parent is missing
-        if (Model.isSchema(parent)) {
-            idOrQuery = schema as Query<T>
-            schema = parent
-            parent = null
-        }
-        if (!Model.isSchema(schema))
+        if (!Model.isSchema(schema)) {
             throw new Error("Type is not a valid model class: " + schema)
-        let id = typeof idOrQuery === "string" ? idOrQuery : null
-        let query = id != null ? null : (idOrQuery as Query<T> || {})
+        }
         this.parent = parent
         this.schema = schema
         this.type = Model.isClass<T>(schema) ? schema : null
         this.id = id
-        this.query = query
+        this.query = query != null ? query : emptyQuery
         this.string = string
         this.path = this.schema.name
-        if (this.id)
+        if (this.id) {
             this.path += "/" + this.id
-        if (this.parent)
+        }
+        if (this.parent) {
             this.path = this.parent.path + "/" + this.path
+        }
 
         Object.freeze(this)
     }
 
-    static create<T = Model>(type: ModelClass<T>, id: string): ModelKey<T>
-    static create<T = Model>(type: ModelSchema<T>, id: string): ModelKey<T>
-    static create<T = Model>(type: ModelClass<T>, query: Query<T>): QueryKey<T>
-    static create<T extends State>(type: StateClass<T>, id: string): StateKey<T>
-    static create<T = Model>(type: StateSchema<T>, id: string): StateKey<T>
+    static create<T = Model>(type: ModelClass<T>, id: string, path?: JSONPointer.default): ModelKey<T>
+    static create<T = Model>(type: ModelSchema<T>, id: string, path?: JSONPointer.default): ModelKey<T>
+    static create<T = Model>(type: ModelClass<T>, query: Query<T>): SearchKey<T>
+    static create<T extends State>(type: StateClass<T>, id: string, path?: JSONPointer.default): StateKey<T>
+    static create<T = Model>(type: StateSchema<T>, id: string, path?: JSONPointer.default): StateKey<T>
     static create<T = Model>(type: StateSchema<T>, query: Query<T>): StateKey<T>
-    static create<T = Model, P = Model>(parent: ModelKey<P>, type: ModelSchema<T>, id: string): ModelKey<T>
-    static create<T = Model, P = Model>(parent: ModelKey<P>, type: ModelClass<T>, id: string): ModelKey<T>
-    static create<T = Model, P = Model>(parent: ModelKey<P>, type: ModelClass<T>, query: Query<T>): QueryKey<T>
-    static create<T = Model>(parentOrType: ModelKey<T> | ModelSchema<T>, typeOrQueryOrId: ModelSchema<T> | Query<T> | string = "", idOrQuery?: Query<T> | string): Key<T> {
-        return new Key(parentOrType, typeOrQueryOrId, idOrQuery)
+    static create<T = Model, P = Model>(parent: ModelKey<P>, type: ModelSchema<T>, id: string, path?: JSONPointer.default): ModelKey<T>
+    static create<T = Model, P = Model>(parent: ModelKey<P>, type: ModelClass<T>, id: string, path?: JSONPointer.default): ModelKey<T>
+    static create<T = Model, P = Model>(parent: ModelKey<P>, type: ModelClass<T>, query: Query<T>): SearchKey<T>
+    static create<T = Model>(...args): Key<T> {
+        let parent: ModelKey | null = null
+        let schema: ModelSchema<T> | null = null
+        let id: string | null = null
+        let query: Query<T> | null = null
+        let i = 0
+        if (Key.isModelKey(args[i])) {
+            parent = args[i++]
+        }
+        if (Model.isSchema(args[i])) {
+            schema = args[i++]
+        }
+        else {
+            throw new Error("Type is not a valid model class: " + args[i])
+        }
+        if (typeof args[i] === "string") {
+            id = args[i++]
+        }
+        if (isPlainObject(args[i])) {
+            query = args[i++]
+        }
+        if (Array.isArray(args[i])) {
+            query = { path: args[i++] }
+        }
+        return new Key(parent, schema, id, query)
     }
 
-    static parse(key: string)
-    static parse(type: ModelClass,  id: string)
-    static parse(type: ModelClass,  id: Query)
-    static parse(parent: Key, type: ModelClass,  id: string)
-    static parse(parent: Key, type: ModelClass,  id: Query)
-    static parse(namespace: Namespace, key: string)
-    static parse(namespace: Namespace, type: ModelClass,  id: string)
-    static parse(namespace: Namespace, type: ModelClass,  id: Query)
-    static parse(namespace: Namespace, parent: Key, type: ModelClass,  id: string)
-    static parse(namespace: Namespace, parent: Key, type: ModelClass,  id: Query)
-    static parse(...steps: Array<Namespace | Key | ModelClass | string | Query>)
+    static parse(key: string): ModelKey 
+    static parse(type: ModelClass,  id: string): Key
+    static parse(type: ModelClass,  id: Query): Key
+    static parse(parent: Key, type: ModelClass,  id: string): Key
+    static parse(parent: Key, type: ModelClass,  id: Query): Key
+    static parse(namespace: Namespace, key: string): Key
+    static parse(namespace: Namespace, type: ModelClass,  id: string): Key
+    static parse(namespace: Namespace, type: ModelClass,  id: Query): Key
+    static parse(namespace: Namespace, parent: Key, type: ModelClass,  id: string): Key
+    static parse(namespace: Namespace, parent: Key, type: ModelClass,  id: Query): Key
+    static parse(...steps: Array<Namespace | Key | ModelClass | string | Query>): Key
     static parse(...steps: Array<Namespace | Key | ModelClass | string | Query>): Key {
         //  get namespace, possibly consuming first step
         let namespace: Namespace
@@ -189,18 +226,43 @@ export default class Key<T = any> {
             parent = Key.parse(namespace, props.parent) as ModelKey
         }
         if (props.query) {
-            if (props.query && isEmptyObject(props.query.where))
+            //  TODO: Really should completely normalize query
+            //  so that equivalent queries always match string format
+            if (props.query && isEmptyObject(props.query.where)) {
                 delete props.query.where
+            }
             query = deepFreeze(props.query)
         }
         if (props.id) {
             id = props.id
         }
 
-        return new Key(parent, type, id || query, text)
+        return new Key(parent, type, id, query)
     }
 
-    isPossibleMatch(this: QueryKey<T>, key: ModelKey<T>): boolean {
+    get(model: T) {
+        return JSONPointer.get(model, this.query.path)
+    }
+
+    /**
+     * Creates a patch using the query.path and the value.
+     */
+    patch(value): Patch<T>
+    /**
+     * Applies a patch to the model using the query.path and the value.
+     */
+    patch(model: T, value): T
+    patch(modelOrValue: T | any, value?) {
+        if (arguments.length == 1) {
+            return createPatch(this.query.path, modelOrValue)
+        }
+        else {
+            return JSONPointer.patch(modelOrValue, this.query.path, value)
+        }
+
+    }
+
+    isPossibleMatch(this: SearchKey<T>, key: ModelKey<T>): boolean {
         return this.type === key.type
             && (this.parent && this.parent.string) === (key.parent && key.parent.string)
     }

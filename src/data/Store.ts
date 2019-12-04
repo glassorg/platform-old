@@ -1,4 +1,4 @@
-import Key, { QueryKey, ModelKey, StateKey } from "./Key"
+import Key, { SearchKey, ModelKey, StateKey } from "./Key"
 import Model from "./Model"
 import State from "./State"
 import DefaultStore from "./stores/DefaultStore"
@@ -22,14 +22,14 @@ export default abstract class Store {
     peek<T extends State>(key: ModelKey<T>): T
     peek<T = Model>(key: StateKey<T>): T
     peek<T = Model>(key: ModelKey<T>): T | null | undefined
-    peek<T = Model>(key: QueryKey<T>): Array<ModelKey<T>> | undefined
+    peek<T = Model>(key: SearchKey<T>): Array<ModelKey<T>> | undefined
     peek<T = Model>(key: Key<T>): T | null | Array<ModelKey<T>> | undefined {
         return this.get(key, true)
     }
     abstract get<T extends State>(key: ModelKey<T>, peek?: boolean): T
     abstract get<T = Model>(key: StateKey<T>, peek?: boolean): T
     abstract get<T = Model>(key: ModelKey<T>, peek?: boolean): T | null | undefined
-    abstract get<T = Model>(key: QueryKey<T>, peek?: boolean): Array<ModelKey<T>> | undefined
+    abstract get<T = Model>(key: SearchKey<T>, peek?: boolean): Array<ModelKey<T>> | undefined
     abstract get<T = Model>(key: Key<T>, peek?: boolean): T | null | Array<ModelKey<T>> | undefined
     abstract patch<T extends string | boolean | number>(key: ModelKey<T>, value: T | null): void
     abstract patch<T>(key: ModelKey<T>, value: Patch<T>): void
@@ -46,7 +46,7 @@ export default abstract class Store {
         }
     }
 
-    list<T = Model>(key: QueryKey<T>, peek?: boolean): T[] | undefined {
+    list<T = Model>(key: SearchKey<T>, peek?: boolean): T[] | undefined {
         let items: T[] = []
         let keys = this.get(key, peek)
         if (keys == null) {
@@ -80,7 +80,7 @@ export default abstract class Store {
     }
 
     watch<T = Model>(key: ModelKey<T>, callback: (value: T | null) => void): Unwatch
-    watch<T = Model>(key: QueryKey<T>, callback: (value: Array<ModelKey<T>>) => void): Unwatch
+    watch<T = Model>(key: SearchKey<T>, callback: (value: Array<ModelKey<T>>) => void): Unwatch
     watch<T = Model>(key: Key<T>, callback: (value: T | null | Array<ModelKey<T>>) => void): Unwatch {
         if (this.watchers == null) {
             this.watchers = new Map()

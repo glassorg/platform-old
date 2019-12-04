@@ -1,6 +1,6 @@
 const { Datastore: GDatastore } = require("@google-cloud/datastore")
 import { DatastoreKey as GKey } from "@google-cloud/datastore/entity"
-import Key, { QueryKey, ModelKey} from "../../data/Key"
+import Key, { SearchKey, ModelKey} from "../../data/Key"
 import Database, { ErrorCallback, RowCallback } from "../Database"
 import Record from "../../data/Record"
 import { Schema } from "../../data/schema"
@@ -65,7 +65,7 @@ function getGooglePath(key: ModelKey, path: string[] = []) {
     if (key.parent) {
         getGooglePath(key.parent, path)
     }
-    if (key.type == null || key.id == null || key.query != null) {
+    if (key.type == null || key.id == null) {
         throw new Error("Invalid entity key: " + key)
     }
     path.push(key.type.name)
@@ -81,7 +81,7 @@ function getGlassKey(gkey, namespace: Namespace) {
     return Key.parse(namespace, ...gkey.path.map(x => String(x))) as ModelKey
 }
 
-function getGoogleQuery(gdatastore, key: QueryKey) {
+function getGoogleQuery(gdatastore, key: SearchKey) {
     if (!key.type || !key.type.name) {
         throw new Error("A key must have a schema with a name to create a query.")
     }
@@ -209,8 +209,8 @@ export default class Datastore extends Database {
         return gentities.map(gentity => this.getGlassEntity(gentity)) as any
     }
 
-    raw(key: QueryKey, callback: RowCallback, error?: ErrorCallback) {
-        let gquery = getGoogleQuery(this.gdatastore, key as QueryKey)
+    raw(key: SearchKey, callback: RowCallback, error?: ErrorCallback) {
+        let gquery = getGoogleQuery(this.gdatastore, key as SearchKey)
         this.gdatastore.runQueryStream(gquery)
             .on('error', (e) => {
                 console.log("Datastore.query#runQueryStream Error: ", e)
@@ -228,7 +228,7 @@ export default class Datastore extends Database {
         )
     }
 
-    async query<T extends Record>(key: QueryKey<T>): Promise<T[]> {
+    async query<T extends Record>(key: SearchKey<T>): Promise<T[]> {
         return new Promise((resolve, reject) => {
             let entities: T[] = []
             this.raw(key, (row) => {
