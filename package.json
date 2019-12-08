@@ -9,7 +9,8 @@
         "setup": "yarn install && guild link",
         "build": "guild build",
         "watch": "guild watch",
-        "clean": "guild clean"
+        "clean": "guild clean",
+        "deploy": "guild deploy"
     },
     "dependencies": {
         "@google-cloud/datastore": "^4.1.1",

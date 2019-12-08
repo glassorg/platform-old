@@ -36,7 +36,14 @@ export default abstract class Store {
 
     delete<T = Model>(keys: ModelKey<T>[]): void
     delete<T = Model>(key: ModelKey<T>): void
-    delete<T = Model>(key: ModelKey<T> | ModelKey<T>[]): void {
+    delete<T = Model>(key: SearchKey<T>): void
+    delete<T = Model>(key: Key<T> | ModelKey<T>[]): void {
+        if (Key.isSearchKey(key)) {
+            key = this.get(key)!
+            if (key == null) {
+                throw new Error("Could not get keys to delete")
+            }
+        }
         if (Array.isArray(key)) {
             for (let k of key) {
                 this.patch(k as any, null)

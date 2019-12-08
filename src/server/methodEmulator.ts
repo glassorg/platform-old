@@ -13,7 +13,7 @@ export default function methodEmulator(req: Request, res: Response, next) {
             if (firstEqual > 0) {
                 let method = query.slice(0, firstEqual)
                 if (methods.has(method)) {
-                    let content = JSON.parse(query.slice(firstEqual + 1))
+                    let content = JSON.parse(decodeURIComponent(query.slice(firstEqual + 1)))
                     req.url = url.slice(0, lastIndex)
                     req.body = content
                     req.method = method
