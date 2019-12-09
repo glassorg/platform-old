@@ -29,6 +29,7 @@
     --theme-font-family: sans-serif;
     --theme-padding: 8px;
     --theme-margin: calc(var(--theme-padding) * 2);
+    --theme-border-radius: 6px;
     --theme-icon-size: 24px;
     --theme-transition-time: 0.3s;
     --theme-transition-function: cubic-bezier(.25,.8,.25,1);
