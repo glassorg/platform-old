@@ -206,6 +206,62 @@ export default class Matrix4 {
         )
     }
 
+    static orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number) {
+        const lr = 1 / (left - right)
+        const bt = 1 / (bottom - top)
+        const nf = 1 / (near - far)
+        return new Matrix4(
+            -2 * lr, 0, 0, 0,
+            0, -2 * bt, 0, 0,
+            0, 0, 2 * nf, 0,
+            (left + right) * lr, (top + bottom) * bt, (far + near) * nf, 1
+        )
+    }
+
+    static lookAt(eye: Vector3, center: Vector3, up: Vector3) {
+        let z0 = eye.x - center.x
+        let z1 = eye.y - center.y
+        let z2 = eye.z - center.z
+        let inverseZLength = 1 / Math.hypot(z0, z1, z2)
+        z0 *= inverseZLength
+        z1 *= inverseZLength
+        z2 *= inverseZLength
+        let x0 = up.y * z2 - up.z * z1
+        let x1 = up.z * z0 - up.x * z2
+        let x2 = up.x * z1 - up.y * z0
+        let xLength = Math.hypot(x0, x1, x2)
+        if (!xLength) {
+            x0 = x1 = x2 = 0
+        }
+        else {
+            x0 /= xLength
+            x1 /= xLength
+            x2 /= xLength
+        }
+        let y0 = z1 * x2 - z2 * x1
+        let y1 = z2 * x0 - z0 * x2
+        let y2 = z0 * x1 - z1 * x0
+        let yLength = Math.hypot(y0, y1, y2)
+        if (!yLength) {
+            y0 = y1 = y2 = 0
+        }
+        else {
+            y0 /= yLength
+            y1 /= yLength
+            y2 /= yLength
+        }
+        
+        return new Matrix4(
+            x0, y0, z0, 0,
+            x1, y1, z1, 0,
+            x2, y2, z2, 0,
+            -(x0 * eye.x + x1 * eye.y + x2 * eye.z),
+                -(y0 * eye.x + y1 * eye.y + y2 * eye.z),
+                    -(z0 * eye.x + z1 * eye.y + z2 * eye.z),
+                        1
+        )
+    }
+
     static transformation(
         translation: Vector3,
         scaling: Vector3 = new Vector3(1, 1, 1),

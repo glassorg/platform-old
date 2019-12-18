@@ -6,6 +6,7 @@ import NodeFactory from "./NodeFactory"
 import localize from "./localize"
 import bindComponentToDom from "./html/bindComponentToDom"
 import SoundContext from "./sound/SoundContext"
+import { bindEventListeners } from "./html/functions"
 
 export type ComponentEventHandler = (component: Component) => void
 
@@ -267,8 +268,12 @@ export default class Context {
             this.renderStack.push(component)
             let maybeDispose = component.render(this as any, properties)
             if (maybeDispose) {
-                if (typeof maybeDispose !== "function")
+                if (typeof maybeDispose === "object") {
+                    maybeDispose = bindEventListeners(maybeDispose)
+                }
+                if (typeof maybeDispose !== "function") {
                     throw new Error("Component render functions can only return a dispose function or nothing")
+                }
                 component.dispose = maybeDispose
             }
             this.renderStack.pop()

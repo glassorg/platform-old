@@ -114,7 +114,7 @@ export default class VirtualNode implements INode {
 
 type Properties<T> = { [P in keyof T]?: T[P] } & { content?: Content }
 type Render<T> = (properties?: Properties<T> | Content) => void
-type Content = (c: Context) => void
+type Content = string | ((c: Context) => void)
 
 const previousProperties = Symbol("previousProperties")
 

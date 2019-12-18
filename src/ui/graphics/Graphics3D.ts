@@ -75,6 +75,8 @@ export default class Graphics3D extends Graphics {
         gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
         gl.enable(GL.DEPTH_TEST)
         gl.depthFunc(GL.LEQUAL)
+        gl.enable(GL.CULL_FACE)
+        gl.cullFace(GL.BACK)
 
         this.updateScreenSize()
     }
@@ -225,7 +227,7 @@ export default class Graphics3D extends Graphics {
         return deps
     }
 
-    fillRectangle(x: number, y: number, width: number, height: number, color: Color, texture: TextureBase | string = Texture.default, depth: number = 0) {
+    fillRectangle(x: number, y: number, width: number, height: number, color: Color, texture: TextureBase | string = Texture.default, depth: number = -1) {
         let a = new Vector3(x, y, depth).transform(this.uniforms.modelView)
         let b = new Vector3(x + width, y, depth).transform(this.uniforms.modelView)
         let c = new Vector3(x, y + height, depth).transform(this.uniforms.modelView)
@@ -234,8 +236,8 @@ export default class Graphics3D extends Graphics {
         this.uniforms.colorTexture = texture
         this.indexStream.writeQuads([
             ...a, ...color, uv.left, uv.top,
-            ...b, ...color, uv.right, uv.top,
             ...c, ...color, uv.left, uv.bottom,
+            ...b, ...color, uv.right, uv.top,
             ...d, ...color, uv.right, uv.bottom,
         ])
     }

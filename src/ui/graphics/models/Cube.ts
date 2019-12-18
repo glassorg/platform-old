@@ -24,10 +24,10 @@ export default function Cube(g: Graphics3D) {
         let c = transform(-1, -1, +1)
         let d = transform(+1, -1, +1)
         indexStream.writeQuads([
-            ...a, ...normal,
             ...b, ...normal,
-            ...c, ...normal,
+            ...a, ...normal,
             ...d, ...normal,
+            ...c, ...normal,
         ])
     }
     addFace([ 0, 0, 1], null, null)                             //  +z

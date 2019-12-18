@@ -17,11 +17,14 @@ export default class InstanceStream extends VertexStream {
         super(buffer, count)
     }
 
-    writeInstance(instance: IndexBuffer, components: number[]) {
+    writeInstance(instance: IndexBuffer, components: number[])
+    writeInstance(instance: IndexBuffer, ...components: number[])
+    writeInstance(instance: IndexBuffer) {
         if (this.buffer.instance !== instance) {
             this.flush()
             this.buffer.instance = instance
         }
+        const components = typeof arguments[1] === "number" ? Array.prototype.slice.call(arguments, 1) : arguments[1]
         this.write(components)
     }
 

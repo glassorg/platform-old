@@ -16,6 +16,10 @@ export default class CanvasBuffer extends Control {
     canvas: HTMLCanvasElement = document.createElement("canvas")
     texture?: Texture
     id: string = getNextId()
+    /**
+     * from -1 (far) to +1 (near)
+     */
+    z: number = 1
 
     constructor() {
         super()
@@ -60,7 +64,7 @@ export default class CanvasBuffer extends Control {
             g.context.drawImage(this.canvas, this.x, this.y)
         }
         else if (g instanceof Graphics3D) {
-            g.fillRectangle(this.x, this.y, this.canvas.width, this.canvas.height, Color.white, this.texture)
+            g.fillRectangle(this.x, this.y, this.canvas.width, this.canvas.height, Color.white, this.texture, this.z)
         }
     }
 

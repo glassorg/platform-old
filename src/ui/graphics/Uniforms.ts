@@ -17,8 +17,11 @@ export class Uniforms {
 }
 
 export function setUniform(g: Graphics3D, uniform: WebGLActiveInfo, location: WebGLUniformLocation, value) {
+    if (value == null) {
+        return
+    }
     let { gl } = g
-    if (value != null && typeof value === "number") {
+    if (typeof value === "number") {
         value = [value]
     }
 

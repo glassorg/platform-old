@@ -30,7 +30,7 @@ export default class InstanceBuffer extends VertexBuffer {
             let vertices = this.instance.vertices
             this.graphics.bindAttributes([vertices, this])
             this.graphics.bindUniforms()
-            let vertexCount = vertices.size / vertices.vertexFormat.components
+            let vertexCount = this.instance.size
             let instanceCount = this.size / this.vertexFormat.components
             this.instance.bind()
             this.graphics.gl.drawElementsInstanced(vertices.primitive, vertexCount, GL.UNSIGNED_SHORT, 0, instanceCount)
