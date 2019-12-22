@@ -1,13 +1,16 @@
 import Matrix4 from "./Matrix4"
 import { equivalent } from "."
+import Structure from "../../data/Structure"
 
-export default class Vector3 {
+@Structure.class()
+export default class Vector3 extends Structure {
 
     readonly x: number
     readonly y: number
     readonly z: number
 
     constructor(x: number = 0, y: number = 0, z: number = 0) {
+        super()
         this.x = x
         this.y = y
         this.z = z

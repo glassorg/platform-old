@@ -1,13 +1,16 @@
 import Vector3 from "./Vector3"
 import { equivalent } from "."
 import Rectangle from "./Rectangle"
+import Structure from "../../data/Structure"
 
-export default class Vector2 {
+@Structure.class()
+export default class Vector2 extends Structure {
 
     x: number
     y: number
 
     constructor(x: number = 0, y: number = 0) {
+        super()
         this.x = x
         this.y = y
     }

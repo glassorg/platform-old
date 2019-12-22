@@ -1,4 +1,4 @@
-import Key, { SearchKey, ModelKey } from "../Key"
+import Key from "../Key"
 import MemoryStore from "./MemoryStore"
 import { Value } from "../Store"
 import Model, { ModelSchema } from "../Model"
@@ -12,7 +12,7 @@ export default class LocalStore extends MemoryStore {
     private serializer: Serializer
     private loaded = new Set<ModelSchema | string>()
 
-    constructor(storage: Storage = localStorage, serializer: Serializer = Model.serializer) {
+    constructor(storage: Storage = localStorage, serializer: Serializer = Serializer.default) {
         super()
         this.serializer = serializer
         this.storage = storage
@@ -35,7 +35,7 @@ export default class LocalStore extends MemoryStore {
                     let keyString = this.storage.key(i)
                     if (keyString !== null && keyString.startsWith(filter) && Key.isProbablyModelKey(keyString)) {
                         try {
-                            let modelKey = this.serializer.key(keyString)
+                            let modelKey = Key.parse(this.serializer.namespace, keyString)
                             this.ensureLoaded(modelKey)
                         } catch (e) {
                             // console.warn(e)

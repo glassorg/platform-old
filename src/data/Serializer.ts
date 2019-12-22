@@ -1,18 +1,21 @@
-import Key from "./Key"
 import defaultNamespace from "./defaultNamespace"
 
-function pretraverse(key, object, visitor) {
-    for (let childKey in object) {
-        let value = object[childKey]
-        if (value && typeof value === "object") {
-            let change = pretraverse(childKey, value, visitor)
-            if (value !== change) {
-                object[childKey] = change
-            }
-        }
-    }
-    object = visitor(key, object)
-    return object
+// function pretraverse(key, object, visitor) {
+//     for (let childKey in object) {
+//         let value = object[childKey]
+//         if (value && typeof value === "object") {
+//             let change = pretraverse(childKey, value, visitor)
+//             if (value !== change) {
+//                 object[childKey] = change
+//             }
+//         }
+//     }
+//     object = visitor(key, object)
+//     return object
+// }
+
+function getId(constructor) {
+    return constructor.id ?? constructor.name
 }
 
 export const typeKey = ""
@@ -29,10 +32,6 @@ export default class Serializer {
         this.indent = options.indent || 0
         this.parse = this.parse.bind(this)
         this.stringify = this.stringify.bind(this)
-    }
-
-    public key(keyString: string): Key {
-        return Key.parse(this.namespace, keyString)
     }
 
     public parse(text: string) {
@@ -63,7 +62,12 @@ export default class Serializer {
                     console.log("********************************************")
                     throw new Error(`Class not found in namespace: ${typeName}`)
                 }
-                object = new modelConstructor(object)
+                if (modelConstructor.parse) {
+                    object = modelConstructor.parse(object)
+                }
+                else {
+                    object = new modelConstructor(object)
+                }
             }
             return object
         }
@@ -90,10 +94,12 @@ export default class Serializer {
                     output[childKey] = pretraverse(childKey, value)
                 }
             }
-            if (object != null && typeof object === "object" && namespace.hasOwnProperty(object.constructor.name)) {
+            let id = getId(object.constructor)
+            if (object != null && typeof object === "object" && namespace.hasOwnProperty(id)) {
                 let encodedChildrenCount = encodedTypeCount - initialTypeCount
+                encodedTypeCount++
                 let modelConstructor = object.constructor
-                output = { [typeKey]: modelConstructor.name, ...output }
+                output = { [typeKey]: getId(modelConstructor), ...output }
                 if (encodedChildrenCount > 0) {
                     output[countKey] = 1
                 }

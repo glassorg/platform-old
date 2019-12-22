@@ -2,8 +2,10 @@ import Matrix4 from "./Matrix4"
 import { equivalent } from "."
 import Vector3 from "./Vector3"
 import Color from "./Color"
+import Structure from "../../data/Structure"
 
-export default class Vector4 {
+@Structure.class()
+export default class Vector4 extends Structure {
 
     readonly x: number
     readonly y: number
@@ -11,6 +13,7 @@ export default class Vector4 {
     readonly w: number
 
     constructor(x = 0, y = 0, z = 0, w = 0) {
+        super()
         this.x = x
         this.y = y
         this.z = z

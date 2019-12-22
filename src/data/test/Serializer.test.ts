@@ -2,7 +2,7 @@ import test from "ava"
 import Model from "../Model"
 import Entity from "../Entity"
 import Serializer from "../Serializer"
-import { AssertionError } from "assert"
+import Vector3 from "../../ui/math/Vector3"
 
 @Model.class()
 export default class SerializerPerson extends Entity {
@@ -19,14 +19,34 @@ export default class SerializerPerson extends Entity {
     @Model.property({ type: "array", items: { type: "integer" }, id: "d" })
     array!: number
 
+    @Model.property({ type: Vector3 })
+    position?: Vector3
+
 }
 
 class Foo extends SerializerPerson {
+
+
 }
 
-const namespace = { SerializerPerson }
+const namespace = { SerializerPerson, Vector3 }
 const { stringify, parse } = new Serializer(namespace, { indent: 4 })
 
+test("Vector Structure Serialization", assert => {
+    let vector = new Vector3()
+    let string = Serializer.default.stringify(vector)
+    assert.true(typeof string === "string")
+    let parsed = Serializer.default.parse(string) as Vector3
+    assert.deepEqual(vector, parsed)
+    assert.true(parsed.constructor === Vector3)
+})
+
+test("Vector Nested Types", assert => {
+    let foo = new SerializerPerson({ id: "foo", position: new Vector3(10, 20, 30)})
+    let string = stringify(foo)
+    let parsed = parse(string) as SerializerPerson
+    assert.true(parsed.position?.constructor === Vector3)
+})
 
 test("SerializerPerson has registered with Model.serializer", assert => {
     assert.true(Model.serializer.namespace.SerializerPerson === SerializerPerson)

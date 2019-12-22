@@ -8,7 +8,6 @@ import Store from "./Store"
 @Model.class()
 export default class Entity extends Model {
 
-    static readonly store: string = "memory"
     static additionalProperties = {}
 
     @Model.property(schema.key, {

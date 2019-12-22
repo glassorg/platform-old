@@ -1,12 +1,11 @@
 import Node from "./Node"
-import DataBuffer from "../DataBuffer"
 import Graphics3D from "../Graphics3D"
 import IndexBuffer from "../IndexBuffer"
 
 export default class Geometry extends Node {
 
     buffer!: IndexBuffer
-    load?: (g: Graphics3D) => DataBuffer
+    load?: (g: Graphics3D) => IndexBuffer
     instance?: number[]
 
     draw(g: Graphics3D) {
