@@ -1,11 +1,12 @@
 import Node from "./Node"
 import Graphics3D from "../Graphics3D"
 import IndexBuffer from "../IndexBuffer"
+import DataBuffer from "../DataBuffer"
 
 export default class Geometry extends Node {
 
-    buffer!: IndexBuffer
-    load?: (g: Graphics3D) => IndexBuffer
+    buffer!: DataBuffer
+    load?: (g: Graphics3D) => DataBuffer
     instance?: number[]
 
     draw(g: Graphics3D) {
@@ -13,7 +14,7 @@ export default class Geometry extends Node {
             if (this.load == null) {
                 throw new Error("You must specify either buffer or load property")
             }
-            this.buffer = g.getModel(this.load) as IndexBuffer
+            this.buffer = g.getModel(this.load)
         }
 
         if (this.instance) {

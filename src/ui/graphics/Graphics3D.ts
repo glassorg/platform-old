@@ -31,7 +31,7 @@ export default class Graphics3D extends Graphics {
     private getWebGLFragmentShader: (shader: FragmentShader) => WebGLShader
     private getWebGLProgram: (program: Program) => WebGLProgram
     public getWebGLTexture: (name: string) => WebGLTexture
-    public getModel: (factory: (g: Graphics3D) => IndexBuffer) => IndexBuffer
+    public getModel: (factory: (g: Graphics3D) => DataBuffer) => DataBuffer
 
     public vertexStream: VertexStream
     public indexStream: IndexStream

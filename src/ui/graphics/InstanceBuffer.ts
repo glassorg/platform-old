@@ -10,7 +10,7 @@ import * as GL from "./GL"
 
 export default class InstanceBuffer extends VertexBuffer {
 
-    instance: IndexBuffer
+    instance: DataBuffer
 
     constructor(graphics: Graphics3D, usage: BufferUsage, vertexFormat: VertexFormat, instance: IndexBuffer) {
         super(graphics, usage, vertexFormat, Primitive.models)
@@ -27,13 +27,18 @@ export default class InstanceBuffer extends VertexBuffer {
 
     draw() {
         if (this.size > 0) {
-            let vertices = this.instance.vertices
-            this.graphics.bindAttributes([vertices, this])
-            this.graphics.bindUniforms()
-            let vertexCount = this.instance.size
-            let instanceCount = this.size / this.vertexFormat.components
-            this.instance.bind()
-            this.graphics.gl.drawElementsInstanced(vertices.primitive, vertexCount, GL.UNSIGNED_SHORT, 0, instanceCount)
+            if (!(this.instance instanceof IndexBuffer)) {
+                throw new Error("Not supported yet or probably ever")
+            }
+            else {
+                let vertices = this.instance.vertices
+                this.graphics.bindAttributes([vertices, this])
+                this.graphics.bindUniforms()
+                let vertexCount = this.instance.size
+                let instanceCount = this.size / this.vertexFormat.components
+                this.instance.bind()
+                this.graphics.gl.drawElementsInstanced(vertices.primitive, vertexCount, GL.UNSIGNED_SHORT, 0, instanceCount)
+            }
         }
     }
 

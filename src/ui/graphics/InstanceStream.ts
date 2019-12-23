@@ -2,7 +2,7 @@ import VertexBuffer from "./VertexBuffer"
 import * as GL from "./GL"
 import VertexFormat from "./VertexFormat"
 import DataStream from "./DataStream"
-import { BufferUsage } from "./DataBuffer"
+import DataBuffer, { BufferUsage } from "./DataBuffer"
 import VertexStream from "./VertexStream"
 import InstanceBuffer from "./InstanceBuffer"
 import IndexBuffer from "./IndexBuffer"
@@ -17,9 +17,12 @@ export default class InstanceStream extends VertexStream {
         super(buffer, count)
     }
 
-    writeInstance(instance: IndexBuffer, components: number[])
-    writeInstance(instance: IndexBuffer, ...components: number[])
-    writeInstance(instance: IndexBuffer) {
+    writeInstance(instance: DataBuffer, components: number[])
+    writeInstance(instance: DataBuffer, ...components: number[])
+    writeInstance(instance: DataBuffer) {
+        if (!(instance instanceof IndexBuffer)) {
+            throw new Error("Not supported yet")
+        }
         if (this.buffer.instance !== instance) {
             this.flush()
             this.buffer.instance = instance

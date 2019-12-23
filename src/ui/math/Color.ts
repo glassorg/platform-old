@@ -1,8 +1,10 @@
 import { clamp } from "."
 import Vector3 from "./Vector3"
 import Vector4 from "./Vector4"
+import Structure from "../../data/Structure"
 
-export default class Color implements Iterable<number> {
+@Structure.class()
+export default class Color extends Structure implements Iterable<number> {
 
     readonly red: number
     readonly green: number
@@ -10,6 +12,7 @@ export default class Color implements Iterable<number> {
     readonly alpha: number
 
     constructor(red: number, green: number, blue: number, alpha: number = 1.0) {
+        super()
         this.red = red
         this.green = green
         this.blue = blue
