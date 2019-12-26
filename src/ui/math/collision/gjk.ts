@@ -34,7 +34,7 @@ export default function gjk(support: SupportFunction, debug: any = undefined) {
     const maxIterations = 100
     const initialHeading = new Vector2(1, 0)
     let initialPoint = support(initialHeading)
-    let heading = initialPoint.negate()
+    let searchDirection = initialPoint.negate()
     let simplex: Vector2[] = [initialPoint]
 
     if (debug)
@@ -47,16 +47,16 @@ export default function gjk(support: SupportFunction, debug: any = undefined) {
         switch (simplex.length) {
 
             case 1: {
-                heading = simplex[0].negate()
+                searchDirection = simplex[0].negate()
                 return false
             }
 
             case 2: {
                 let [b, a] = simplex
                 if (checkEdge(a, b)) {
-                    heading = normalForEdge(a, b)
+                    searchDirection = normalForEdge(a, b)
                 } else {
-                    heading = a.negate()
+                    searchDirection = a.negate()
                     simplex = [a]
                 }
                 return false
@@ -68,13 +68,13 @@ export default function gjk(support: SupportFunction, debug: any = undefined) {
                     return true
 
                 if (checkEdge(a, b)) {
-                    heading = normalForEdge(a, b)
+                    searchDirection = normalForEdge(a, b)
                     simplex = [b, a]
                 } else if (checkEdge(a, c)) {
-                    heading = normalForEdge(a, c)
+                    searchDirection = normalForEdge(a, c)
                     simplex = [c, a]
                 } else {
-                    heading = a.negate()
+                    searchDirection = a.negate()
                     simplex = [a]
                 }
 
@@ -87,8 +87,8 @@ export default function gjk(support: SupportFunction, debug: any = undefined) {
     while (true) {
         if (++i > maxIterations)
             return false
-        let nextVertex = support(heading)
-        if (nextVertex.dot(heading) < 0)
+        let nextVertex = support(searchDirection)
+        if (nextVertex.dot(searchDirection) < 0)
             return false
         simplex.push(nextVertex)
         let intersected = checkAndUpdateSimplex()
