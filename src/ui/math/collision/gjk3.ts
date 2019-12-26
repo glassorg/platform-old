@@ -145,9 +145,9 @@ export default function gjk(support: SupportFunction, debug: any = undefined) {
             searchDirection = searchDirection.add(new Vector3(1, 1, 0))
         let nextVertex = support(searchDirection)
 
-        let isVNaN = nextVertex.toArray().map(x => isNaN(x)).reduce((a, b) => a || b)
-        if (isVNaN)
-            debugger
+        // let isVNaN = nextVertex.toArray().map(x => isNaN(x)).reduce((a, b) => a || b)
+        // if (isVNaN)
+        //     debugger
 
         if (nextVertex.dot(searchDirection) < 0)
             return false
