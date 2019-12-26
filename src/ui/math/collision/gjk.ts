@@ -4,18 +4,26 @@ export type SupportFunction = (v: Vector2) => Vector2
 
 function normalOnSide(vector: Vector2, direction: Vector2) {
     let crossZ = vector.x * direction.y - vector.y * direction.x
-    return crossZ > 0 ?
+    return crossZ < 0 ?
         new Vector2(vector.y, -vector.x) :
         new Vector2(-vector.y, vector.x)
 }
 
 const RIGHT = new Vector2(1, 0)
-export default function gjk(support: SupportFunction, maxIterations: 100, initialHeading = RIGHT) {
+export default function gjk(support: SupportFunction, debug: any = undefined) {
+    const maxIterations = 100
+    const initialHeading = RIGHT
     let initialPoint = support(initialHeading)
     let heading = initialPoint.negate()
     let simplex: Vector2[] = [initialPoint]
 
+    if (debug)
+        debug.simplices = []
+
     function checkAndUpdateSimplex() {
+        if (debug)
+            debug.simplices.push(simplex.slice())
+
         switch (simplex.length) {
 
             case 1: {
