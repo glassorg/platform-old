@@ -9,10 +9,30 @@ function normalOnSide(vector: Vector2, direction: Vector2) {
         new Vector2(-vector.y, vector.x)
 }
 
-const RIGHT = new Vector2(1, 0)
+function isAbove(rayOrigin: Vector2, rayHeading: Vector2) {
+    return rayOrigin.dot(rayHeading) < 0
+}
+
+function checkEdge(egdeA: Vector2, edgeB: Vector2) {
+    let heading = edgeB.subtract(egdeA)
+    return isAbove(egdeA, heading)
+}
+
+function normalForEdge(edgeA: Vector2, edgeB: Vector2) {
+    return normalOnSide(edgeB.subtract(edgeA), edgeA.negate())
+}
+
+function checkFace(a: Vector2, b: Vector2, c: Vector2) {
+    let ab = b.subtract(a)
+    let ac = c.subtract(a)
+    let abNormal = normalOnSide(ab, ac)
+    let acNormal = normalOnSide(ac, ab)
+    return isAbove(a, abNormal) && isAbove(a, acNormal)
+}
+
 export default function gjk(support: SupportFunction, debug: any = undefined) {
     const maxIterations = 100
-    const initialHeading = RIGHT
+    const initialHeading = new Vector2(1, 0)
     let initialPoint = support(initialHeading)
     let heading = initialPoint.negate()
     let simplex: Vector2[] = [initialPoint]
@@ -33,50 +53,31 @@ export default function gjk(support: SupportFunction, debug: any = undefined) {
 
             case 2: {
                 let [b, a] = simplex
-                let ab = b.subtract(a)
-                let ao = a.negate()
-                if (ab.dot(ao) < 0) {
-                    heading = ao
+                if (checkEdge(a, b)) {
+                    heading = normalForEdge(a, b)
+                } else {
+                    heading = a.negate()
                     simplex = [a]
-                    return false
                 }
-
-                heading = normalOnSide(ab, ao)
                 return false
             }
 
             case 3: {
                 let [c, b, a] = simplex
-                let ab = b.subtract(a)
-                let ac = c.subtract(a)
-                let ao = a.negate()
-
-                let inAB = ab.dot(ao) > 0
-                let inAC = ac.dot(ao) > 0
-
-                if (!inAB && !inAC) {
-                    heading = ao
-                    simplex = [a]
-                    return false
-                }
-
-                let abNormal = normalOnSide(ab, ac).negate()
-                let acNormal = normalOnSide(ac, ab).negate()
-
-                let belowAB = abNormal.dot(ao) < 0
-                let belowAC = acNormal.dot(ao) < 0
-
-                if (belowAB && belowAC)
+                if (checkFace(a, b, c))
                     return true
 
-                if (inAB && !belowAB) {
-                    heading = abNormal
+                if (checkEdge(a, b)) {
+                    heading = normalForEdge(a, b)
                     simplex = [b, a]
-                    return false
+                } else if (checkEdge(a, c)) {
+                    heading = normalForEdge(a, c)
+                    simplex = [c, a]
+                } else {
+                    heading = a.negate()
+                    simplex = [a]
                 }
 
-                heading = acNormal
-                simplex = [c, a]
                 return false
             }
         }
