@@ -9,13 +9,18 @@ function normalOnSide(vector: Vector2, direction: Vector2) {
         new Vector2(-vector.y, vector.x)
 }
 
-function isAbove(rayOrigin: Vector2, rayHeading: Vector2) {
+function isOriginAbove(rayOrigin: Vector2, rayHeading: Vector2) {
     return rayOrigin.dot(rayHeading) < 0
 }
 
 function checkEdge(egdeA: Vector2, edgeB: Vector2) {
     let heading = edgeB.subtract(egdeA)
-    return isAbove(egdeA, heading)
+    return isOriginAbove(egdeA, heading)
+}
+
+function checkEdgeSigned(edgeA: Vector2, edgeB: Vector2, inPoint: Vector2) {
+    let heading = edgeB.subtract(edgeA)
+    return isOriginAbove(edgeA, heading) && !isOriginAbove(edgeA, normalOnSide(heading, inPoint.subtract(edgeA)))
 }
 
 function normalForEdge(edgeA: Vector2, edgeB: Vector2) {
@@ -27,7 +32,7 @@ function checkFace(a: Vector2, b: Vector2, c: Vector2) {
     let ac = c.subtract(a)
     let abNormal = normalOnSide(ab, ac)
     let acNormal = normalOnSide(ac, ab)
-    return isAbove(a, abNormal) && isAbove(a, acNormal)
+    return isOriginAbove(a, abNormal) && isOriginAbove(a, acNormal)
 }
 
 export default function gjk(support: SupportFunction, debug: any = undefined) {
@@ -67,10 +72,10 @@ export default function gjk(support: SupportFunction, debug: any = undefined) {
                 if (checkFace(a, b, c))
                     return true
 
-                if (checkEdge(a, b)) {
+                if (checkEdgeSigned(a, b, c)) {
                     searchDirection = normalForEdge(a, b)
                     simplex = [b, a]
-                } else if (checkEdge(a, c)) {
+                } else if (checkEdgeSigned(a, c, b)) {
                     searchDirection = normalForEdge(a, c)
                     simplex = [c, a]
                 } else {
