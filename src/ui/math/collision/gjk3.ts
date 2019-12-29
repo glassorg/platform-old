@@ -19,18 +19,18 @@ function isOriginAbove(rayOrigin: Vector3, rayHeading: Vector3) {
     return rayOrigin.dot(rayHeading) < 0
 }
 
-function checkEdge(egdeA: Vector3, edgeB: Vector3) {
-    let heading = edgeB.subtract(egdeA)
-    return isOriginAbove(egdeA, heading)
+function checkEdge(a: Vector3, b: Vector3) {
+    let heading = b.subtract(a)
+    return isOriginAbove(a, heading)
 }
 
-function checkTriangleEdge(edgeA: Vector3, edgeB: Vector3, inPoint: Vector3) {
-    let heading = edgeB.subtract(edgeA)
-    return isOriginAbove(edgeA, heading) && !isOriginAbove(edgeA, normalOnSide(heading, inPoint.subtract(edgeA)))
+function checkTriangleEdge(a: Vector3, b: Vector3, inPoint: Vector3) {
+    let heading = b.subtract(a)
+    return isOriginAbove(a, heading) && !isOriginAbove(a, normalOnSide(heading, inPoint.subtract(a)))
 }
 
-function normalForEdge(edgeA: Vector3, edgeB: Vector3) {
-    return normalOnSide(edgeB.subtract(edgeA), edgeA.negate())
+function normalForEdge(a: Vector3, b: Vector3) {
+    return normalOnSide(b.subtract(a), a.negate())
 }
 
 function checkFace(a: Vector3, b: Vector3, c: Vector3) {
@@ -138,10 +138,10 @@ export default function gjk(support: SupportFunction, debug: any = undefined) {
                 ]
 
                 for (let face of faces) {
-                    let [v0, v1, v2, inPoint] = face
-                    if (checkTetrahedralFace(v0, v1, v2, inPoint)) {
-                        searchDirection = normalForFace(v0, v1, v2)
-                        simplex = face
+                    let [a, b, c, d] = face
+                    if (checkTetrahedralFace(a, b, c, d)) {
+                        searchDirection = normalForFace(a, b, c)
+                        simplex = [a, b, c]
                         return false
                     }
                 }
@@ -162,7 +162,7 @@ export default function gjk(support: SupportFunction, debug: any = undefined) {
                     let [a, b, c, d] = edge
                     if (checkTetrahedralEdge(a, b, c, d)) {
                         searchDirection = normalForEdge(a, b)
-                        simplex = edge
+                        simplex = [a, b]
                         return false
                     }
                 }
