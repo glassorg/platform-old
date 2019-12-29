@@ -29,7 +29,7 @@ export type Config = {
     }
 }
 
-export let instance: { database: Database, config: Config & { namespace: Namespace } } & Express
+export let instance: { database: Database, package: any, config: Config & { namespace: Namespace } } & Express
 
 /**
  * Initializes the standard glass web server.
@@ -56,7 +56,7 @@ export function create(config: Config) {
     const packageProperties = JSON.parse(fs.readFileSync(path.join(projectRoot, "package.json")).toString())
     let projectId = packageProperties.id || packageProperties.name
     let database = new (config.firestore ? Firestore : Datastore)({namespace:namespace!, projectId})
-    instance = Object.assign(express(), { config, database }) as any
+    instance = Object.assign(express(), { config, database, package: packageProperties }) as any
     // use gzip compression at level 1 for maximum speed, minimal compression
     instance.use(compression({ level: 1 }))
     // parse identity token

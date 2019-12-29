@@ -42,13 +42,12 @@ export default abstract class DataBuffer {
      */
     public readonly type: DataType
 
-    constructor(graphics: Graphics3D, usage: BufferUsage, type: DataType, primitive: Primitive) {
+    constructor(graphics: Graphics3D, usage: BufferUsage, type: DataType, primitive: Primitive, glBuffer = graphics.gl.createBuffer()) {
         this.graphics = graphics
         this.usage = usage
         this.type = type
-        let glBuffer = graphics.gl.createBuffer()
         if (glBuffer == null)
-            throw new Error("Failed to createBuffer")
+            throw new Error("glBuffer required")
         this.glBuffer = glBuffer
         this.primitive = primitive
     }

@@ -6,6 +6,7 @@ import State, { StateSchema, StateClass } from "./State"
 import defaultNamespace from "./defaultNamespace"
 import * as JSONPointer from "./JSONPointer"
 import Patch, { createPatch } from "./Patch"
+import guid from "../utility/guid"
 
 export type SearchKey<T = any> = Key<T> & { id: null, query: Query<T> }
 export type ModelKey<T = any> = Key<T> & { id: string, query: null }
@@ -142,6 +143,7 @@ export default class Key<T = any> {
         Object.freeze(this)
     }
 
+    static create<T = Model>(type: ModelClass<T>): ModelKey<T>
     static create<T = Model>(type: ModelClass<T>, id: string, path?: JSONPointer.default): ModelKey<T>
     static create<T = Model>(type: ModelSchema<T>, id: string, path?: JSONPointer.default): ModelKey<T>
     static create<T = Model>(type: ModelClass<T>, query: Query<T>): SearchKey<T>
@@ -165,6 +167,9 @@ export default class Key<T = any> {
         }
         else {
             throw new Error("Type is not a valid model class: " + args[i])
+        }
+        if (args[i] == null) {
+            id = guid()
         }
         if (typeof args[i] === "string") {
             id = args[i++]

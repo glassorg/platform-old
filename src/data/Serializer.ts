@@ -34,10 +34,10 @@ export default class Serializer {
         this.stringify = this.stringify.bind(this)
     }
 
-    public parse(text: string) {
+    public parse(text: string | object) {
         let { namespace } = this
         // this pretraversal revive function is much faster than using the built in JSON.parse reviver
-        let root = JSON.parse(text)
+        let root = typeof text === "object" ? text : JSON.parse(text)
         function pretraverse(key, object) {
             let typeName = object[typeKey]
             let childCount = object[countKey] || 0
@@ -79,6 +79,11 @@ export default class Serializer {
     }
 
     public stringify(root) {
+        root = this.toJSON(root)
+        return JSON.stringify(root, null, this.indent > 0 ? this.indent : undefined)
+    }
+
+    public toJSON(root: any) {
         let { namespace } = this
         let encodedTypeCount = 0
         function pretraverse(key, object) {
@@ -109,7 +114,7 @@ export default class Serializer {
         if (root != null && typeof root === "object") {
             root = pretraverse("", root)
         }
-        return JSON.stringify(root, null, this.indent > 0 ? this.indent : undefined)
+        return root
     }
 
     public register(name: string, type) {

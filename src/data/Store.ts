@@ -1,8 +1,9 @@
 import Key, { SearchKey, ModelKey, StateKey } from "./Key"
 import Model from "./Model"
 import State from "./State"
-import DefaultStore from "./stores/DefaultStore"
+// import DefaultStore from "./stores/DefaultStore"
 import Patch from "./Patch"
+import { Stores } from "./stores/DefaultStore"
 
 export type Value = Key[] | Model | any | null
 export type Listener = (key: Key) => void
@@ -110,14 +111,13 @@ export default abstract class Store {
         }
     }
 
-    private static _default: DefaultStore
-    static get default(): DefaultStore {
-        if (Store._default == null) {
-            //  need to dynamically require
-            //  because otherwise there is a dependency loop
-            Store._default = require("./stores/DefaultStore").create()
-        }
+    private static _default: Store
+    static get default(): Store {
         return Store._default
+    }
+    static set default(value: Store) {
+        Store._default = value
     }
 
 }
+

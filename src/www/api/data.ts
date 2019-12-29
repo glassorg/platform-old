@@ -6,6 +6,7 @@ import Entity from "../../data/Entity"
 import Patch, { createPatch } from "../../data/Patch"
 import Model from "../../data/Model"
 import clonePatch from "../../utility/clonePatch"
+import Serializer from "../../data/Serializer"
 
 const database = webServer.instance.database
 
@@ -78,7 +79,8 @@ async function putLimited(batch: Batch, patch: boolean) {
                 throw new Error("No deletion yet")
             }
             entity = clonePatch(entity, patch)
-        } else if (patch != null) {
+        }
+        else if (patch != null) {
             // make sure patch is a full instance
             entity = patch instanceof Entity ? patch : new key.type!({ key, ...patch } as any) as Entity
         }
@@ -134,6 +136,8 @@ export default async function(req: Request, res: Response) {
     let thisPath = "/data/"
     let path = addQuery(req.path.slice(req.path.indexOf(thisPath) + thisPath.length), req)
 
+    console.log("+++++++++++++++++++", { path, namespace: database.namespace })
+
     let key = Key.parse(database.namespace, path)
     try {
         if (req.method === "GET") {
@@ -158,7 +162,7 @@ export default async function(req: Request, res: Response) {
             let value
             if (req.method === "POST") {
                 //  json body
-                value = req.body
+                value = new Serializer(database.namespace).parse(JSON.stringify(req.body))
             }
             else {
                 //  uploading binary file
@@ -168,6 +172,7 @@ export default async function(req: Request, res: Response) {
                 value = `data:${contentType};${encoding},${encoded}`
             }
             let applyPatch = key.patch(value)
+            console.log("applyPatch------", applyPatch)
             // IF the user
             let result = await patch({ [key.toString()]: applyPatch })
             res.json({})

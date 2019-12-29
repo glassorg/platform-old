@@ -2,15 +2,19 @@ import Component, { Render } from "../Component"
 import Store from "../../data/Store"
 import Context from "../Context"
 import DependencyTracker from "../../utility/DependencyTracker"
-import DefaultStore from "../../data/stores/DefaultStore"
+// import DefaultStore from "../../data/stores/DefaultStore"
 import Key from "../../data/Key"
 
 export default function bindComponentToDom<T>(
     container: HTMLElement,
     componentType: Render<T>,
     componentProperties: T,
-    store: DefaultStore = Store.default
+    store: Store = Store.default
 ) {
+    if (store == null) {
+        throw new Error("Store.default has not been initialized")
+    }
+
     let pendingRenders = new Set<Component>()
 
     function render(time) {

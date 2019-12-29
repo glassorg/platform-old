@@ -1,5 +1,5 @@
 import test from "ava"
-import Firestore, { getIndexedValues } from "./Firestore"
+// import Firestore, { getIndexedValues } from "./Firestore"
 import Datastore from "./Datastore"
 import Entity from "../../data/Entity"
 import Model from "../../data/Model"

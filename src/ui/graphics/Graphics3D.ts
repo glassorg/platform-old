@@ -31,7 +31,7 @@ export default class Graphics3D extends Graphics {
     private getWebGLFragmentShader: (shader: FragmentShader) => WebGLShader
     private getWebGLProgram: (program: Program) => WebGLProgram
     public getWebGLTexture: (name: string) => WebGLTexture
-    public getModel: (factory: (g: Graphics3D) => DataBuffer) => DataBuffer
+    public getMesh: (factory: (g: Graphics3D) => DataBuffer) => DataBuffer
 
     public vertexStream: VertexStream
     public indexStream: IndexStream
@@ -57,7 +57,7 @@ export default class Graphics3D extends Graphics {
         this.getWebGLTexture = memoize((name: string) => createTexture(this.gl, name, () => this.invalidate()))
         let getUniformDependencies = this.getUniformDependencies
         this.getUniformDependencies = memoize((program: Program) => getUniformDependencies.call(this, program))
-        this.getModel = memoize(factory => factory(this))
+        this.getMesh = memoize(factory => factory(this))
 
         let initialProgram = Program.default3D
         this.vertexStream = new VertexStream(

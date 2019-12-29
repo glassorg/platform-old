@@ -37,8 +37,9 @@ export default class ServerStore extends MemoryStore {
                 let keys = entities.map(entity => entity.key)
                 super.setValue(key, keys)
             }
-            if (Key.isModelKey(key) && entities.length == 0)
+            if (Key.isModelKey(key) && entities.length == 0) {
                 super.setValue(key, null)
+            }
         }
 
         console.log(`ensureLoaded ${key}`)

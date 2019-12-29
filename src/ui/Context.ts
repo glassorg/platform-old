@@ -1,6 +1,6 @@
 import INode, { NodeClass, isNodeClass } from "./INode"
 import Component, { Render } from "./Component"
-import DefaultStore from "../data/stores/DefaultStore"
+// import DefaultStore from "../data/stores/DefaultStore"
 import Store from "../data/Store"
 import NodeFactory from "./NodeFactory"
 import localize from "./localize"
@@ -40,7 +40,7 @@ export default class Context {
     private elements: Array<INode | null>
     private renderStack: Component[] = []
     public onDispose?: ComponentEventHandler
-    public store: DefaultStore = Store.default
+    public store: Store = Store.default
     public sound: SoundContext = new SoundContext()
     public document: Document
     public localize = localize

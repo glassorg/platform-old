@@ -7,46 +7,11 @@ import {Firestore as GoogleFirestore, Query as GoogleQuery, DocumentReference, D
 import { Schema } from "../../data/schema"
 import Serializer from "../../data/Serializer"
 import getPackageJson, { getProjectId } from "../getPackageJson"
+import { toDocumentValues, toEntity } from "../../data/stores/FireStore"
 
-const serializedProperty = "_"
-
-export function getIndexedValues(entity: Record) {
-    let values: any = {}
-    let deleted = entity.deleted != null
-    common.traverse(entity, entity.constructor as Schema, (value, schema, ancestors, path) => {
-        if (schema.index && (!deleted || path[0] === "deleted")) {
-            let name = path.join(".")
-            values[name] = value
-        }
-    })
-    return values
-}
-
-const getSerializer = common.memoize(
-    function(namespace: Namespace) {
-      return new Serializer(namespace)
-    }
-)
-
-function serialize(entity: Record, namespace: Namespace) {
-    //  remove the type
-    let values = Object.assign({}, entity)
-    //  remove the key
-    delete values.key
-    return getSerializer(namespace).stringify(values)
-}
-
-function deserialize(key: ModelKey, serialized: string, namespace: Namespace) {
-    let values = getSerializer(namespace).parse(serialized) as Record
-    //  restore the key
-    values.key = key
-    //  restore the type
-    return new key.type!(values as any)
-}
-
-function toGoogleQuery(gfirestore: GoogleFirestore, key: Key) {
+export function toGoogleQuery(db: GoogleFirestore, key: Key) {
     let { parent, type, query } = key
-    let gquery: GoogleQuery = gfirestore.collection(key.path)
+    let gquery: GoogleQuery = db.collection(key.path)
     if (query) {
         if (query.limit != null) {
             gquery = gquery.limit(query.limit)
@@ -83,15 +48,6 @@ function toGoogleQuery(gfirestore: GoogleFirestore, key: Key) {
     return gquery
 }
 
-function toEntity<T extends Record>(namespace: Namespace, doc: DocumentSnapshot): T | null {
-    if (!doc.exists) {
-        return null
-    }
-    let data = doc.data()!
-    let key = Key.parse(namespace, doc.ref.path) as ModelKey
-    return deserialize(key, data[serializedProperty], namespace)
-}
-
 export default class Firestore extends Database {
 
     private gfirestore: GoogleFirestore
@@ -101,7 +57,7 @@ export default class Firestore extends Database {
     constructor(properties: { namespace: Namespace } & { [P in keyof Firestore]?: Firestore[P] }) {
         super(properties.namespace)
         Object.assign(this, properties)
-        let packageJson = getPackageJson()
+        // let packageJson = getPackageJson()
         this.gfirestore = new GoogleFirestore({ projectId: this.projectId })
     }
 
@@ -110,10 +66,10 @@ export default class Firestore extends Database {
     }
 
     async get<T extends Record = Record>(keys: ModelKey<T>[]): Promise<Array<T | null>> {
-        throw new Error("need to reimplement this for batch get")
-        // let docRef = this.gfirestore.doc(key.toString())
-        // let doc = await docRef.get()
-        // return toEntity<T>(this.namespace, doc) as T | null
+        let refs = keys.map(key => this.gfirestore.doc(key.path))
+        let docs = await this.gfirestore.getAll(...refs)
+        let entities = docs.map(doc => toEntity<T>(this.namespace, doc as any))
+        return entities
     }
 
     query<T extends Record>(key: SearchKey<T>): Promise<T[]> {
@@ -146,7 +102,7 @@ export default class Firestore extends Database {
             if (entity.deleted && this.hardDelete) {
                 batch.delete(docRef)
             } else {
-                let values = { [serializedProperty]: serialize(entity, this.namespace), ...getIndexedValues(entity) }
+                let values = toDocumentValues(entity, this.namespace)
                 batch.set(docRef, values)
             }
         }
