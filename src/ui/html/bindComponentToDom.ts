@@ -2,17 +2,24 @@ import Component, { Render } from "../Component"
 import Store from "../../data/Store"
 import Context from "../Context"
 import DependencyTracker from "../../utility/DependencyTracker"
-// import DefaultStore from "../../data/stores/DefaultStore"
+// import * as DefaultStore from "../../data/stores/DefaultStore"
 import Key from "../../data/Key"
 
 export default function bindComponentToDom<T>(
     container: HTMLElement,
     componentType: Render<T>,
     componentProperties: T,
-    store: Store = Store.default
+    store?: Store
 ) {
     if (store == null) {
-        throw new Error("Store.default has not been initialized")
+        store = Store.default
+        if (store == null) {
+            //  there is a circular dependency somewhere.
+            //  between Store -> Key -> Model -> Store
+            //  have not been able to remove it without losing State typing.
+            //  so we're still importing this one with require.
+            store = Store.default = require("../../data/stores/DefaultStore").create()
+        }
     }
 
     let pendingRenders = new Set<Component>()
