@@ -2,6 +2,7 @@ import Vector3 from "./Vector3"
 import Vector4 from "./Vector4"
 import Matrix4 from "./Matrix4"
 import ISupported from "./ISupported"
+import Ray from "./Ray"
 
 export default class Sphere implements ISupported {
 
@@ -35,5 +36,29 @@ export default class Sphere implements ISupported {
     addRadius(value: number) {
         return value === 0 ? this : new Sphere(this.center, this.radius + value)
     }
+
+    raycastDistance(ray: Ray, front: boolean = true) {
+        let toSphere = this.center.subtract(ray.point)
+        let parallelDist = toSphere.dot(ray.unitHeading)
+        if (parallelDist < 0)
+            return null
+        let perpendicular = ray.unitHeading.rejection(toSphere)
+        let perpendicularDistSq = perpendicular.lengthSquared()
+        let radiusSq = this.radius ** 2
+        if (perpendicularDistSq > radiusSq)
+            return null
+        let radiusOfSlice = Math.sqrt(radiusSq - perpendicularDistSq)
+        return front ?
+            parallelDist - radiusOfSlice :
+            parallelDist + radiusOfSlice
+    }
+
+    raycast(ray: Ray, front: boolean = true) {
+        let distance = this.raycastDistance(ray, front)
+        if (distance === null)
+            return null
+        return ray.getPosition(distance)
+    }
+
 
 }
