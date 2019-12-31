@@ -13,18 +13,18 @@ function isOriginAbove(rayOrigin: Vector2, rayHeading: Vector2) {
     return rayOrigin.dot(rayHeading) < 0
 }
 
-function checkEdge(egdeA: Vector2, edgeB: Vector2) {
-    let heading = edgeB.subtract(egdeA)
-    return isOriginAbove(egdeA, heading)
+function checkEdge(a: Vector2, b: Vector2) {
+    let heading = b.subtract(a)
+    return isOriginAbove(a, heading)
 }
 
-function checkEdgeSigned(edgeA: Vector2, edgeB: Vector2, inPoint: Vector2) {
-    let heading = edgeB.subtract(edgeA)
-    return isOriginAbove(edgeA, heading) && !isOriginAbove(edgeA, normalOnSide(heading, inPoint.subtract(edgeA)))
+function checkTriangleEdge(a: Vector2, b: Vector2, inPoint: Vector2) {
+    let heading = b.subtract(a)
+    return isOriginAbove(a, heading) && !isOriginAbove(a, normalOnSide(heading, inPoint.subtract(a)))
 }
 
-function normalForEdge(edgeA: Vector2, edgeB: Vector2) {
-    return normalOnSide(edgeB.subtract(edgeA), edgeA.negate())
+function normalForEdge(a: Vector2, b: Vector2) {
+    return normalOnSide(b.subtract(a), a.negate())
 }
 
 function checkFace(a: Vector2, b: Vector2, c: Vector2) {
@@ -72,10 +72,10 @@ export default function gjk(support: SupportFunction, debug: any = undefined) {
                 if (checkFace(a, b, c))
                     return true
 
-                if (checkEdgeSigned(a, b, c)) {
+                if (checkTriangleEdge(a, b, c)) {
                     searchDirection = normalForEdge(a, b)
                     simplex = [b, a]
-                } else if (checkEdgeSigned(a, c, b)) {
+                } else if (checkTriangleEdge(a, c, b)) {
                     searchDirection = normalForEdge(a, c)
                     simplex = [c, a]
                 } else {
