@@ -1,6 +1,8 @@
 import { createTexture } from "./functions"
 import TextureBase from "./TextureBase"
 import Rectangle from "../math/Rectangle"
+import Graphics3D from "./Graphics3D"
+import Graphics from "./Graphics"
 
 export default class Texture extends TextureBase {
 
@@ -17,7 +19,8 @@ export default class Texture extends TextureBase {
 
     constructor(gl: WebGL2RenderingContext, id: string, src?: string)
     constructor(gl: WebGL2RenderingContext, id: string, glTexture: WebGLTexture, width: number, height: number)
-    constructor(gl: WebGL2RenderingContext, id: string, glTextureOrSrc: WebGLTexture | string = id, width?: number, height?: number) {
+    constructor(gl: WebGL2RenderingContext, id: string, glTextureOrSrc: string, width?: number, height?: number, callback?: () => void)
+    constructor(gl: WebGL2RenderingContext, id: string, glTextureOrSrc: WebGLTexture | string = id, width?: number, height?: number, callback?: () => void) {
         super()
         this.id = id
         this.gl = gl
@@ -32,6 +35,7 @@ export default class Texture extends TextureBase {
                 }
                 self.width = image.width;
                 self.height = image.height;
+                callback?.()
             })
         }
         else {
@@ -74,5 +78,20 @@ export default class Texture extends TextureBase {
      * Gets the bottom UV coordinate.
      */
     get bottom() { return 1 }
+
+    /**
+     * ResourceLoader interface
+     */
+    static load(g: Graphics, id: string): Promise<Texture> {
+        return new Promise((resolve, reject) => {
+            if (!(g instanceof Graphics3D)) {
+                throw new Error()
+            }
+            let texture = new Texture(g.gl, id, id, undefined, undefined, () => {
+                console.log("resolving texture")
+                resolve(texture)
+            })
+        })
+    }
 
 }
