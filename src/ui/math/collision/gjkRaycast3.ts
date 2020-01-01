@@ -24,15 +24,6 @@ function normalOnSide(vector: Vector3, direction: Vector3) {
     return vector.cross(direction).cross(vector)
 }
 
-function faceNormalOnSide(a: Vector3, b: Vector3, c: Vector3, abovePoint: Vector3) {
-    let ab = b.subtract(a)
-    let ac = c.subtract(a)
-    let normal = ab.cross(ac)
-    return normal.dot(abovePoint.subtract(a)) < 0 ?
-        normal.negate() :
-        normal
-}
-
 function isOriginAbove(rayOrigin: Vector3, rayHeading: Vector3) {
     return rayOrigin.dot(rayHeading) < 0
 }
@@ -68,38 +59,18 @@ function normalForFace(a: Vector3, b: Vector3, c: Vector3) {
         normal
 }
 
-function checkTetrahedron(a: Vector3, b: Vector3, c: Vector3, d: Vector3) {
-    return isOriginAbove(a, faceNormalOnSide(a, b, c, d)) &&
-        isOriginAbove(a, faceNormalOnSide(a, b, d, c)) &&
-        isOriginAbove(a, faceNormalOnSide(a, c, d, b))
+function nonMultiple(vector: Vector3) {
+    let result = new Vector3(1, 0, 0)
+    while (result.cross(vector).equivalent(Vector3.zero))
+        result = new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5)
+    return result
 }
 
-function checkTetrahedralVertex(a: Vector3, b: Vector3, c: Vector3, d: Vector3) {
-    return !checkEdge(a, b) &&
-        !checkEdge(a, c) &&
-        !checkEdge(a, d)
-}
-
-function checkTetrahedralEdge(a: Vector3, b: Vector3, c: Vector3, d: Vector3) {
-    let ab = b.subtract(a)
-    let ac = c.subtract(a)
-    let ad = d.subtract(a)
-    let acNormal = normalOnSide(ab, ac)
-    let adNormal = normalOnSide(ab, ad)
-    return checkEdge(a, b) &&
-        !isOriginAbove(a, acNormal) &&
-        !isOriginAbove(a, adNormal)
-}
-
-function checkTetrahedralFace(a: Vector3, b: Vector3, c: Vector3, inPoint: Vector3) {
-    return checkFace(a, b, c) && !isOriginAbove(a, faceNormalOnSide(a, b, c, inPoint))
-}
-
-export default function gjk(support: SupportFunction, debug: any = undefined) {
+export default function gjkRaycast3(support: SupportFunction, heading: Vector3, debug: any = undefined) {
     const maxIterations = 100
-    const initialHeading = new Vector3(1, 0, 0)
+    const initialHeading = nonMultiple(heading).cross(heading)
     let initialPoint = support(initialHeading)
-    let searchDirection = initialPoint.negate()
+    let searchDirection = heading.rejection(initialPoint.negate())
     let simplex: Vector3[] = [initialPoint]
 
     if (debug)
@@ -130,7 +101,7 @@ export default function gjk(support: SupportFunction, debug: any = undefined) {
             case 3: {
                 let [c, b, a] = simplex
                 if (checkFace(a, b, c)) {
-                    searchDirection = normalForFace(a, b, c)
+                    return true
                 } else if (checkTriangleEdge(a, b, c)) {
                     searchDirection = normalForEdge(a, b)
                     simplex = [b, a]
@@ -143,48 +114,6 @@ export default function gjk(support: SupportFunction, debug: any = undefined) {
                 }
                 return false
             }
-
-            case 4: {
-                let [d, c, b, a] = simplex
-                if (checkTetrahedron(a, b, c, d))
-                    return true
-
-                let faces = [
-                    [a, b, c, d],
-                    [a, b, d, c],
-                    [a, c, d, b],
-                ]
-
-                for (let face of faces) {
-                    let [a, b, c, d] = face
-                    if (checkTetrahedralFace(a, b, c, d)) {
-                        searchDirection = normalForFace(a, b, c)
-                        simplex = [a, b, c]
-                        return false
-                    }
-                }
-
-                if (checkTetrahedralVertex(a, b, c, d)) {
-                    searchDirection = a.negate()
-                    simplex = [a]
-                    return false
-                }
-
-                let edges = [
-                    [a, b, c, d],
-                    [a, c, b, d],
-                    [a, d, b, c],
-                ]
-
-                for (let edge of edges) {
-                    let [a, b, c, d] = edge
-                    if (checkTetrahedralEdge(a, b, c, d)) {
-                        searchDirection = normalForEdge(a, b)
-                        simplex = [a, b]
-                        return false
-                    }
-                }
-            }
         }
     }
 
@@ -192,10 +121,10 @@ export default function gjk(support: SupportFunction, debug: any = undefined) {
     while (true) {
         if (++i > maxIterations)
             return false
-        if (searchDirection.equivalent(Vector3.zero)) {
-            // searchDirection = new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5)
-            searchDirection = searchDirection.add(new Vector3(1, 1, 0))
-        }
+        searchDirection = heading.rejection(searchDirection)
+        if (searchDirection.equivalent(Vector3.zero))
+            searchDirection = searchDirection.add(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5))
+
         let nextVertex = support(searchDirection)
 
         // let isVNaN = nextVertex.toArray().map(x => isNaN(x)).reduce((a, b) => a || b)
