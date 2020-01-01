@@ -74,13 +74,13 @@ export default class Node extends VirtualNode {
         else {
             this._effect.render(g as any, this.draw.bind(this))
         }
+        this.dirty = false
         g.uniforms.modelView = saveTransform
     }
 
     public draw(g: Graphics) {
         this.drawSelf(g)
         this.drawChildren(g)
-        this.dirty = false
     }
 
     public drawSelf(g: Graphics) {

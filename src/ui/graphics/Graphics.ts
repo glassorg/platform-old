@@ -1,8 +1,13 @@
 import Color from "../math/Color"
 import Matrix4 from "../math/Matrix4"
+import ResourceManager from "./resources/ResourceManager"
+import ResourceLoader from "./resources/ResourceLoader"
+import Node from "./scene/Node"
 
 export default abstract class Graphics {
 
+    // resources
+    public readonly resources: ResourceManager
     // timing
     time = 0
     // properties
@@ -23,5 +28,16 @@ export default abstract class Graphics {
     abstract fillRectangle(x: number, y: number, width: number, height: number, color: Color, texture?)
     // request redraw
     abstract invalidate()
+
+    /**
+     * Shorthand for Graphics.resources.getResource(loader, id)
+     */
+    resource<T>(loader: ResourceLoader, id: string, node?: Node) {
+        return this.resources.getResource(loader, id, node)
+    }
+
+    constructor() {
+        this.resources = new ResourceManager(this)
+    }
 
 }

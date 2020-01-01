@@ -12,9 +12,8 @@ type Options = {
 
 export async function init(options: Options): Promise<boolean> {
     const { namespace } = options
-    let firebase = await getApp()
     Store.default = DefaultStore.create({
-        server: options.firestore ? new FireStore(namespace, firebase) : new ServerStore()
+        server: options.firestore ? new FireStore(namespace, await getApp()) : new ServerStore()
     })
     return true
 }

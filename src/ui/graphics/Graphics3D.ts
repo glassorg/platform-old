@@ -75,8 +75,8 @@ export default class Graphics3D extends Graphics {
         gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
         gl.enable(GL.DEPTH_TEST)
         gl.depthFunc(GL.LEQUAL)
-        gl.enable(GL.CULL_FACE)
-        gl.cullFace(GL.BACK)
+        // gl.enable(GL.CULL_FACE)
+        // gl.cullFace(GL.BACK)
 
         this.updateScreenSize()
     }
