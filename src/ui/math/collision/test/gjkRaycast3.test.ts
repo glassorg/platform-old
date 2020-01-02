@@ -21,7 +21,8 @@ test("GJK Raycast 3", assert => {
         let r = 10
         let center = new Vector3(10, random(-r, r), random(-r, r))
         let support = (v: Vector3) => v.normalize().scale(r).add(center)
-        let collided = gjkRaycast3(support, new Vector3(1, 0, 0))
+        let collision = gjkRaycast3(support, new Vector3(1, 0, 0))
+        let collided = collision !== null
         let shouldCollide = Math.hypot(center.y, center.z) <= r
         return collided == shouldCollide
     }

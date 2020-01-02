@@ -1,8 +1,9 @@
 import Vector3 from "../Vector3";
 import Matrix4 from "../Matrix4";
-import { SupportFunction, nonMultiple, checkEdge, normalForEdge, checkFace, checkTriangleEdge } from "./gjkCommon";
+import { SupportFunction, nonMultiple, checkEdge, normalForEdge, checkFace, checkTriangleEdge, normalForFace, raycastTriangle } from "./gjkCommon";
 
-export default function gjkRaycast3(support: SupportFunction, heading: Vector3, debug: any = undefined) {
+
+export function gjkRaycastInitialTriangle(support: SupportFunction, heading: Vector3, debug?: any) {
     function project(vector: Vector3) { return heading.rejection(vector) }
     const maxIterations = 100
     const initialHeading = nonMultiple(heading).cross(heading)
@@ -63,15 +64,45 @@ export default function gjkRaycast3(support: SupportFunction, heading: Vector3, 
     let i = 0
     while (true) {
         if (++i > maxIterations)
-            return false
+            return null
         if (searchDirection.equivalent(Vector3.zero))
             searchDirection = project(searchDirection.add(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5)))
         let nextVertex = support(searchDirection)
         if (nextVertex.dot(searchDirection) < 0)
-            return false
+            return null
         simplex.push(nextVertex)
         let intersected = checkAndUpdateSimplex()
         if (intersected)
-            return true
+            return simplex
+    }
+}
+
+export default function gjkRaycast3(support: SupportFunction, heading: Vector3, debug?: any) {
+    function project(vector: Vector3) { return heading.rejection(vector) }
+    const maxIterations = 100
+    let simplex = gjkRaycastInitialTriangle(support, heading, debug)
+    if (!simplex)
+        return null
+    let i = 0
+    while (true) {
+        let [a, b, c] = simplex as Vector3[]
+        let normal = normalForFace(a, b, c)
+        let d = support(normal)
+        if (++i > maxIterations || d.equivalent(a) || d.equivalent(b) || d.equivalent(c))
+            return simplex
+        let faces = [
+            [d, b, c],
+            [a, d, c],
+            [a, b, d],
+        ]
+        for (let face of faces) {
+            let [a, b, c] = face
+            try {
+                if (raycastTriangle(Vector3.zero, heading, a, b, c) !== null)
+                    simplex = face
+            } catch (e) {
+                return simplex
+            }
+        }
     }
 }
