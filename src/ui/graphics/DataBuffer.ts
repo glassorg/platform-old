@@ -38,17 +38,22 @@ export default abstract class DataBuffer {
      */
     protected readonly glBuffer: WebGLBuffer
     /**
+     * The offset where data starts within this glBuffer.
+     */
+    public readonly offset: number
+    /**
      * The type of data stored, either Vertex or Index data. 
      */
     public readonly type: DataType
 
-    constructor(graphics: Graphics3D, usage: BufferUsage, type: DataType, primitive: Primitive, glBuffer = graphics.gl.createBuffer()) {
+    constructor(graphics: Graphics3D, usage: BufferUsage, type: DataType, primitive: Primitive, glBuffer = graphics.gl.createBuffer(), offset = 0) {
         this.graphics = graphics
         this.usage = usage
         this.type = type
         if (glBuffer == null)
             throw new Error("glBuffer required")
         this.glBuffer = glBuffer
+        this.offset = offset
         this.primitive = primitive
     }
 
@@ -58,11 +63,10 @@ export default abstract class DataBuffer {
         this.graphics.gl.bindBuffer(this.type, this.glBuffer)
     }
 
-    setData(data: Float32Array | Uint16Array, size: number = data.length) {
-        const offset = 0
+    setData(data: Float32Array | Uint16Array, length: number = data.length) {
         this.bind()
-        this.graphics.gl.bufferData(this.type, data, this.usage, offset, size)
-        this.size = size
+        this.graphics.gl.bufferData(this.type, data, this.usage, this.offset, length)
+        this.size = length
     }
 
 }

@@ -1,5 +1,4 @@
 import VertexFormat from "./VertexFormat"
-import * as GL from "./GL"
 import Graphics3D from "./Graphics3D"
 import DataBuffer, { DataType, BufferUsage } from "./DataBuffer"
 import Primitive from "./Primitive"
@@ -15,10 +14,11 @@ export default class VertexBuffer extends DataBuffer {
         graphics: Graphics3D,
         usage: BufferUsage,
         vertexFormat: VertexFormat,
-        primitive: number = Primitive.triangles
-    )
-    {
-        super(graphics, usage, DataType.Vertex, primitive)
+        primitive: number = Primitive.triangles,
+        glBuffer?: WebGLBuffer,
+        offset?: number
+    ) {
+        super(graphics, usage, DataType.Vertex, primitive, glBuffer, offset)
         this.vertexFormat = vertexFormat
     }
 

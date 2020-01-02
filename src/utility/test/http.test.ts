@@ -1,9 +1,14 @@
 import test from "ava"
-import http from "../http"
+import http, { getRelativeUrl } from "../http"
 
-test("http", t => {
+test("getRelativeUrl", assert => {
+    assert.deepEqual(getRelativeUrl("/foo/bar", "baz"), "/foo/baz")
+    assert.deepEqual(getRelativeUrl("/foo/bar", "/baz"), "/baz")
+})
+
+test("http", assert => {
     let inObject = { foo: "Sup?", bar: "Hi There." }
     let query = http.queryFromObject(inObject)
     let outObject = http.objectFromQuery(query)
-    t.deepEqual(outObject, inObject)
+    assert.deepEqual(outObject, inObject)
 })

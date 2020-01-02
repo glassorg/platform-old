@@ -1,4 +1,13 @@
 
+export function getRelativeUrl(base: string, url: string) {
+    if (/^(([a-z]+:)|\/)/.test(url)) {
+        return url
+    }
+    const lastSlash = base.lastIndexOf("/")
+    const root = lastSlash >= 0 ? base.slice(0, lastSlash + 1) : base
+    return root + url
+}
+
 export function queryFromObject(obj) {
     return "?" + Object.keys(obj).map((k) => encodeURIComponent(k) + "=" + encodeURIComponent(obj[k])).join("&")
 }
