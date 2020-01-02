@@ -1,5 +1,4 @@
 import Vector3 from "../Vector3";
-import Matrix4 from "../Matrix4";
 import { SupportFunction, nonMultiple, checkEdge, normalForEdge, checkFace, checkTriangleEdge, normalForFace, raycastTriangle } from "./gjkCommon";
 
 
@@ -78,14 +77,20 @@ export function gjkRaycastInitialTriangle(support: SupportFunction, heading: Vec
 }
 
 export default function gjkRaycast3(support: SupportFunction, heading: Vector3, debug?: any) {
-    function project(vector: Vector3) { return heading.rejection(vector) }
-    const maxIterations = 100
+    const maxIterations = 20
     let simplex = gjkRaycastInitialTriangle(support, heading, debug)
     if (!simplex)
         return null
     let i = 0
     while (true) {
         let [a, b, c] = simplex as Vector3[]
+
+        // let finish = () => {
+        //     let area = Math.abs(b.subtract(a).cross(c.subtract(a)).length()) / 2
+        //     console.log("AREA = " + area)
+        //     return simplex
+        // }
+
         let normal = normalForFace(a, b, c)
         let d = support(normal)
         if (++i > maxIterations || d.equivalent(a) || d.equivalent(b) || d.equivalent(c))

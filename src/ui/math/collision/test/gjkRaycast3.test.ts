@@ -1,7 +1,6 @@
 import test from "ava"
 import gjkRaycast3 from "../gjkRaycast3"
 import Vector3 from "../../Vector3"
-import Vector2 from "../../Vector2"
 
 test("GJK Raycast 3", assert => {
     let t = -1
