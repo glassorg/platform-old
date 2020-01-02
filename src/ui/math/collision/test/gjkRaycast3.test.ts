@@ -1,6 +1,18 @@
 import test from "ava"
 import gjkRaycast3 from "../gjkRaycast3"
 import Vector3 from "../../Vector3"
+import { raycastTriangle } from "../gjkCommon"
+
+test("Raycast triangle", assert => {
+    let zero = Vector3.zero
+    let collisionTime = raycastTriangle(
+        zero, new Vector3(1, 0, 0), // Ray starting at origin, facing +x
+        new Vector3(20, 10, 0), // top, leans back
+        new Vector3(10, -10, -10), // bottom left
+        new Vector3(10, -10, 10) // bottom right
+    )
+    assert.deepEqual(collisionTime, 15)
+})
 
 test("GJK Raycast 3", assert => {
     let t = -1
