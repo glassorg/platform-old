@@ -1,7 +1,6 @@
 import test from "ava"
 import gjkRaycast3 from "../gjkRaycast3"
 import Vector3 from "../../Vector3"
-import Vector2 from "../../Vector2"
 
 test("GJK Raycast 3", assert => {
     let t = -1
@@ -21,7 +20,8 @@ test("GJK Raycast 3", assert => {
         let r = 10
         let center = new Vector3(10, random(-r, r), random(-r, r))
         let support = (v: Vector3) => v.normalize().scale(r).add(center)
-        let collided = gjkRaycast3(support, new Vector3(1, 0, 0))
+        let collision = gjkRaycast3(support, new Vector3(1, 0, 0))
+        let collided = collision !== null
         let shouldCollide = Math.hypot(center.y, center.z) <= r
         return collided == shouldCollide
     }
