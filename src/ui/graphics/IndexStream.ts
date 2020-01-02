@@ -22,7 +22,7 @@ export default class IndexStream extends DataStream {
     constructor(buffer: IndexBuffer, count = 64 * 1024) {
         super()
         this.buffer = buffer
-        this.vertices = new VertexStream(buffer.vertices, count)
+        this.vertices = new VertexStream(buffer.vertices[0], count)
         let data = new ArrayBuffer(count * sizeOfUint16)
         this.data = new Uint16Array(data)
     }
@@ -31,7 +31,7 @@ export default class IndexStream extends DataStream {
         return this.vertices.vertexFormat
     }
     set vertexFormat(value) {
-        this.buffer.vertices.vertexFormat = value
+        this.buffer.vertices[0].vertexFormat = value
     }
 
     /**

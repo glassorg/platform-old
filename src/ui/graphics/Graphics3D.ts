@@ -180,14 +180,14 @@ export default class Graphics3D extends Graphics {
                     break
                 }
             }
-            if (element == null) {
+            if (element == null || elementBuffer == null) {
                 throw new Error(`VertexElement not found: ${attribute.name}`)
             }
             elementBuffer!.bind()
             gl.enableVertexAttribArray(location)
-            gl.vertexAttribPointer(location, element.size, element.type, element.normalize, element.stride, element.offset)
+            gl.vertexAttribPointer(location, element.size, element.type, element.normalize, element.stride, elementBuffer.offset + element.offset)
             //  divisor is used for instanced rendering
-            gl.vertexAttribDivisor(location, elementBuffer!.vertexDivisor)
+            gl.vertexAttribDivisor(location, elementBuffer.vertexDivisor)
         }
     }
 

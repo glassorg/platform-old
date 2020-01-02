@@ -18,7 +18,7 @@ export default function bindComponentToDom<T>(
             //  between Store -> Key -> Model -> Store
             //  have not been able to remove it without losing State typing.
             //  so we're still importing this one with require.
-            store = Store.default = require("../../data/stores/DefaultStore").create()
+            Store.default = store = require("../../data/stores/DefaultStore").create()
         }
     }
 
@@ -67,8 +67,8 @@ export default function bindComponentToDom<T>(
             dependencies.add(context.component, key.string)
         }
     }
-    store.addWriteListener(writeListener)
-    store.addReadListener(readListener)
+    store?.addWriteListener(writeListener)
+    store?.addReadListener(readListener)
 
     let context = new Context(container)
     context.onDispose = (component: Component) => {
@@ -81,7 +81,7 @@ export default function bindComponentToDom<T>(
 
     //  return a function which can be used to unbind this
     return () => {
-        store.removeWriteListener(writeListener)
-        store.removeReadListener(readListener)
+        store?.removeWriteListener(writeListener)
+        store?.removeReadListener(readListener)
     }
 }

@@ -3,6 +3,7 @@ import Component from "./Component"
 import Context from "./Context"
 import INode, { NodeClass, isNodeClass } from "./INode"
 import { memoize } from "../utility/common"
+import Invalidatable from "./graphics/Invalidatable"
 
 export function extendElementAsVirtualNodeRoot<T>(element: T): T & INode {
     return Object.defineProperties(element, {
@@ -26,7 +27,7 @@ export function extendElementAsVirtualNodeRoot<T>(element: T): T & INode {
     })
 }
 
-export default class VirtualNode implements INode {
+export default class VirtualNode implements INode, Invalidatable {
 
     id?: string
     parentNode: INode | null = null
@@ -96,7 +97,7 @@ export default class VirtualNode implements INode {
         return child
     }
 
-    markDirty() {
+    invalidate() {
         for (let node: INode | null= this; node != null && node.dirty === false; node = node.parentNode) {
             node.dirty = true
         }
@@ -134,7 +135,7 @@ const getFactoryInstance = memoize(function <T extends VirtualNode>(nodeClass: N
                 }
             }
             node[previousProperties] = properties
-            node.markDirty()
+            node.invalidate()
         },
         dispose(node: T): void {
             // TODO: Actually recycle the instance.

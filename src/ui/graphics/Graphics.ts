@@ -3,6 +3,7 @@ import Matrix4 from "../math/Matrix4"
 import ResourceManager from "./resources/ResourceManager"
 import ResourceLoader from "./resources/ResourceLoader"
 import Node from "./scene/Node"
+import Invalidatable from "./Invalidatable"
 
 export default abstract class Graphics {
 
@@ -30,10 +31,10 @@ export default abstract class Graphics {
     abstract invalidate()
 
     /**
-     * Shorthand for Graphics.resources.getResource(loader, id)
+     * Shorthand for Graphics.resources.getResource(loader, id, dependent)
      */
-    resource<T>(loader: ResourceLoader, id: string, node?: Node) {
-        return this.resources.getResource(loader, id, node)
+    resource<T>(loader: ResourceLoader, id: string, dependent: Invalidatable): T | null {
+        return this.resources.get(loader, id, dependent)
     }
 
     constructor() {
