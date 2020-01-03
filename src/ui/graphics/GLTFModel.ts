@@ -16,7 +16,7 @@ import Color_FragmentShader from "./effects/Color.frag"
 
 const programs = {
     position: new Program(
-        new VertexShader(VertexFormat.position, Position_VertexShader),
+        new VertexShader(VertexFormat.positionNormal, Position_VertexShader),
         new FragmentShader(Color_FragmentShader)
     )
 }
@@ -59,19 +59,14 @@ function createDataBuffer(g: Graphics3D, gltf: GLTF, bufferViews: WebGLBuffer[],
     if (gltf.bufferViews == null || gltf.accessors == null) {
         throw new Error()
     }
-    let vertexElements: VertexElement[] = []
-    let vertexGLBuffer: WebGLBuffer | null = null
+    let vertexElementsByBuffer = new Map<WebGLBuffer, VertexElement[]>()
     for (let NAME in p.attributes) {
         let name = getShaderName(NAME)
         let attributeAccessor = gltf.accessors[p.attributes[NAME]]
         let attributeBufferView = gltf.bufferViews[attributeAccessor.bufferView ?? 0]
         let attributeBuffer = bufferViews[attributeAccessor.bufferView ?? 0]
-        if (vertexGLBuffer != null && vertexGLBuffer != attributeBuffer) {
-            throw new Error("Attributes must reside in the same buffer")
-            // TODO: Allow multiple different VertexBuffers
-            // should be similar to how we handle instancing with multiple vertex buffers?
-        }
-        vertexGLBuffer = attributeBuffer
+        let vertexElements: VertexElement[] = vertexElementsByBuffer.get(attributeBuffer) ?? []
+        vertexElementsByBuffer.set(attributeBuffer, vertexElements)
         let componentSize = componentTypeSizes.get(attributeAccessor.componentType)!
         let componentCount = accessorTypeElementCounts[attributeAccessor.type]
         let elementSizeBytes = componentSize * componentCount
@@ -86,17 +81,26 @@ function createDataBuffer(g: Graphics3D, gltf: GLTF, bufferViews: WebGLBuffer[],
         )
         vertexElements.push(vertexElement)
     }
-    let vertexFormat = new VertexFormat(...vertexElements)
-    // we always use 0 offset for the vertices buffer since we use bufferView and accessor offsets already
-    let vertexBuffer = new VertexBuffer(g, BufferUsage.staticDraw, vertexFormat, p.mode, vertexGLBuffer!, 0)
+    let vertexBuffers: VertexBuffer[] = []
+    for (let attributeBuffer of vertexElementsByBuffer.keys()) {
+        let vertexElements = vertexElementsByBuffer.get(attributeBuffer)!
+        let vertexFormat = new VertexFormat(...vertexElements)
+        let vertexBuffer = new VertexBuffer(g, BufferUsage.staticDraw, vertexFormat, p.mode, attributeBuffer, 0)
+        vertexBuffers.push(vertexBuffer)
+    }
+
     if (p.indices == null) {
-        return vertexBuffer
+        if (vertexBuffers.length !== 1) {
+            throw new Error("Non indexed vertices MUST be interleaved in a single buffer")
+        }
+        return vertexBuffers[0]
     }
 
     let indexAccessor = gltf.accessors[p.indices]
     let buffer = bufferViews[indexAccessor.bufferView ?? 0]
     // now create an indexed array thingy
-    let indexBuffer = new IndexBuffer(g, BufferUsage.staticDraw, vertexBuffer, p.mode, buffer, indexAccessor.componentType, 0, indexAccessor.count)
+    console.log("Indexes", { p, indexAccessor })
+    let indexBuffer = new IndexBuffer(g, BufferUsage.staticDraw, vertexBuffers, p.mode, buffer, indexAccessor.componentType, 0, indexAccessor.count)
     return indexBuffer
 }
 

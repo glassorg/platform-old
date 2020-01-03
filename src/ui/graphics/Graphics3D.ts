@@ -75,8 +75,8 @@ export default class Graphics3D extends Graphics {
         gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
         gl.enable(GL.DEPTH_TEST)
         gl.depthFunc(GL.LEQUAL)
-        // gl.enable(GL.CULL_FACE)
-        // gl.cullFace(GL.BACK)
+        gl.enable(GL.CULL_FACE)
+        gl.cullFace(GL.BACK)
 
         this.updateScreenSize()
     }
@@ -185,7 +185,7 @@ export default class Graphics3D extends Graphics {
             }
             elementBuffer!.bind()
             gl.enableVertexAttribArray(location)
-            gl.vertexAttribPointer(location, element.size, element.type, element.normalize, element.stride, elementBuffer.offset + element.offset)
+            gl.vertexAttribPointer(location, element.size, element.type, element.normalize, element.stride, element.offset)
             //  divisor is used for instanced rendering
             gl.vertexAttribDivisor(location, elementBuffer.vertexDivisor)
         }

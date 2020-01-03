@@ -14,8 +14,8 @@ export default class VertexElement {
         size: number,
         type: number = GL.FLOAT,
         normalize: boolean = type !== GL.FLOAT,
-        offset: number = 0,
-        stride: number = 0
+        offset: number = -1, // -1 makes VertexFormat constructor calculate
+        stride: number = -1  // -1 makes VertexFormat constructor calculate
     ) {
         this.name = name
         this.size = size

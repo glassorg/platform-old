@@ -54,13 +54,17 @@ export default class VertexFormat {
         // now initialize correct offset and stride
         let offset: number = 0
         for (let element of elements) {
-            element.offset = offset
+            if (element.offset < 0) {
+                element.offset = offset
+            }
             offset += element.size * getGLTypeSize(element.type)
         }
         this.size = offset
         let stride = offset
         for (let element of elements) {
-            element.stride = stride
+            if (element.stride < 0) {
+                element.stride = stride
+            }
         }
         this.string = this.elements.join("")
         this.floatElements = get4ByteComponentTypeArray(this)
