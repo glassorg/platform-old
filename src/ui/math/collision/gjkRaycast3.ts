@@ -85,16 +85,15 @@ export default function gjkRaycast3(support: SupportFunction, heading: Vector3, 
     while (true) {
         let [a, b, c] = simplex as Vector3[]
 
-        // let finish = () => {
-        //     let area = Math.abs(b.subtract(a).cross(c.subtract(a)).length()) / 2
-        //     console.log("AREA = " + area)
-        //     return simplex
-        // }
+        let collisionTime = () => {
+            let time = raycastTriangle(Vector3.zero, heading, a, b, c) as number
+            return { time, normal }
+        }
 
         let normal = normalForFace(a, b, c)
         let d = support(normal)
         if (++i > maxIterations || d.equivalent(a) || d.equivalent(b) || d.equivalent(c))
-            return simplex
+            return collisionTime()
         let faces = [
             [d, b, c],
             [a, d, c],
@@ -106,7 +105,7 @@ export default function gjkRaycast3(support: SupportFunction, heading: Vector3, 
                 if (raycastTriangle(Vector3.zero, heading, a, b, c) !== null)
                     simplex = face
             } catch (e) {
-                return simplex
+                return collisionTime()
             }
         }
     }
