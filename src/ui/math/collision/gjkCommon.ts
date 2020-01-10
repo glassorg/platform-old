@@ -81,7 +81,7 @@ export function checkTetrahedralFace(a: Vector3, b: Vector3, c: Vector3, inPoint
 export function nonMultiple(vector: Vector3) {
     let result = new Vector3(1, 0, 0)
     while (result.cross(vector).equivalent(Vector3.zero))
-        result = new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5)
+        result = new Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1).normalize()
     return result
 }
 

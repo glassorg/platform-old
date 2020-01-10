@@ -5,7 +5,7 @@ import { SupportFunction, nonMultiple, checkEdge, normalForEdge, checkFace, chec
 export function gjkRaycastInitialTriangle(support: SupportFunction, heading: Vector3, debug?: any) {
     function project(vector: Vector3) { return heading.rejection(vector) }
     const maxIterations = 100
-    const initialHeading = project(nonMultiple(heading).cross(heading))
+    let initialHeading = project(new Vector3(1, 0, 0))
     let initialPoint = support(initialHeading)
     let searchDirection = project(initialPoint.negate())
     let simplex: Vector3[] = [initialPoint]
