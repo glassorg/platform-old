@@ -1,11 +1,13 @@
 import Vector3 from "../Vector3";
 import { SupportFunction, nonMultiple, checkEdge, normalForEdge, checkFace, checkTriangleEdge, normalForFace, raycastTriangle } from "./gjkCommon";
 
+const ex = new Vector3(1, 0, 0)
+const ey = new Vector3(0, 1, 0)
 
 export function gjkRaycastInitialTriangle(support: SupportFunction, heading: Vector3, debug?: any) {
     function project(vector: Vector3) { return heading.rejection(vector) }
     const maxIterations = 100
-    let initialHeading = project(new Vector3(1, 0, 0))
+    let initialHeading = project(heading.cross(ex).equivalent(Vector3.zero) ? ey : ex)
     let initialPoint = support(initialHeading)
     let searchDirection = project(initialPoint.negate())
     let simplex: Vector3[] = [initialPoint]
