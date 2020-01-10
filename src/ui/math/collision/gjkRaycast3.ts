@@ -91,31 +91,33 @@ export default function gjkRaycast3(support: SupportFunction, heading: Vector3, 
             return { time, normal }
         }
 
-        let tooClose = (p, q) => p.equivalent(q)
-
         let normal = normalForFace(a, b, c)
         let d = support(normal)
-        if ((++i > maxIterations) || tooClose(a, d) || tooClose(b, d) || tooClose(c, d)) {
-            // console.log("Exited at iteration: " + i)
-            // if (i > 6)
-            //     return null
+        if ((++i > maxIterations) || d.equivalent(a) || d.equivalent(b) || d.equivalent(c))
             return collision()
-        }
+
         let faces = [
             [d, b, c],
             [a, d, c],
             [a, b, d],
         ]
+
+        let success = false
         for (let face of faces) {
             let [a, b, c] = face
             try {
-                if (raycastTriangle(Vector3.zero, heading, a, b, c) !== null)
+                if (raycastTriangle(Vector3.zero, heading, a, b, c) !== null) {
                     simplex = face
+                    success = true
+                    break
+                }
             } catch (e) {
                 // Couldn't invert matrix, raytrace failed.
-                return collision()
             }
         }
+
+        if (!success)
+            return collision()
 
     }
 }

@@ -85,7 +85,7 @@ export function nonMultiple(vector: Vector3) {
     return result
 }
 
-export function raycastTriangle(rayOrigin: Vector3, rayHeading: Vector3, a: Vector3, b: Vector3, c: Vector3) {
+export function raycastTriangle(rayOrigin: Vector3, rayHeading: Vector3, a: Vector3, b: Vector3, c: Vector3, epsilon = 0.0001) {
     let ab = b.subtract(a)
     let ac = c.subtract(a)
     let ao = rayOrigin.subtract(a)
@@ -97,7 +97,7 @@ export function raycastTriangle(rayOrigin: Vector3, rayHeading: Vector3, a: Vect
         0, 0, 0, 1)
     let hc = ao.transform(m.inverse()) // Barycentric coordinates of hit.
     let time = hc.z
-    if (hc.x < 0 || hc.y < 0 || hc.x + hc.y > 1 || time < 0)
+    if (hc.x < -epsilon || hc.y < -epsilon || hc.x + hc.y > (1 + epsilon) || time < 0)
         return null
     return time
 }
