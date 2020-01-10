@@ -5,11 +5,10 @@ import { SupportFunction, nonMultiple, checkEdge, normalForEdge, checkFace, chec
 export function gjkRaycastInitialTriangle(support: SupportFunction, heading: Vector3, debug?: any) {
     function project(vector: Vector3) { return heading.rejection(vector) }
     const maxIterations = 100
-    const initialHeading = nonMultiple(heading).cross(heading)
+    const initialHeading = project(nonMultiple(heading).cross(heading))
     let initialPoint = support(initialHeading)
     let searchDirection = project(initialPoint.negate())
     let simplex: Vector3[] = [initialPoint]
-
 
     if (debug)
         debug.simplices = []
@@ -65,7 +64,7 @@ export function gjkRaycastInitialTriangle(support: SupportFunction, heading: Vec
         if (++i > maxIterations)
             return null
         if (searchDirection.equivalent(Vector3.zero))
-            searchDirection = project(searchDirection.add(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5)))
+            searchDirection = project(new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5))
         let nextVertex = support(searchDirection)
         if (nextVertex.dot(searchDirection) < 0)
             return null
@@ -77,7 +76,7 @@ export function gjkRaycastInitialTriangle(support: SupportFunction, heading: Vec
 }
 
 export default function gjkRaycast3(support: SupportFunction, heading: Vector3, debug?: any) {
-    const maxIterations = 20
+    const maxIterations = 10
     let simplex = gjkRaycastInitialTriangle(support, heading, debug)
     if (!simplex)
         return null
@@ -85,15 +84,21 @@ export default function gjkRaycast3(support: SupportFunction, heading: Vector3, 
     while (true) {
         let [a, b, c] = simplex as Vector3[]
 
-        let collisionTime = () => {
+        let collision = () => {
             let time = raycastTriangle(Vector3.zero, heading, a, b, c) as number
             return { time, normal }
         }
 
+        let tooClose = (p, q) => p.equivalent(q)
+
         let normal = normalForFace(a, b, c)
         let d = support(normal)
-        if (++i > maxIterations || d.equivalent(a) || d.equivalent(b) || d.equivalent(c))
-            return collisionTime()
+        if ((++i > maxIterations) || tooClose(a, d) || tooClose(b, d) || tooClose(c, d)) {
+            // console.log("Exited at iteration: " + i)
+            // if (i > 6)
+            //     return null
+            return collision()
+        }
         let faces = [
             [d, b, c],
             [a, d, c],
@@ -105,8 +110,10 @@ export default function gjkRaycast3(support: SupportFunction, heading: Vector3, 
                 if (raycastTriangle(Vector3.zero, heading, a, b, c) !== null)
                     simplex = face
             } catch (e) {
-                return collisionTime()
+                // Couldn't invert matrix, raytrace failed.
+                return collision()
             }
         }
+
     }
 }
