@@ -36,7 +36,7 @@ export let instance: { database: Database, package: any, config: Config & { name
  * @param projectRoot the root directory of the project
  * @param namespaceOrPath the entity namespace or a string to the namespace module relative to the projectRoot
  */
-export function create(config: Config) {
+export function create(config: Config, app = express()) {
     process.on('uncaughtException', function(err) {
         // handle the error safely
         console.log("glass.platform.server.webServer uncaughtException:", err)
@@ -56,7 +56,7 @@ export function create(config: Config) {
     const packageProperties = JSON.parse(fs.readFileSync(path.join(projectRoot, "package.json")).toString())
     let projectId = packageProperties.id || packageProperties.name
     let database = new (config.firestore ? Firestore : Datastore)({namespace:namespace!, projectId})
-    instance = Object.assign(express(), { config, database, package: packageProperties }) as any
+    instance = Object.assign(app, { config, database, package: packageProperties }) as any
     // use gzip compression at level 1 for maximum speed, minimal compression
     instance.use(compression({ level: 1 }))
     // parse identity token
