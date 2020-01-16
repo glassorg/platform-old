@@ -13,6 +13,7 @@ import VertexShader from "./VertexShader"
 import FragmentShader from "./FragmentShader"
 import Position_VertexShader from "./effects/Position.vert"
 import Color_FragmentShader from "./effects/Color.frag"
+import { getGLTypeSize } from "./functions"
 
 const programs = {
     position: new Program(
@@ -46,14 +47,6 @@ const accessorTypeElementCounts = {
     MAT3: 3 * 3,
     MAT4: 4 * 4,
 }
-const componentTypeSizes = new Map<number, number>([
-    [GL.BYTE, 1],
-    [GL.UNSIGNED_BYTE, 1],
-    [GL.SHORT, 2],
-    [GL.UNSIGNED_SHORT, 2],
-    [GL.UNSIGNED_INT, 4],
-    [GL.FLOAT, 4]
-])
 
 function createDataBuffer(g: Graphics3D, gltf: GLTF, bufferViews: WebGLBuffer[], p: MeshPrimitive): DataBuffer {
     if (gltf.bufferViews == null || gltf.accessors == null) {
@@ -67,7 +60,7 @@ function createDataBuffer(g: Graphics3D, gltf: GLTF, bufferViews: WebGLBuffer[],
         let attributeBuffer = bufferViews[attributeAccessor.bufferView ?? 0]
         let vertexElements: VertexElement[] = vertexElementsByBuffer.get(attributeBuffer) ?? []
         vertexElementsByBuffer.set(attributeBuffer, vertexElements)
-        let componentSize = componentTypeSizes.get(attributeAccessor.componentType)!
+        let componentSize = getGLTypeSize(attributeAccessor.componentType)
         let componentCount = accessorTypeElementCounts[attributeAccessor.type]
         let elementSizeBytes = componentSize * componentCount
         let stride = attributeBufferView.byteStride ?? elementSizeBytes

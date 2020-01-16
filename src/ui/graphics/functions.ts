@@ -84,9 +84,9 @@ export function createProgram(gl: WebGL2RenderingContext, vertexShader: WebGLSha
 }
 
 export function getGLTypeSize(type: number) {
-    if (type === GL.FLOAT || type === GL.INT)
+    if (type === GL.FLOAT || type === GL.INT || type === GL.UNSIGNED_INT)
         return 4
     if (type === GL.UNSIGNED_BYTE || type === GL.BYTE)
         return 1
-    throw new Error("Unrecognized type: " + type)
+    return 2
 }
