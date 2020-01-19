@@ -16,22 +16,22 @@ test("VertexArray reading and writing", assert => {
     const v = new VertexArray(format, 1)
     assert.deepEqual(v.capacity, 1)
 
-    v.set3(0, "position", new Vector3(1.5, 2.5, 3.5))
-    v.set3(0, "normal", new Vector3(1.0, 0.0, 0.0))
+    v.set(0, "position", new Vector3(1.5, 2.5, 3.5))
+    v.set(0, "normal", new Vector3(1.0, 0.0, 0.0))
     v.set(0, "custom", 0xFFFFFFFF)
 
-    assert.deepEqual(v.get3(0, "position"), new Vector3(1.5, 2.5, 3.5))
-    assert.deepEqual(v.get3(0, "normal"), new Vector3(1.0, 0.0, 0.0))
+    assert.deepEqual(v.get(0, "position", Vector3), new Vector3(1.5, 2.5, 3.5))
+    assert.deepEqual(v.get(0, "normal", Vector3), new Vector3(1.0, 0.0, 0.0))
     assert.deepEqual(v.get(0, "custom"), 0xFFFFFFFF)
     assert.deepEqual(v.length, 1)
     assert.deepEqual(v.toArray(), [1.5, 2.5, 3.5, 1.0, 0.0, 0.0, 0xFFFFFFFF])
 
-    v.set3(1, "position", new Vector3(2.5, 3.5, 4.5))
-    v.set3(1, "normal", new Vector3(0.0, 1.0, 0.0))
+    v.set(1, "position", new Vector3(2.5, 3.5, 4.5))
+    v.set(1, "normal", new Vector3(0.0, 1.0, 0.0))
     v.set(1, "custom", 0xFFFFFF00)
 
-    assert.deepEqual(v.get3(1, "position"), new Vector3(2.5, 3.5, 4.5))
-    assert.deepEqual(v.get3(1, "normal"), new Vector3(0.0, 1.0, 0.0))
+    assert.deepEqual(v.get(1, "position", Vector3), new Vector3(2.5, 3.5, 4.5))
+    assert.deepEqual(v.get(1, "normal", Vector3), new Vector3(0.0, 1.0, 0.0))
     assert.deepEqual(v.get(1, "custom"), 0xFFFFFF00)
     assert.deepEqual(v.length, 2)
     //  this ensures that we still retain earlier

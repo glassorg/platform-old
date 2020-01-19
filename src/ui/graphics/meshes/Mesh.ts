@@ -36,6 +36,36 @@ export default class Mesh {
         return ib
     }
 
+    subdivideFace(faceIndex: number) {
+        const faceVertexIndex0 = faceIndex * 3
+        const a = this.indexes.get(faceVertexIndex0 + 0)
+        const b = this.indexes.get(faceVertexIndex0 + 1)
+        const c = this.indexes.get(faceVertexIndex0 + 2)
+        //  create 3 new interpolated vertices
+        const ab = this.vertices.addInterpolatedVertex(a, b)
+        const bc = this.vertices.addInterpolatedVertex(b, c)
+        const ca = this.vertices.addInterpolatedVertex(c, a)
+        // first change old vertex to now be face a -> ab -> ca
+        this.indexes.set(faceVertexIndex0 + 1, ab)
+        this.indexes.set(faceVertexIndex0 + 2, ca)
+        // now add three new faces
+        this.indexes.push(
+            ab, b, bc,
+            ca, bc, c,
+            ca, ab, bc,
+        )
+    }
+
+    subdivideAllFaces(recurse = 0) {
+        for (let count = 0; count <= recurse; count++) {
+            const faceCount = this.indexes.length / 3
+            for (let face = faceCount - 1; face >= 0; face--) {
+                this.subdivideFace(face)
+            }
+        }
+        return this
+    }
+
     computeNormals() {
         if (this.primitive !== Primitive.triangles) {
             throw new Error("Can only generate normals on triangles")
@@ -46,26 +76,26 @@ export default class Mesh {
         for (let i = 0; i < this.vertices.length; i++) {
             vertexFaces[i] = []
         }
-        for (let fi = 0; fi < this.indexes.length; fi += 3) {
-            const ai = this.indexes.get(fi + 0)
-            const bi = this.indexes.get(fi + 1)
-            const ci = this.indexes.get(fi + 2)
-            vertexFaces[ai].push(fi)
-            vertexFaces[bi].push(fi)
-            vertexFaces[ci].push(fi)
-            faceNormals[fi] = getFaceNormal(
-                this.vertices.get3(ai, "position"),
-                this.vertices.get3(bi, "position"),
-                this.vertices.get3(ci, "position"),
+        for (let faceVertexIndex0 = 0; faceVertexIndex0 < this.indexes.length; faceVertexIndex0 += 3) {
+            const ai = this.indexes.get(faceVertexIndex0 + 0)
+            const bi = this.indexes.get(faceVertexIndex0 + 1)
+            const ci = this.indexes.get(faceVertexIndex0 + 2)
+            vertexFaces[ai].push(faceVertexIndex0)
+            vertexFaces[bi].push(faceVertexIndex0)
+            vertexFaces[ci].push(faceVertexIndex0)
+            faceNormals[faceVertexIndex0] = getFaceNormal(
+                this.vertices.get(ai, "position"),
+                this.vertices.get(bi, "position"),
+                this.vertices.get(ci, "position"),
             )
         }
 
         for (let vi = 0; vi < this.vertices.length; vi++) {
-            // for every vertex, finds faces that contains it and
+            // for every vertex, get the surrounding faces normals
             let normals = vertexFaces[vi].map(fi => faceNormals[fi])
             // now set the normal on that vertex
             let normal = Vector3.add(normals).normalize()
-            this.vertices.set3(vi, "normal", normal)
+            this.vertices.set(vi, "normal", normal)
         }
         return this
     }

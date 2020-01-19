@@ -52,6 +52,12 @@ export default class IndexArray {
         }
     }
 
+    push(...values: number[]) {
+        const length = this.length
+        this.setMinLength(length + values.length)
+        this.data.set(values, length)
+    }
+
     get(index: number) {
         return this.data[index]
     }
