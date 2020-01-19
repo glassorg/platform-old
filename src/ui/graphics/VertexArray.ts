@@ -8,13 +8,13 @@ import { transfer } from "./functions"
 export default class VertexArray {
 
     public readonly format: VertexFormat
-    private floatData!: Float32Array
-    private uintData!: Uint32Array
+    public floatData!: Float32Array
+    public uintData!: Uint32Array
     private _length = 0
 
     constructor(format: VertexFormat, capacity = 256) {
         this.format = format
-        this.resize(capacity)
+        this.setCapacity(capacity)
     }
 
     get length() {
@@ -25,26 +25,32 @@ export default class VertexArray {
         return this.floatData?.buffer
     }
 
-    private setMinLength(length: number) {
-        if (this.capacity < length) {
-            this.grow(length)
+    private ensureCapacity(capacity: number) {
+        if (this.capacity < capacity) {
+            this.grow(capacity)
         }
-        this._length = length
+    }
+
+    private setMinLength(length: number) {
+        this.ensureCapacity(length)
+        this._length = Math.max(this._length, length)
     }
 
     get capacity() {
-        return this.floatData.buffer.byteLength / this.format.size
+        return (this.floatData?.buffer.byteLength ?? 0) / this.format.size
     }
 
     private grow(minimum = 0) {
-        this.resize(Math.max(minimum, this.capacity * 2))
+        this.setCapacity(Math.max(minimum, this.capacity * 2))
     }
 
-    private resize(capacity: number) {
-        const newSize = capacity * this.format.size
-        const buffer = this.buffer ? transfer(this.buffer, newSize) : new ArrayBuffer(newSize)
-        this.floatData = new Float32Array(buffer)
-        this.uintData = new Uint32Array(buffer)
+    private setCapacity(capacity: number) {
+        if (capacity != this.capacity) {
+            const newSize = capacity * this.format.size
+            const buffer = this.buffer ? transfer(this.buffer, newSize) : new ArrayBuffer(newSize)
+            this.floatData = new Float32Array(buffer)
+            this.uintData = new Uint32Array(buffer)
+        }
     }
 
     private getElement(name: string) {
@@ -111,6 +117,18 @@ export default class VertexArray {
         array[elementIndex+1] = value.y
         array[elementIndex+2] = value.z
         return value
+    }
+
+    setData(data: ArrayLike<number>) {
+        this.setCapacity(this._length = data.length / this.format.components)
+        let index = 0
+        for (let i = 0; i < this._length; i++) {
+            for (let float of this.format.floatElements) {
+                (float ? this.floatData : this.uintData)[index] = data[index]
+                index++
+            }
+        }
+        return this
     }
 
     toArray() {

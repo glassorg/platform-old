@@ -22,6 +22,18 @@ export default class Vector3 extends Structure {
         yield this.z;
     }
 
+    static add(vectors: Vector3[]) {
+        let x = 0
+        let y = 0
+        let z = 0
+        for (let v of vectors) {
+            x += v.x
+            y += v.y
+            z += v.z
+        }
+        return new Vector3(x, y, z)
+    }
+
     add(v: Vector3) {
         return new Vector3(this.x + v.x, this.y + v.y, this.z + v.z)
     }

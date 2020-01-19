@@ -63,7 +63,7 @@ export default abstract class DataBuffer {
         this.graphics.gl.bindBuffer(this.type, this.glBuffer)
     }
 
-    setData(data: Float32Array | Uint16Array, length: number = data.length) {
+    setData(data: Uint32Array | Uint16Array | Float32Array, length: number = data.length) {
         this.bind()
         this.graphics.gl.bufferData(this.type, data, this.usage, this.offset, length)
         this.size = length

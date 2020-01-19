@@ -9,12 +9,12 @@ import { transfer } from "./functions"
 export default class IndexArray {
 
     public readonly type: ElementType
-    private data!: Uint32Array | Uint16Array
+    public data!: Uint32Array | Uint16Array
     private _length = 0
 
-    constructor(type: ElementType = ElementType.UnsignedShort, capacity = 256) {
+    constructor(capacity = 256, type: ElementType = ElementType.UnsignedShort) {
         this.type = type
-        this.resize(capacity)
+        this.setCapacity(capacity)
     }
 
     get length() {
@@ -25,25 +25,31 @@ export default class IndexArray {
         return this.data?.buffer
     }
 
-    private setMinLength(length: number) {
-        if (this.capacity < length) {
-            this.grow(length)
+    private ensureCapacity(capacity: number) {
+        if (this.capacity < capacity) {
+            this.grow(capacity)
         }
-        this._length = length
+    }
+
+    private setMinLength(length: number) {
+        this.ensureCapacity(length)
+        this._length = Math.max(this._length, length)
     }
 
     get capacity() {
-        return this.data.length
+        return this.data?.length ?? 0
     }
 
     private grow(minimum = 0) {
-        this.resize(Math.max(minimum, this.capacity * 2))
+        this.setCapacity(Math.max(minimum, this.capacity * 2))
     }
 
-    private resize(capacity: number) {
-        const newSize = capacity * (this.type === ElementType.UnsignedShort ? 2 : 4)
-        const buffer = this.buffer ? transfer(this.buffer, newSize) : new ArrayBuffer(newSize)
-        this.data = new (this.type === ElementType.UnsignedShort ? Uint16Array : Uint32Array)(buffer)
+    private setCapacity(capacity: number) {
+        if (capacity != this.capacity) {
+            const newSize = capacity * (this.type === ElementType.UnsignedShort ? 2 : 4)
+            const buffer = this.buffer ? transfer(this.buffer, newSize) : new ArrayBuffer(newSize)
+            this.data = new (this.type === ElementType.UnsignedShort ? Uint16Array : Uint32Array)(buffer)
+        }
     }
 
     get(index: number) {
@@ -52,6 +58,12 @@ export default class IndexArray {
     set(index: number, value: number) {
         this.setMinLength(index + 1)
         this.data[index] = value
+    }
+
+    setData(data: ArrayLike<number>) {
+        this.setCapacity(this._length = data.length)
+        this.data.set(data, 0)
+        return this
     }
 
     toArray() {

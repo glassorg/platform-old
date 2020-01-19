@@ -7,8 +7,11 @@ import IndexStream from "../IndexStream"
 import Matrix4 from "../../math/Matrix4"
 import Vector3 from "../../math/Vector3"
 import Mesh from "../meshes/Mesh"
+import VertexArray from "../VertexArray"
+import IndexArray from "../IndexArray"
+import { memoize } from "../../../utility/common"
 
-export function createIcosahedron(recurseSteps = 0) {
+export function createSphereMesh(detail = 0) {
 
     //  algorithm adapted from https://wiki.mcneel.com/developer/scriptsamples/icosahedron
     //  we need to add the icosohedron vertices.
@@ -57,7 +60,22 @@ export function createIcosahedron(recurseSteps = 0) {
         4, 8, 10,        
     ]
     // TODO: calculate normals, make mesh.
+    const mesh = new Mesh(
+        new VertexArray(VertexFormat.positionNormal, 12).setData(vertices),
+        new IndexArray(20).setData(faces)
+    )
+    return mesh
 }
+
+export default memoize(function getSphereFactory(detail = 0) {
+
+    return function createSphere(g: Graphics3D) {
+        const mesh = createSphereMesh(detail)
+        mesh.generateNormals()
+        return mesh.createIndexBuffer(g)
+    }
+
+}) 
 
 // /**
 //  * Returns a unit cube with position/normal vertices. Each side is length = 1.
