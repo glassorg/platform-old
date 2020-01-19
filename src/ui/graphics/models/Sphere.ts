@@ -71,7 +71,7 @@ export default memoize(function getSphereFactory(detail = 0) {
 
     return function createSphere(g: Graphics3D) {
         const mesh = createSphereMesh(detail)
-        mesh.generateNormals()
+        mesh.computeNormals()
         return mesh.createIndexBuffer(g)
     }
 

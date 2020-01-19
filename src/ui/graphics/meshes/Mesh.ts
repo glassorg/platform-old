@@ -36,26 +36,33 @@ export default class Mesh {
         return ib
     }
 
-    generateNormals() {
+    computeNormals() {
         if (this.primitive !== Primitive.triangles) {
             throw new Error("Can only generate normals on triangles")
         }
 
+        const faceNormals: Vector3[] = new Array(this.indexes.length / 3)
+        const vertexFaces: number[][] = []
+        for (let i = 0; i < this.vertices.length; i++) {
+            vertexFaces[i] = []
+        }
+        for (let fi = 0; fi < this.indexes.length; fi += 3) {
+            const ai = this.indexes.get(fi + 0)
+            const bi = this.indexes.get(fi + 1)
+            const ci = this.indexes.get(fi + 2)
+            vertexFaces[ai].push(fi)
+            vertexFaces[bi].push(fi)
+            vertexFaces[ci].push(fi)
+            faceNormals[fi] = getFaceNormal(
+                this.vertices.get3(ai, "position"),
+                this.vertices.get3(bi, "position"),
+                this.vertices.get3(ci, "position"),
+            )
+        }
+
         for (let vi = 0; vi < this.vertices.length; vi++) {
             // for every vertex, finds faces that contains it and
-            let normals: Vector3[] = []
-            // check every face.
-            for (let i = 0; i < this.indexes.length; i++) {
-                let index = this.indexes.get(i)
-                if (index === vi) {
-                    let fi = Math.floor(i / 3) * 3 // faceIndex
-                    normals.push(getFaceNormal(
-                        this.vertices.get3(this.indexes.get(fi + 0), "position"),
-                        this.vertices.get3(this.indexes.get(fi + 1), "position"),
-                        this.vertices.get3(this.indexes.get(fi + 2), "position"),
-                    ))
-                }
-            }
+            let normals = vertexFaces[vi].map(fi => faceNormals[fi])
             // now set the normal on that vertex
             let normal = Vector3.add(normals).normalize()
             this.vertices.set3(vi, "normal", normal)
