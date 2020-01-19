@@ -43,7 +43,7 @@ export default class IndexArray {
     private resize(capacity: number) {
         const newSize = capacity * (this.type === ElementType.UnsignedShort ? 2 : 4)
         const buffer = this.buffer ? transfer(this.buffer, newSize) : new ArrayBuffer(newSize)
-        this.data = new (this.type === ElementType.UnsignedInt ? Uint16Array : Uint32Array)(buffer)
+        this.data = new (this.type === ElementType.UnsignedShort ? Uint16Array : Uint32Array)(buffer)
     }
 
     get(index: number) {
@@ -52,6 +52,10 @@ export default class IndexArray {
     set(index: number, value: number) {
         this.setMinLength(index + 1)
         this.data[index] = value
+    }
+
+    toArray() {
+        return [...this.data]
     }
 
 }

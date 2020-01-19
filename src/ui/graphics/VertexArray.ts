@@ -57,7 +57,7 @@ export default class VertexArray {
 
     get(vertexIndex: number, attributeName: string) {
         const element = this.getElement(attributeName)
-        const elementIndex = vertexIndex * (this.format.size >>> 2)
+        const elementIndex = vertexIndex * (this.format.size >>> 2) + (element.offset >>> 2)
         const float = element.type === GL.FLOAT
         const array = float ? this.floatData : this.uintData
         return array[elementIndex]
@@ -65,14 +65,14 @@ export default class VertexArray {
     set(vertexIndex: number, attributeName: string, value: number) {
         this.setMinLength(vertexIndex + 1)
         const element = this.getElement(attributeName)
-        const elementIndex = vertexIndex * (this.format.size >>> 2)
+        const elementIndex = vertexIndex * (this.format.size >>> 2) + (element.offset >>> 2)
         const float = element.type === GL.FLOAT
         const array = float ? this.floatData : this.uintData
         return array[elementIndex] = value
     }
     get2(vertexIndex: number, attributeName: string) {
         const element = this.getElement(attributeName)
-        const elementIndex = vertexIndex * (this.format.size >>> 2)
+        const elementIndex = vertexIndex * (this.format.size >>> 2) + (element.offset >>> 2)
         const float = element.type === GL.FLOAT
         const array = float ? this.floatData : this.uintData
         return new Vector2(
@@ -83,7 +83,7 @@ export default class VertexArray {
     set2(vertexIndex: number, attributeName: string, value: Vector2) {
         this.setMinLength(vertexIndex + 1)
         const element = this.getElement(attributeName)
-        const elementIndex = vertexIndex * (this.format.size >>> 2)
+        const elementIndex = vertexIndex * (this.format.size >>> 2) + (element.offset >>> 2)
         const float = element.type === GL.FLOAT
         const array = float ? this.floatData : this.uintData
         array[elementIndex+0] = value.x
@@ -92,7 +92,7 @@ export default class VertexArray {
     }
     get3(vertexIndex: number, attributeName: string) {
         const element = this.getElement(attributeName)
-        const elementIndex = vertexIndex * (this.format.size >>> 2)
+        const elementIndex = vertexIndex * (this.format.size >>> 2) + (element.offset >>> 2)
         const float = element.type === GL.FLOAT
         const array = float ? this.floatData : this.uintData
         return new Vector3(
@@ -104,13 +104,25 @@ export default class VertexArray {
     set3(vertexIndex: number, attributeName: string, value: Vector3) {
         this.setMinLength(vertexIndex + 1)
         const element = this.getElement(attributeName)
-        const elementIndex = vertexIndex * (this.format.size >>> 2)
+        const elementIndex = vertexIndex * (this.format.size >>> 2) + (element.offset >>> 2)
         const float = element.type === GL.FLOAT
         const array = float ? this.floatData : this.uintData
         array[elementIndex+0] = value.x
         array[elementIndex+1] = value.y
         array[elementIndex+2] = value.z
         return value
+    }
+
+    toArray() {
+        const array: number[] = []
+        let index = 0
+        for (let i = 0; i < this._length; i++) {
+            for (let float of this.format.floatElements) {
+                array[index] = (float ? this.floatData : this.uintData)[index]
+                index++
+            }
+        }
+        return array
     }
 
 }
