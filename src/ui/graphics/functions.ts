@@ -90,3 +90,15 @@ export function getGLTypeSize(type: number) {
         return 1
     return 2
 }
+
+export function transfer(source: ArrayBuffer, length) {
+    if ((ArrayBuffer as any).transfer != null) {
+        return (ArrayBuffer as any).transfer(source, length)
+    }
+    if (length <= source.byteLength)
+        return source.slice(0, length);
+    var sourceView = new Uint8Array(source),
+        destView = new Uint8Array(new ArrayBuffer(length));
+    destView.set(sourceView);
+    return destView.buffer;
+};
