@@ -12,6 +12,10 @@ export function getFaceNormal(a: Vector3, b: Vector3, c: Vector3) {
     return a.subtract(b).cross(a.subtract(c))
 }
 
+function getVertexCacheKey(position: Vector3): any {
+    return position.toString()    
+}
+
 export default class Mesh {
 
     readonly vertices: VertexArray
@@ -36,19 +40,44 @@ export default class Mesh {
         return ib
     }
 
-    subdivideFace(faceIndex: number) {
+    // TODO: share vertices by position cache
+    subdivideFace(faceIndex: number, keyFunction?: ((position: Vector3) => any), cache?: Map<any,number>) {
         const faceVertexIndex0 = faceIndex * 3
+
+        const getInterpolatedVertex = (a: number, b: number) => {
+            if (keyFunction && cache) {
+                const position = this.vertices.get(a, "position", Vector3).lerp(this.vertices.get(b, "position", Vector3), 0.5)
+                const key = keyFunction(position)
+                const cached = cache.get(key)
+                if (cached != null) {
+                    return cached
+                }
+                else {
+                   const newVertexIndex = this.vertices.addInterpolatedVertex(a, b)
+                   cache.set(key, newVertexIndex)
+                   return newVertexIndex 
+                }
+            }
+            // return this.indexes.get(faceVertexIndex0)
+            return this.vertices.addInterpolatedVertex(a, b)
+        }
+
         const a = this.indexes.get(faceVertexIndex0 + 0)
         const b = this.indexes.get(faceVertexIndex0 + 1)
         const c = this.indexes.get(faceVertexIndex0 + 2)
         //  create 3 new interpolated vertices
-        const ab = this.vertices.addInterpolatedVertex(a, b)
-        const bc = this.vertices.addInterpolatedVertex(b, c)
-        const ca = this.vertices.addInterpolatedVertex(c, a)
+        const ab = getInterpolatedVertex(a, b)
+        const bc = getInterpolatedVertex(b, c)
+        const ca = getInterpolatedVertex(c, a)
         // first change old vertex to now be face a -> ab -> ca
         this.indexes.set(faceVertexIndex0 + 1, ab)
         this.indexes.set(faceVertexIndex0 + 2, ca)
         // now add three new faces
+        //       A
+        //     /   \
+        //   CA --- AB
+        //  /  \   /  \
+        // C --- BC --- B
         this.indexes.push(
             ab, b, bc,
             ca, bc, c,
@@ -56,11 +85,12 @@ export default class Mesh {
         )
     }
 
-    subdivideAllFaces(recurse = 0) {
+    subdivideAllFaces(recurse = 0, keyFunction: (position: Vector3) => any = getVertexCacheKey) {
+        let cache = new Map()
         for (let count = 0; count <= recurse; count++) {
             const faceCount = this.indexes.length / 3
             for (let face = faceCount - 1; face >= 0; face--) {
-                this.subdivideFace(face)
+                this.subdivideFace(face, keyFunction, cache)
             }
         }
         return this

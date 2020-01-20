@@ -7,6 +7,8 @@ import { transfer } from "./functions"
 import Vector4 from "../math/Vector4"
 import { lerp } from "../math"
 
+type Constructor<T> = new (...values: number[]) => T
+
 export default class VertexArray {
 
     public readonly format: VertexFormat
@@ -81,7 +83,20 @@ export default class VertexArray {
         return vertexIndexC
     }
 
-    get<T = number>(vertexIndex: number, attributeName: string, type?: new (...values: number[]) => T): T {
+    forEach<T = Vector3>(attribute: string, type: Constructor<T> | null, callback: (value: T, index: number) => void) {
+        for (let i = 0; i < this.length; i++) {
+            let value = this.get<T>(i, attribute, type ?? undefined)
+            callback(value, i)
+        }
+    }
+
+    filter<T = Vector3>(attribute: string, type: Constructor<T> | null, fn: (value: T, index: number) => T) {
+        this.forEach<T>(attribute, type, (value, i) => {
+            this.set(i, attribute, fn(value, i))
+        })
+    }
+
+    get<T = number>(vertexIndex: number, attributeName: string, type?: Constructor<T>): T {
         const element = this.getElement(attributeName)
         const elementIndex = vertexIndex * (this.format.size >>> 2) + (element.offset >>> 2)
         const float = element.type === GL.FLOAT

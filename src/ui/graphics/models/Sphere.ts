@@ -11,7 +11,7 @@ import VertexArray from "../VertexArray"
 import IndexArray from "../IndexArray"
 import { memoize } from "../../../utility/common"
 
-export function createSphereMesh(detail = 0) {
+export function createSphereMesh() {
 
     //  algorithm adapted from https://wiki.mcneel.com/developer/scriptsamples/icosahedron
     //  we need to add the icosohedron vertices.
@@ -70,8 +70,9 @@ export function createSphereMesh(detail = 0) {
 export default memoize(function getSphereFactory(detail = 0) {
 
     return function createSphere(g: Graphics3D) {
-        const mesh = createSphereMesh(detail)
-        mesh.subdivideAllFaces(detail)
+        const mesh = createSphereMesh()
+        mesh.subdivideAllFaces(2)
+        mesh.vertices.filter("position", Vector3, p => p.normalize())
         mesh.computeNormals()
         return mesh.createIndexBuffer(g)
     }
