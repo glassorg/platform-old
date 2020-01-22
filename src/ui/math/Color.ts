@@ -61,6 +61,13 @@ export default class Color extends Structure implements Iterable<number> {
         return new Color(this.red, this.green, this.blue, alpha)
     }
 
+    writeTo(array: number[], index: number) {
+        array[index + 0] = this.red
+        array[index + 1] = this.green
+        array[index + 2] = this.blue
+        array[index + 3] = this.alpha
+    }
+
     toVector4() {
         return new Vector4(this.red, this.green, this.blue, this.alpha)
     }

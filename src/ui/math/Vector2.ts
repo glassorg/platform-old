@@ -99,6 +99,11 @@ export default class Vector2 extends Structure {
         return new Rectangle(minX, minY, maxX - minX, maxY - minY)
     }
 
+    writeTo(array: number[], index: number) {
+        array[index + 0] = this.x
+        array[index + 1] = this.y
+    }
+
     toArray() {
         return [ this.x, this.y ]
     }

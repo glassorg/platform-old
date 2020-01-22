@@ -87,6 +87,13 @@ export default class Vector4 extends Structure {
 
     static zero = new Vector4(0, 0, 0, 0)
 
+    writeTo(array: number[], index: number) {
+        array[index + 0] = this.x
+        array[index + 1] = this.y
+        array[index + 2] = this.z
+        array[index + 3] = this.w
+    }
+
     toArray() {
         return [ this.x, this.y, this.z, this.w ]
     }
