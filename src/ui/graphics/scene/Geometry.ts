@@ -14,7 +14,7 @@ export default class Geometry extends Node {
             if (this.load == null) {
                 throw new Error("You must specify either buffer or load property")
             }
-            this.buffer = g.getMesh(this.load)
+            this.buffer = g.getDataBuffer(this.load)
         }
 
         if (this.instance) {

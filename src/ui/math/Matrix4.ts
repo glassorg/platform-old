@@ -196,8 +196,8 @@ export default class Matrix4 {
 
     // https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_model_view_projection#Perspective_Matrix
     static perspective(fov: number, aspect: number, near: number, far: number) {
-        let f = Math.tan(Math.PI * 0.5 - fov * 0.5)
-        let rangeInv = 1 / (near - far)
+        let f = 1.0 / Math.tan(fov  / 2.0)
+        let rangeInv = 1.0 / (near - far)
         return new Matrix4(
             f / aspect, 0, 0, 0,
             0, f, 0, 0,

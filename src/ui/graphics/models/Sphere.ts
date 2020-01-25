@@ -71,7 +71,7 @@ export default memoize(function getSphereFactory(detail = 0) {
 
     return function createSphere(g: Graphics3D) {
         const mesh = createSphereMesh()
-        mesh.subdivideAllFaces(2)
+        mesh.subdivideAllFaces(detail)
         mesh.vertices.filter("position", Vector3, p => p.normalize())
         mesh.computeNormals()
         return mesh.createIndexBuffer(g)
