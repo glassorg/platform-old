@@ -20,6 +20,10 @@ export function lerp(a, b, alpha = 0.5) {
     return a.lerp(b, alpha)
 }
 
+export function easeInOutCubic(x) {
+    return x ** 2 * 3 - x ** 3 * 2
+}
+
 export type RandomNumberGenerator = (min?, max?) => number
 
 // Source: https://en.wikipedia.org/wiki/Xorshift
