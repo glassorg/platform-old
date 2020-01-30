@@ -1,5 +1,6 @@
 import Vector3 from "../Vector3"
 import Matrix4 from "../Matrix4"
+import { RandomNumberGenerator } from ".."
 
 export type SupportFunction = (v: Vector3) => Vector3
 
@@ -78,13 +79,10 @@ export function checkTetrahedralFace(a: Vector3, b: Vector3, c: Vector3, inPoint
     return checkFace(a, b, c) && !isOriginAbove(a, faceNormalOnSide(a, b, c, inPoint))
 }
 
-export function nonMultiple(vector: Vector3) {
-    // const ex = new Vector3(1, 0, 0)
-    // const ey = new Vector3(0, 1, 0)
-    // return vector.cross(ex).equivalent(Vector3.zero) ? ey : ex
+export function nonMultiple(vector: Vector3, random: RandomNumberGenerator) {
     let result = new Vector3(1, 0, 0)
     while (result.cross(vector).equivalent(Vector3.zero))
-        result = new Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1).normalize()
+        result = new Vector3(random() * 2 - 1, random() * 2 - 1, random() * 2 - 1).normalize()
     return result
 }
 
