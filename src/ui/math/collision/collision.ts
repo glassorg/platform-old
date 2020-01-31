@@ -2,6 +2,8 @@ import { SupportFunction } from "./gjkCommon";
 import Vector3 from "../Vector3";
 import gjkRaycast3 from "./gjkRaycast3";
 import { equivalent } from "..";
+import VertexElement from "../../graphics/VertexElement";
+import VertexFormat from "../../graphics/VertexFormat";
 
 export function shapeCast(supportA: SupportFunction, supportB: SupportFunction, velocityA: Vector3, velocityB: Vector3) {
     let minkowskiDiffSupport = (v: Vector3) => supportA(v).subtract(supportB(v.negate()))
@@ -27,21 +29,23 @@ export function supportFace(support: SupportFunction, normal: Vector3, samples =
                 .add(thumb.scale(v))
         )
 
-        // let collinear = false
+        let collinear = false
         let vs = vertices
         let vc = vs.length
         // if (vc > 1)
         //     collinear = vertex.subtract(vs[vc - 1])
         //         .cross(vs[vc - 1].subtract(vs[vc - 2]))
         //         .equivalent(Vector3.zero)
-
-        // if (collinear)
-        //     vs[vc - 1] = vertex
-        if (i == 0 || !vertex.equivalent(vs[vc - 1]))
+        let beenDone = i > 0 && (vertex.equivalent(vs[vc - 1]) || vertex.equivalent(vs[0]))
+        if (collinear)
+            vs[vc - 1] = vertex
+        else if (!beenDone)
             vs.push(vertex)
     }
     return vertices
 }
 
 export function supportContactManifold(supportA: SupportFunction, supportB: SupportFunction, normal: Vector3) {
+    let faceA = supportFace(supportA, normal)
+    let faceB = supportFace(supportB, normal.negate())
 }
