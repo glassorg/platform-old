@@ -3,13 +3,11 @@ import { clamp } from ".."
 
 function getPlaneNormal(polyA: Vector3[], polyB: Vector3[]) {
     let firstThreeVertices: Vector3[] = []
-    for (let v of polyA) {
-        if (firstThreeVertices.length == 3) break
-        firstThreeVertices.push(v)
-    }
-    for (let v of polyB) {
-        if (firstThreeVertices.length == 3) break
-        firstThreeVertices.push(v)
+    for (let poly of [polyA, polyB]) {
+        for (let v of poly) {
+            if (firstThreeVertices.length == 3) break
+            firstThreeVertices.push(v)
+        }
     }
 
     let [a, b, c] = firstThreeVertices
@@ -94,12 +92,11 @@ export default function intersectPolygon(polyA: Vector3[], polyB: Vector3[]) {
     }
 
     let vertices = allIntersections()
-    for (let v of polyA)
-        vertices.push(v)
-    for (let v of polyB)
-        vertices.push(v)
-
-    return vertices.filter(v => containsPoint(polyA, v) && containsPoint(polyB, v))
+    for (let poly of [polyA, polyB])
+        for (let v of poly)
+            if (containsPoint(polyA, v) && containsPoint(polyB, v))
+                vertices.push(v)
+    return vertices
 }
 
 // export function sweepIntersectPolygon(polyA: Vector3[], polyB: Vector3[]) {
