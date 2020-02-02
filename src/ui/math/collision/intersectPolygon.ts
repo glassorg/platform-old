@@ -28,12 +28,29 @@ function intersection(a0: Vector3, a1: Vector3, b0: Vector3, b1: Vector3, planeN
     let t = diff.dot(n) / ah.dot(n)
     if (!Number.isFinite(t))
         return null
+    let point = a0.add(ah.scale(t))
+    if (!lineContainsPoint(a0, a1, point) || !lineContainsPoint(b0, b1, point))
+        return null
     return a0.add(ah.scale(t))
+}
+
+function distanceSquaredFromLine(a: Vector3, b: Vector3, p: Vector3) {
+    let ap = p.subtract(a)
+    let ab = b.subtract(a)
+    let h = clamp(ap.dot(ab) / ab.lengthSquared(), 0, 1)
+    return ap.subtract(ab.scale(h)).lengthSquared()
+}
+
+const epsilon = 0.001
+function lineContainsPoint(a: Vector3, b: Vector3, p: Vector3) {
+    return distanceSquaredFromLine(a, b, p) < epsilon
 }
 
 function getCyc(arr, index) { return arr[index % arr.length] }
 
 // This is O(n^2), but we expect a max of 16 vertices. We should still find an more efficient solution.
+// This is not a completely general intersction algorithm, it assumes that the polygons are convex, coplanar, and overlapping.
+// This is only intended for contact manifold generation where these conditions are guaranteed.
 export default function intersectPolygon(polyA: Vector3[], polyB: Vector3[]) {
     if (polyA.length == 1)
         return polyA
@@ -41,13 +58,6 @@ export default function intersectPolygon(polyA: Vector3[], polyB: Vector3[]) {
         return polyB
 
     let planeNormal = getPlaneNormal(polyA, polyB)
-
-    function lineContainsPoint(a: Vector3, b: Vector3, p: Vector3) {
-        let ap = p.subtract(a)
-        let ab = b.subtract(a)
-        let h = clamp(ap.dot(ab) / ab.lengthSquared(), 0, 1)
-        return ap.subtract(ab.scale(h)).lengthSquared() < 0.001
-    }
 
     function containsPoint(poly: Vector3[], point: Vector3) {
         if (poly.length == 2)
@@ -60,15 +70,18 @@ export default function intersectPolygon(polyA: Vector3[], polyB: Vector3[]) {
             let curChirality = Math.sign(ab.cross(ap).dot(planeNormal))
             if (curChirality == 0) continue
             chirality = chirality || curChirality
-            if (chirality != curChirality) return false
+            if (chirality != curChirality && !lineContainsPoint(a, b, point)) return false
         }
         return true
     }
 
+    // Because the polygons are convex, this returns a max of 2 intersections.
     function allIntersections() {
         let result: Vector3[] = []
-        for (let i = 0; i < polyA.length; i++) {
-            for (let j = 0; j < polyB.length; j++) {
+        let polyAEdgeCount = polyA.length == 2 ? 1 : polyA.length
+        let polyBEdgeCount = polyB.length == 2 ? 1 : polyB.length
+        for (let i = 0; i < polyAEdgeCount; i++) {
+            for (let j = 0; j < polyBEdgeCount; j++) {
                 let v = intersection(
                     polyA[i], getCyc(polyA, i + 1),
                     polyB[j], getCyc(polyB, j + 1),
@@ -90,7 +103,7 @@ export default function intersectPolygon(polyA: Vector3[], polyB: Vector3[]) {
 }
 
 // export function sweepIntersectPolygon(polyA: Vector3[], polyB: Vector3[]) {
-//     let planeNormal = preprocess(polyA, polyB)
+//     let planeNormal = getPlaneNormal(polyA, polyB)
 //     let sweepAxis = polyA[1].subtract(polyA[0])
 
 //     let sortEdges = (poly: Vector3[], edges: number[]) => edges.sort((i, j) => poly[i].dot(sweepAxis) - poly[j].dot(sweepAxis))
