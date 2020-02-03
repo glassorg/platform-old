@@ -39,7 +39,7 @@ function distanceSquaredFromLine(a: Vector3, b: Vector3, p: Vector3) {
     return ap.subtract(ab.scale(h)).lengthSquared()
 }
 
-const epsilon = 0.001
+const epsilon = 0.01
 function lineContainsPoint(a: Vector3, b: Vector3, p: Vector3) {
     return distanceSquaredFromLine(a, b, p) < epsilon
 }

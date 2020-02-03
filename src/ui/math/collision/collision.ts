@@ -1,9 +1,6 @@
 import { SupportFunction } from "./gjkCommon";
 import Vector3 from "../Vector3";
 import gjkRaycast3 from "./gjkRaycast3";
-import { equivalent } from "..";
-import VertexElement from "../../graphics/VertexElement";
-import VertexFormat from "../../graphics/VertexFormat";
 import intersectPolygon from "./intersectPolygon";
 
 export function shapeCast(supportA: SupportFunction, supportB: SupportFunction, velocityA: Vector3, velocityB: Vector3) {
@@ -14,7 +11,7 @@ export function shapeCast(supportA: SupportFunction, supportB: SupportFunction, 
 
 const ex = new Vector3(1, 0, 0)
 const ey = new Vector3(0, 1, 0)
-export function supportFace(support: SupportFunction, normal: Vector3, samples = 8, deltaNormal = 0.001) {
+export function supportFace(support: SupportFunction, normal: Vector3, samples = 8, deltaNormal = 0.01) {
     let vertices: Vector3[] = []
     normal = normal.normalize()
     let up = normal.cross(ey).equivalent(Vector3.zero) ? ex : ey
