@@ -46,6 +46,7 @@ export type Schema = {
     index?: boolean
     visible?: boolean
     editable?: boolean
+    mutable?: boolean
     required?: boolean
     coerce?(this: any, value): any
     validate?(this: any, value): any

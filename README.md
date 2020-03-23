@@ -49,6 +49,8 @@ Main glass library
     X   2D Canvas usage from within 3D.
         Text Rendering within Canvas 2D.
         3D Effects.
+
+        GLTF Loader needs to use the new Mesh class.
     
         Need ability to create/delete a Texture and update it's src
         Move the field upload implementation into the general platform data/download

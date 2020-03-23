@@ -101,9 +101,11 @@ export default class MemoryStore extends Store {
     }
 
     protected setValue(key: Key, value: Value) {
-        let currentValue = this.values.get(key.string)
-        if (value === currentValue) {
-            return false
+        if (key.type?.mutable != true) {
+            let currentValue = this.values.get(key.string)
+            if (value === currentValue) {
+                return false
+            }
         }
 
         if (Key.isModelKey(key)) {

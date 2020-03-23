@@ -18,6 +18,11 @@ function get4ByteComponentTypeArray(vertexFormat: VertexFormat) {
             for (let i = 0; i < element.size; i++) {
                 array.push(false)
             }
+        } else if (element.type === GL.UNSIGNED_BYTE) {
+            if (element.size !== 4) {
+                throw new Error(`UNSIGNED_BYTE type must come in vector size 4`)
+            }
+            array.push(false)
         } else {
             throw new Error(`Unsupported type: ${element.type}`)
         }
