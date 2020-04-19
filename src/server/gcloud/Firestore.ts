@@ -106,6 +106,7 @@ export default class Firestore extends Database {
                 batch.set(docRef, values)
             }
         }
+        console.log(`Firestore.put ${entities.length} documents.`)
         await batch.commit()
     }
 }
