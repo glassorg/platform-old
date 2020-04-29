@@ -2,8 +2,8 @@ import Vector3 from "../Vector3";
 import { SupportFunction, nonMultiple, checkEdge, normalForEdge, checkFace, checkTriangleEdge, normalForFace, raycastTriangle } from "./gjkCommon";
 import { equivalent, randomNumberGenerator } from "..";
 
-// This method projects a 3D shape onto a plane normal to heading passing through the origin, performs 2D GJK on this shape.
-// If this finds a triangle containing the ray origin, than the ray passes through the 3D shape.
+// This method projects a 3D shape onto a plane normal to 'heading', and passing through the origin. It then performs 2D GJK on this shape.
+// If this finds a triangle containing the ray origin, then the ray passes through the 3D shape.
 export function silhouetteGjk(support: SupportFunction, heading: Vector3, debug?: any) {
     function project(vector: Vector3) { return heading.rejection(vector) }
     const random = randomNumberGenerator()
