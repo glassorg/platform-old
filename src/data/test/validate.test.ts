@@ -149,6 +149,6 @@ test("class", t => {
 })
 
 test("User.email", t => {
-    t.throws(() => new User({ key: Key.create(User, "invalid email"), name: "Kris", mobile: "1111111111", passwordHash: "" }))
-    t.notThrows(() => new User({ key: Key.create(User, "valid@email.com"), name: "Kris", mobile: "1111111111", passwordHash: "" }))
+    t.throws(() => new User({ key: Key.create(User, "invalid email"), email: "invalid email" }))
+    t.notThrows(() => new User({ key: Key.create(User, "valid@email.com"), email: "valid@email.com" }))
 })
