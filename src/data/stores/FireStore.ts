@@ -5,7 +5,7 @@ import Serializer from "../Serializer"
 import Namespace from "../Namespace"
 import Record from "../../data/Record"
 import * as common from "../../utility/common"
-import {Firestore as GoogleFirestore, Query as GoogleQuery, DocumentReference, DocumentSnapshot, SetOptions} from "@google-cloud/firestore"
+import {Firestore as GoogleFirestore, Query as GoogleQuery, DocumentReference, DocumentSnapshot, SetOptions, WhereFilterOp} from "@google-cloud/firestore"
 import { Schema } from "../../data/schema"
 
 const serializedProperty = "_"
@@ -87,8 +87,11 @@ export function toGoogleQuery(db: firebase.firestore.Firestore, key: Key) {
             for (const name in where) {
                 const value = where[name]
                 if (typeof value === "object") {
-                    const op: any = Object.keys(value || {})[0]
-                    gquery = gquery.where(name, op, where[name])
+                    for (let op in value) {
+                        // convert op to google format
+                        let googleOp = op === "contains" ? "array-contains" : op as WhereFilterOp
+                        gquery = gquery.where(name, googleOp, value[op])
+                    }
                 } else {
                     gquery = gquery.where(name, "==", where[name])
                 }

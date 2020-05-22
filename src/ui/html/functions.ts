@@ -34,10 +34,11 @@ export function getFormValues(element: HTMLFormElement) {
     let values: any = {}
     // TODO: improve this to query from some class indicator of field
     for (let input of element.querySelectorAll("input")) {
-        values[input.name] = input.value
+        values[input.name || input.id] = input.value
     }
     return values
 }
+
 
 function isForm(element: HTMLElement) {
     return element instanceof HTMLFormElement

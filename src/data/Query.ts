@@ -10,6 +10,7 @@ const ops = {
     "<" : (a, b) => a < b,
     ">=": (a, b) => a >= b,
     "<=": (a, b) => a <= b,
+    "contains": (a, b) => Array.isArray(a) && a.indexOf(b) >= 0,
 }
 
 type Ascending = true

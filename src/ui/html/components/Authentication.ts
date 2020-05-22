@@ -6,9 +6,9 @@ import User from "../../../model/User"
 
 export type AuthProperties = {
     signInSuccessUrl?: string,
-    termsOfServiceUrl: string
-    privacyPolicyUrl: string,
-    content: (() => void),
+    termsOfServiceUrl?: string
+    privacyPolicyUrl?: string,
+    content: ((user: User) => void),
 }
 
 function showSignIn(p: AuthProperties) {
@@ -28,10 +28,10 @@ function showSignIn(p: AuthProperties) {
         // tosUrl and privacyPolicyUrl accept either url string or a callback
         // function.
         // Terms of service url/callback.
-        tosUrl: p.termsOfServiceUrl,
+        tosUrl: p.termsOfServiceUrl ?? "/terms.html",
         // Privacy policy url/callback.
         privacyPolicyUrl: function() {
-            window.location.assign(p.privacyPolicyUrl);
+            window.location.assign(p.privacyPolicyUrl ?? "/privacy.html");
         }
     };
 
@@ -67,7 +67,7 @@ export default Context.component(function AuthHeader(c: Context, p: AuthProperti
                     content: `Logout`
                 })
 
-                p.content()
+                p.content(user)
             }
             else {
                 showSignIn(p)
