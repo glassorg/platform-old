@@ -2,16 +2,20 @@ import * as firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
 
-type App = firebase.app.App
-let app: App | null = null
-
-export async function getApp(): Promise<App> {
-    if (app == null) {
-        const config = await (await fetch("/api/firebase/config")).json()
-        if (config.apiKey == null) {
-            throw new Error("Your package.json needs a webConfig. You can generate by creating a web app from https://console.firebase.google.com/u/0/project/<YOURPROJECTID>/settings/general/")
-        }
-        app = firebase.initializeApp(config)
+export type FirebaseApp = firebase.app.App
+export type FirebaseConfig = {
+    configSource: String,
+    webConfig: {
+        apiKey: String,
+        authDomain: String,
+        databaseURL: String,
+        projectId: String,
+        storageBucket: String,
+        messagingSenderId: String,
+        appId: String,
     }
-    return app
+};
+
+export function initializeApp(config: FirebaseConfig) {
+    return firebase.initializeApp(config)
 }

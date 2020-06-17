@@ -1261,6 +1261,11 @@
     webpack-cli "^3.1.2"
     webpack-dev-server "^3.1.10"
 
+"@glas/test@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@glas/test/-/test-1.0.3.tgz#f2d1780aed3bb42b34de27920fee27f7f86d02df"
+  integrity sha512-SJqhXBwN48D60njrq544fxowiqrFivQ9FfgeHYyCNv99p72KE19kFDXY1aqsAY7MN9hnBS3P+0/3VBqhVw92Bw==
+
 "@google-cloud/common@^0.31.0":
   version "0.31.1"
   resolved "https://registry.yarnpkg.com/@google-cloud/common/-/common-0.31.1.tgz#ab8da218b0a435c396807d1fb6fe7a7854ce9a1f"

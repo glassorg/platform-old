@@ -6,7 +6,7 @@ import apiRouter from "./apiRouter"
 import path from "path"
 import fs from "fs"
 import methodEmulator from "./methodEmulator"
-import bodyParser = require("body-parser")
+import bodyParser from "body-parser"
 import Namespace, { isNamespace } from "../data/Namespace"
 import IdentityProvider from "./IdentityProvider"
 import Firestore from "./gcloud/Firestore"

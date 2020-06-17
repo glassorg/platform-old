@@ -2,14 +2,15 @@ import Store from "../data/Store";
 import * as DefaultStore from "../data/stores/DefaultStore";
 import FireStore from "../data/stores/FireStore";
 import Namespace from "../data/Namespace";
-import { getApp } from "./Firebase";
+import { FirebaseConfig, initializeApp } from "./Firebase";
 import * as firebase from "firebase/app";
-import ServerStore from "../data/stores/ServerStore";
 import User from "../model/User";
+import MemoryStore from "../data/stores/MemoryStore";
+import Context from "../ui/Context";
 
 type Options = {
-    namespace: Namespace
-    firestore?: boolean
+    namespace: Namespace,
+    firebase?: FirebaseConfig,
 }
 
 function updateUser() {
@@ -31,14 +32,11 @@ function updateUser() {
     }
 }
 
-export async function init(options: Options): Promise<boolean> {
+export function init(options: Options): Promise<boolean> {
     const { namespace } = options
     Store.default = DefaultStore.create({
-        server: options.firestore ? new FireStore(namespace, await getApp()) : new ServerStore()
+        server: options.firebase ? new FireStore(namespace, initializeApp(options.firebase)) : new MemoryStore()
     })
-
-    // after database creation, let's check on user status.
-    // updateUser()
 
     return new Promise((resolve, reject) => {
         firebase.auth().onAuthStateChanged(
@@ -52,4 +50,13 @@ export async function init(options: Options): Promise<boolean> {
             }
         );
     })
+}
+
+export async function bind(options: Options, render: (c: Context) => void, selector = "app") {
+    await init(options)
+    const element = document.querySelector(selector) as HTMLElement
+    if (element == null) {
+        throw new Error(`Element not found ${selector}`)
+    }
+    Context.bind(render, undefined, element)
 }
