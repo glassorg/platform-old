@@ -2,15 +2,14 @@ import Store from "../data/Store";
 import * as DefaultStore from "../data/stores/DefaultStore";
 import FireStore from "../data/stores/FireStore";
 import Namespace from "../data/Namespace";
-import { FirebaseConfig, initializeApp } from "./Firebase";
+import { getApp, FirebaseConfig } from "./Firebase";
 import * as firebase from "firebase/app";
+import ServerStore from "../data/stores/ServerStore";
 import User from "../model/User";
-import MemoryStore from "../data/stores/MemoryStore";
-import Context from "../ui/Context";
 
 type Options = {
-    namespace: Namespace,
-    firebase?: FirebaseConfig,
+    namespace: Namespace
+    firebase: FirebaseConfig
 }
 
 function updateUser() {
@@ -32,31 +31,27 @@ function updateUser() {
     }
 }
 
-export function init(options: Options): Promise<boolean> {
+export async function init(options: Options): Promise<boolean> {
     const { namespace } = options
     Store.default = DefaultStore.create({
-        server: options.firebase ? new FireStore(namespace, initializeApp(options.firebase)) : new MemoryStore()
+        server: options.firebase ? new FireStore(namespace, getApp(options.firebase)) : new ServerStore()
     })
 
     return new Promise((resolve, reject) => {
-        firebase.auth().onAuthStateChanged(
-            function (user) {
-                updateUser()
-                resolve(true)
-            },
-            function (error) {
-                console.log(error)
-                resolve(false)
-            }
-        );
+        if (options.firebase) {
+            firebase.auth().onAuthStateChanged(
+                function (user) {
+                    updateUser()
+                    resolve(true)
+                },
+                function (error) {
+                    console.log(error)
+                    resolve(false)
+                }
+            );
+        }
+        else {
+            resolve(true)
+        }
     })
-}
-
-export async function bind(options: Options, render: (c: Context) => void, selector = "app") {
-    await init(options)
-    const element = document.querySelector(selector) as HTMLElement
-    if (element == null) {
-        throw new Error(`Element not found ${selector}`)
-    }
-    Context.bind(render, undefined, element)
 }
