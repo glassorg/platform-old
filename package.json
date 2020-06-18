@@ -1,6 +1,6 @@
 {
     "name": "@glas/platform",
-    "version": "0.1.71",
+    "version": "0.1.72",
     "main": "lib/index.js",
     "repository": "https://github.com/glassorg/platform.git",
     "author": "Kris Nye <krisnye@gmail.com>",
