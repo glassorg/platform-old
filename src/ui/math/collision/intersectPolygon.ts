@@ -73,7 +73,7 @@ export default function intersectPolygon(polyA: Vector3[], polyB: Vector3[]) {
         return true
     }
 
-    // Because the polygons are convex, this returns a max of 2 intersections.
+    // Because the polygons are convex, this typically returns 2 intersections.
     function allIntersections() {
         let result: Vector3[] = []
         let polyAEdgeCount = polyA.length == 2 ? 1 : polyA.length
