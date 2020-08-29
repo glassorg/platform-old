@@ -9,7 +9,7 @@ export type StateClass<T extends State> = ModelClass<T>
  */
 export default abstract class State extends Model {
 
-    get isDefault(this: State) {
+    get isDefault() {
         //  the real reason this property is here is so that the compiler will distinguish
         //  Model from State. Otherwise the overloaded methods on IStateSource.peek and get
         //  will treat all Model instances as if they are State instances.

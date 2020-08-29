@@ -5,8 +5,8 @@ import Key from "../data/Key"
 @Entity.class()
 export default class User extends Entity {
 
-    @Entity.property({ type: "string" })
-    id!: string
+    // @Entity.property({ type: "string" })
+    // id!: string
 
     @Entity.property({ type: "string" })
     name!: string

@@ -10,13 +10,13 @@ import Program from "../Program"
 
 export default class Node extends VirtualNode {
 
-    boundingShape?: BoundingShape
-    pickable?: Pickable
+    _boundingShape?: BoundingShape
+    _pickable?: Pickable
     //  the worldTransform, transforms from child space to world space
     //  worldTransform
     worldTransform = Matrix4.identity
     //  localTransform
-    transform?: Matrix4 | null
+    _transform?: Matrix4 | null
     //  effect to use when rendering this node
     _effect?: Effect | null
 
@@ -25,6 +25,27 @@ export default class Node extends VirtualNode {
     }
     public set effect(value) {
         this._effect = value
+    }
+
+    get transform() {
+        return this._transform
+    }
+    set transform(value) {
+        this._transform = value
+    }
+
+    get boundingShape() {
+        return this._boundingShape
+    }
+    set boundingShape(value) {
+        this._boundingShape = value
+    }
+
+    get pickable() {
+        return this._pickable
+    }
+    set pickable(value) {
+        this._pickable = value
     }
 
     protected calculateWorldTransform(parentTransform, localTransform) {

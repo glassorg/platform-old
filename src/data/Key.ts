@@ -9,7 +9,7 @@ import Patch, { createPatch } from "./Patch"
 import guid from "../utility/guid"
 
 export type SearchKey<T = any> = Key<T> & { id: null, query: Query<T> }
-export type ModelKey<T = any> = Key<T> & { id: string, query: null }
+export type ModelKey<T = any> = Key<T> & { id: string }
 export type StateKey<T = any> = ModelKey<T> & { schema: { default: T } }
 
 const emptyQuery = Object.freeze({})

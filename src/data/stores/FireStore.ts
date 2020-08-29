@@ -5,10 +5,16 @@ import Serializer from "../Serializer"
 import Namespace from "../Namespace"
 import Record from "../../data/Record"
 import * as common from "../../utility/common"
-import {Firestore as GoogleFirestore, Query as GoogleQuery, DocumentReference, DocumentSnapshot, SetOptions, WhereFilterOp} from "@google-cloud/firestore"
+import {Firestore as GoogleFirestore, Query as GoogleQuery, DocumentReference, DocumentSnapshot, SetOptions, WhereFilterOp, DocumentData} from "@google-cloud/firestore"
 import { Schema } from "../../data/schema"
 
 export const serializedProperty = "_"
+
+export type Snapshot = {
+    data(): any
+    ref: { path: string }
+    exists: boolean
+}
 
 export function getIndexedValues(entity: Record) {
     let values: any = {}
@@ -30,7 +36,7 @@ const getSerializer = common.memoize(
 
 function serialize(entity: Record, namespace: Namespace) {
     //  remove the type
-    let values = Object.assign({}, entity)
+    let values = Object.assign({}, entity) as any
     //  remove the key
     delete values.key
     return getSerializer(namespace).stringify(values)
@@ -48,11 +54,11 @@ export function toDocumentValues(entity: Record, namespace: Namespace) {
     return { [serializedProperty]: serialize(entity, namespace), ...getIndexedValues(entity) }
 }
 
-function getKey(namespace: Namespace, doc: firebase.firestore.QueryDocumentSnapshot) {
+function getKey(namespace: Namespace, doc: Snapshot) {
     return Key.parse(namespace, doc.ref.path) as ModelKey
 }
 
-export function toEntity<T extends Record>(namespace: Namespace, doc: firebase.firestore.QueryDocumentSnapshot, key: ModelKey = getKey(namespace, doc)): T | null {
+export function toEntity<T extends Record>(namespace: Namespace, doc: Snapshot, key: ModelKey = getKey(namespace, doc)): T | null {
     if (!doc.exists) {
         return null
     }
