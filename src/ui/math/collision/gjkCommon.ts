@@ -86,6 +86,7 @@ export function nonMultiple(vector: Vector3, random: RandomNumberGenerator) {
     return result
 }
 
+// https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
 export function raycastTriangle(rayOrigin: Vector3, rayHeading: Vector3, a: Vector3, b: Vector3, c: Vector3, epsilon = 0.0001) {
     let ab = b.subtract(a)
     let ac = c.subtract(a)
