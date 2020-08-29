@@ -8,7 +8,7 @@ import * as common from "../../utility/common"
 import {Firestore as GoogleFirestore, Query as GoogleQuery, DocumentReference, DocumentSnapshot, SetOptions, WhereFilterOp} from "@google-cloud/firestore"
 import { Schema } from "../../data/schema"
 
-const serializedProperty = "_"
+export const serializedProperty = "_"
 
 export function getIndexedValues(entity: Record) {
     let values: any = {}
@@ -48,11 +48,11 @@ export function toDocumentValues(entity: Record, namespace: Namespace) {
     return { [serializedProperty]: serialize(entity, namespace), ...getIndexedValues(entity) }
 }
 
-function getKey(namespace: Namespace, doc: firebase.firestore.DocumentSnapshot) {
+function getKey(namespace: Namespace, doc: firebase.firestore.QueryDocumentSnapshot) {
     return Key.parse(namespace, doc.ref.path) as ModelKey
 }
 
-export function toEntity<T extends Record>(namespace: Namespace, doc: firebase.firestore.DocumentSnapshot, key: ModelKey = getKey(namespace, doc)): T | null {
+export function toEntity<T extends Record>(namespace: Namespace, doc: firebase.firestore.QueryDocumentSnapshot, key: ModelKey = getKey(namespace, doc)): T | null {
     if (!doc.exists) {
         return null
     }

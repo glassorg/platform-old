@@ -7,9 +7,16 @@ import * as firebase from "firebase/app";
 import ServerStore from "../data/stores/ServerStore";
 import User from "../model/User";
 
-type Options = {
+export type TwilioConfig = {
+    fromPhone: string
+    account: string
+    token: string
+}
+
+export type Options = {
     namespace: Namespace
-    firebase: FirebaseConfig
+    firebase?: FirebaseConfig
+    twilio?: TwilioConfig
 }
 
 function updateUser() {

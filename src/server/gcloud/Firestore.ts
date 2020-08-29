@@ -54,11 +54,14 @@ export default class Firestore extends Database {
     public readonly projectId?: string = getProjectId()
     public readonly hardDelete: boolean = true
 
-    constructor(properties: { namespace: Namespace } & { [P in keyof Firestore]?: Firestore[P] }) {
+    constructor(
+        properties: { namespace: Namespace } & { [P in keyof Firestore]?: Firestore[P] },
+        gfirestore?: GoogleFirestore
+    ) {
         super(properties.namespace)
         Object.assign(this, properties)
         // let packageJson = getPackageJson()
-        this.gfirestore = new GoogleFirestore({ projectId: this.projectId })
+        this.gfirestore = gfirestore ?? new GoogleFirestore({ projectId: this.projectId })
     }
 
     raw(key: SearchKey, callback: RowCallback, error?: ErrorCallback) {
@@ -109,4 +112,16 @@ export default class Firestore extends Database {
         console.log(`Firestore.put ${entities.length} documents.`)
         await batch.commit()
     }
+
+    // not using the explicit doc type because of a type conflict between our firebase api and the firebase admin api
+    toEntity<T extends Record>(doc: { data(): any }): T {
+        return toEntity(this.namespace, doc as any) as T
+    }
+
+    // not used yet, may provide if needed
+    private toDocumentValues(entity: Record) {
+        return toDocumentValues(entity, this.namespace)
+    }
+
+
 }
