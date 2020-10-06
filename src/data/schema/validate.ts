@@ -57,7 +57,7 @@ export default function validate(schema: Schema, value, root = value, path: stri
                     errors.push(`${path.join(".")} is not valid type: ${type.join('|')}`)
                 }
             } else if (!isValidType(type, value)) {
-                errors.push(`${path.join(".")} is not valid type: ${type}`)
+                errors.push(`${path.join(".")} is not valid type: ${type}, value: ${JSON.stringify(value)}`)
             }
         }
         if (value != null) {

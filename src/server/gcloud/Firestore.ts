@@ -8,6 +8,7 @@ import { Schema } from "../../data/schema"
 import Serializer from "../../data/Serializer"
 import getPackageJson, { getProjectId } from "../getPackageJson"
 import { toDocumentValues, toEntity } from "../../data/stores/FireStore"
+import TimeStamp from "../../data/TimeStamp"
 
 export function toGoogleQuery(db: GoogleFirestore, key: Key) {
     let { parent, type, query } = key
@@ -25,6 +26,7 @@ export function toGoogleQuery(db: GoogleFirestore, key: Key) {
             for (const sort of query.sort) {
                 for (const name in sort) {
                     if (sort.hasOwnProperty(name)) {
+                        // console.log(">>>>>> SORT", name, sort[name])
                         gquery = gquery.orderBy(name, sort[name] ? "asc" : "desc")
                     }
                 }
@@ -45,7 +47,17 @@ export function toGoogleQuery(db: GoogleFirestore, key: Key) {
         }
     }
 
+    // console.log(key.toString() + ":", gquery)
+
     return gquery
+}
+
+export function stamp(record: Record, time = new Date().toISOString(), by = "SERVER") {
+    const timestamp = new TimeStamp({ time, by })
+    return record.clone({
+        created: record.created ?? timestamp,
+        updated: timestamp
+    })
 }
 
 export default class Firestore extends Database {
@@ -82,8 +94,8 @@ export default class Firestore extends Database {
             let records: T[] = []
             gquery.stream().on('data', (doc) => {
                 try {
-                    // records.push(toEntity<T>(this.namespace, doc)!)
-                    records.push(doc)
+                    records.push(toEntity<T>(this.namespace, doc)!)
+                    // records.push(doc)
                 } catch (e) {
                     reject(error = e)
                 }
@@ -101,6 +113,8 @@ export default class Firestore extends Database {
     async put(entities: Record[]) {
         let batch = this.gfirestore.batch()
         for (let entity of entities) {
+            // timestamp each entity
+            entity = stamp(entity)
             let docRef = this.gfirestore.doc(entity.key.toString())
             if (entity.deleted && this.hardDelete) {
                 batch.delete(docRef)
@@ -109,7 +123,7 @@ export default class Firestore extends Database {
                 batch.set(docRef, values)
             }
         }
-        console.log(`Firestore.put ${entities.length} documents.`)
+        console.log(`Firestore.put\n${entities.map(e => `    ${e.key}`).join(`\n`)}`)
         await batch.commit()
     }
 

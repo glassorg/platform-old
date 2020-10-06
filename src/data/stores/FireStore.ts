@@ -5,7 +5,7 @@ import Serializer from "../Serializer"
 import Namespace from "../Namespace"
 import Record from "../../data/Record"
 import * as common from "../../utility/common"
-import {Firestore as GoogleFirestore, Query as GoogleQuery, DocumentReference, DocumentSnapshot, SetOptions, WhereFilterOp, DocumentData} from "@google-cloud/firestore"
+import {Firestore as GoogleFirestore, Query as GoogleQuery, WhereFilterOp} from "@google-cloud/firestore"
 import { Schema } from "../../data/schema"
 
 export const serializedProperty = "_"
@@ -21,7 +21,9 @@ export function getIndexedValues(entity: Record) {
     let deleted = entity.deleted != null
     common.traverse(entity, entity.constructor as Schema, (value, schema, ancestors, path) => {
         if (schema.index && (!deleted || path[0] === "deleted")) {
-            let name = path.join(".")
+            //  initially we used ".", but that prevents queries from working
+            //  in google firestore
+            let name = path.join("_")
             values[name] = value
         }
     })

@@ -47,6 +47,10 @@ export default class Model {
         }
     }
 
+    clone(properties: { [P in keyof this]?: this[P] }) {
+        return new (this.constructor as any)(this, properties)
+    }
+
     public static ValidateAndFreezeOnConstruction = true //typeof window !== "undefined"
 
     validate() {

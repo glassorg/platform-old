@@ -39,10 +39,10 @@ const getSerializer = common.memoize(
 
 function serialize(entity: Record, namespace: Namespace) {
     return getSerializer(namespace).stringify(entity)
-    let values = JSON.parse(getSerializer(namespace).stringify(entity))
-    delete values[typeKey]
-    delete values[Record.properties.key!.id!.valueOf()]
-    return JSON.stringify(values)
+    // let values = JSON.parse(getSerializer(namespace).stringify(entity))
+    // delete values[typeKey]
+    // delete values[Record.properties.key!.id!.valueOf()]
+    // return JSON.stringify(values)
 }
 
 function deserialize(key: ModelKey, serialized: string, namespace: Namespace) {
@@ -175,7 +175,7 @@ export default class Datastore extends Database {
         if (gentity == null) {
             return null
         }
-        let gkey = gentity[GDatastore.KEY]
+        // let gkey = gentity[GDatastore.KEY]
         let compressedData = gentity[serializedProperty]
         let decompressed = compression.deflate.decompress(compressedData)
         return decompressed

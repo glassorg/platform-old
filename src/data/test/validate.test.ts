@@ -47,21 +47,21 @@ Model.ValidateAndFreezeOnConstruction = true
 
 test("can construct valid model", t => {
     t.notThrows(() => {
-        let modified = { by: "kody.j.king@gmail.com", date: Date.parse("1995-09-25T12:00:00") }
+        let modified = { by: "kody.j.king@gmail.com", time: Date.parse("1995-09-25T12:00:00") }
         new ValidatePerson({ key: "ValidatePerson/kody", name: "Kody King  ", birthDate: "1995-09-25", favoriteNumber: 8, created: modified, updated: modified, array: [12, 20, 13], customValue: "foo" })
     })
 })
 
 test("can not construct invalid model", t => {
     t.notThrows(() => {
-        let modified = { by: "kody.j.king@gmail.com", date: Date.parse("1995-09-25T12:00:00") }
+        let modified = { by: "kody.j.king@gmail.com", time: Date.parse("1995-09-25T12:00:00") }
         new ValidatePerson({ key: "ValidatePerson/kody", name: "Kody King  ", birthDate: "1995-09-25", favoriteNumber: 8, created: modified, updated: modified, array: [12, 20, 13], customValue: "foo" })
     })
 })
 
 test("additional property should throw", t => {
     t.throws(() => {
-        let modified = { by: "kody.j.king@gmail.com", date: Date.parse("1995-09-25T12:00:00") }
+        let modified = { by: "kody.j.king@gmail.com", time: Date.parse("1995-09-25T12:00:00") }
         new ValidatePerson({ key: "ValidatePerson/kody", name: "Kody King", birthDate: "1995-09-25", favoriteNumber: 8, created: modified, updated: modified, array: [12, 20, 13], additional: "property" })
     })
 })

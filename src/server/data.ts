@@ -1,14 +1,17 @@
 import { Request, Response, response } from "express"
-import * as webServer from "../../server/webServer"
-import Firestore from "../../server/gcloud/Firestore"
-import Key from "../../data/Key"
-import Entity from "../../data/Entity"
-import Patch, { createPatch } from "../../data/Patch"
-import Model from "../../data/Model"
-import clonePatch from "../../utility/clonePatch"
-import Serializer from "../../data/Serializer"
+import * as webServer from "./webServer"
+import Firestore from "./gcloud/Firestore"
+import Key from "../data/Key"
+import Entity from "../data/Entity"
+import Patch, { createPatch } from "../data/Patch"
+import Model from "../data/Model"
+import clonePatch from "../utility/clonePatch"
+import Serializer from "../data/Serializer"
 
-const database = webServer.instance.database
+//  THIS WAS MOVED FROM THE OLD www/api WHICH WAS UNSECURE
+//  THIS IS IN DIRE NEED OF SOME REFACTORING
+
+export const database = webServer.instance.database
 
 function sendError(error, res, status = 500) {
     console.log(`api/data/query streaming error`, error)

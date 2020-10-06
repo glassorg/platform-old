@@ -107,6 +107,12 @@ export const date: Schema = {
     }
 }
 
+export const datetimeString: Schema = {
+    type: "string",
+    format: "date-time",
+    pattern: /^\d{4}-(0[1-9]|10|11|12)-(0[1-9]|[1-2][0-9]|30|31)T(([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-9][0-9](\.[0-9]{1,3}Z?)?)|24:00:00$/,
+}
+
 export const datetime: Schema = {
     ...number,
     format: "date-time",
