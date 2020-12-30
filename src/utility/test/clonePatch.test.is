@@ -1,0 +1,28 @@
+import assert
+    strict as assert
+import ..clonePatch
+
+data class Foo
+    var foo = 10
+
+data class Bar
+    var bar = 10
+
+let foo = new Foo({ x: 1, y: 2, bar: new Bar({ a: 10, b: 20 }) })
+let foo2 = clonePatch(foo, {x: 5, bar: { b: 40 }})
+assert.deepEqual(foo2, new Foo({ x: 5, y: 2, bar: new Bar({ a: 10, b: 40 }) }))
+assert(clonePatch(foo, null) is Null)
+assert(clonePatch(foo, {}) == foo)
+assert(clonePatch(foo, "foo") == "foo")
+assert(clonePatch(foo, 12) == 12)
+assert(clonePatch(foo, false) == false)
+assert.deepEqual(clonePatch([1, 2], { "2": 3 }), [1, 2, 3])
+let bar = new Foo({ x: 10 })
+let bar2 = clonePatch(bar, { x: null })
+assert.deepEqual(bar2, new Foo({}))
+// make sure a delete value command like bar: null can'assert slip through into value
+assert.deepEqual(clonePatch({}, { foo: { bar: null} }), {foo: {}})
+// make sure empty object assigned to null or undefined yields an empty object
+assert.deepEqual(clonePatch(null, {}), {})
+assert.deepEqual(clonePatch(undefined, {}), {})
+

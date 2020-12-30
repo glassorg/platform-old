@@ -1,0 +1,56 @@
+import assert
+    strict as assert
+import ..Model
+import ..Entity
+import ..Namespace
+import ..Key
+    IdentityKey
+import ...utility.clonePatch
+
+data class Person extends Entity
+    var name: String
+
+data class Pet extends Entity
+    var name: String
+
+let namespace = new Namespace(Person, Pet)
+
+let owner = Key.create(Person, "kris")
+
+assert(owner is IdentityKey)
+assert.deepEqual(owner.parent, null)
+assert.deepEqual(owner.query, null)
+assert.deepEqual(owner.id, "kris")
+assert.deepEqual(owner.toString(), "Person/kris")
+
+let pet1 = Key.parse(namespace, owner, Pet, "fido")
+assert.deepEqual(pet1.toString(), "Person/kris/Pet/fido")
+assert.deepEqual(pet1.parent, owner)
+
+let petSearch = Key.parse(namespace, owner, Pet, { where: { name: "Fido" } })
+assert.deepEqual(petSearch.toString(), "Person/kris/Pet?{\"where\":{\"name\":\"Fido\"}}")
+
+assert.throws()
+    -> new Key()
+assert.throws()
+    -> new Key({})
+assert.throws()
+    -> new Key({ type: 12 })
+// not throws
+new Key({ type: Number })
+type Whole = Integer & >= 0
+new Key({ type: Whole })
+
+//     // test query paths
+// let name = Key.create(Person, "Kris", ["name"])
+// assert.deepEqual(name.toString(), "Person/Kris?{\"path\":[\"name\"]}")
+// let kris = new Person({ id: "Kris", name: "Kris Nye" })
+// assert.deepEqual(name.get(kris), "Kris Nye")
+//     assert.deepEqual(name.patch(kris, "Kris Nilsen"), new Person({ id: "Kris", name: "Kris Nilsen" }))
+//     assert.deepEqual(clonePatch(kris, name.patch("Foo")), new Person({ id: "Kris", name: "Foo" }))
+
+//     assert.deepEqual(name, Key.parse(namespace, "Person/Kris?name"))
+//     assert.deepEqual(name, Key.parse(namespace, "Person/Kris?/name"))
+
+
+// })

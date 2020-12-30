@@ -1,0 +1,25 @@
+
+export type Primitive = Null | String | Number | Boolean
+
+export type PlainObject = .constructor == Object
+export let EmptyObject = new Type()
+    isEmptyObject(value) ->
+        for _ in value
+            return false
+        return true
+
+export let deepFreeze = (value) ->
+    if value is Primitive
+        for property in value
+            deepFreeze(value[property])
+        Object.freeze(value)
+    return value
+
+export let memoize = (fn, cache: Map = new Map()) ->
+    return
+        (arg) ->
+            var result = cache.get(arg)
+            if result is Undefined
+                result = fn.apply(this, arguments)
+                cache.set(arg, result)
+            return result

@@ -1,0 +1,189 @@
+
+import ..utility.common
+    deepFreeze
+    PlainObject
+    EmptyObject
+    memoize
+
+import .Query
+import .Model
+import .Namespace
+import .defaultNamespace
+import .JSONPointer.*
+import ..utility.guid
+
+export type QueryKey = Key & .id is Null
+export type IdentityKey = Key & .id isnt Null
+
+let emptyQuery = Object.freeze({})
+
+let match = (regex, map, text) ->
+    let result = regex.exec(text)
+    if result is Null
+        return null
+    return
+        {}
+            for [key, index] in map
+                let value = result[index]
+                if value isnt Null
+                    [key]: value
+
+//                (parent                    )     (type      )   (id       )       (query )
+let keyRegex = /^((([^\/\?#]+\/[^\/\?#]+\/?)+)\/)?(([^\/\?#]+)(\/([^\/\?#]*))?)?(\?(.*))?$/i
+let keyMap = {}
+    parent: 2
+    type: 5
+    id: 7
+    query: 9
+
+let parseKey = (key) ->
+    let result = match(keyRegex, keyMap, key)
+    if result is Null
+        throw new Error("Invalid key: " + key)
+    let { query } = result
+    if query
+        if (query[0] == "{")
+            let x = 12
+            try
+                result.query = JSON.parse(query)
+            catch e
+                throw new Error("Invalid key query: " + key + ", " + e)
+        else
+            result.query = { path: JSONPointer.parse(query) }
+    return result
+
+let stringify = (steps: Array) ->
+    let buffer = []
+    for step in steps
+        // if step is Array
+        //     // ?path/to/a/field => { path: ["path", "to", "a", "field"] }
+        //     step = { pointer: step }
+        if step is PlainObject
+            buffer.push("?", JSON.stringify(step))
+        else if step isnt Null
+            if buffer.length > 0
+                buffer.push("/")
+            if step is Type
+                buffer.push(step.name)
+            else
+                buffer.push(step.toString())
+    return buffer.join("")
+
+let keyToString = memoize()
+    (key: Key) -> stringify([key.parent, key.type, key.id, key.query])
+
+export let isProbablyIdentityKey = (value: string) ->
+    if value is Null
+        return false
+    var slashes = 0
+    let slashCode = "/".charCodeAt(0)
+    for i in 0 .. value.length
+        if value.charCodeAt(i) == slashCode
+            slashes += 1
+    return (slashes % 2 == 1) && keyRegex.test(value)
+
+export let isPossibleMatch = (query: QueryKey, key: IdentityKey) ->
+    return
+        &&
+            query.type == key.type
+            query.parent?.toString() == key.parent?.toString()
+
+export default data class Key
+
+    var parent: Key | Null = null
+    var type: Type
+    // public readonly type: ModelClass<T> | null
+    var id: String | Null = null
+    var query: Query | Null = null
+    // var string: String
+    // var path: String
+    // let toString = () =>
+    //     return memoize
+
+    let toString = -> keyToString(this)
+    let toJSON = -> this.toString()
+
+    static let create = (...args) ->
+        var parent: IdentityKey | Null = null
+        var type: Type | Null = null
+        var id: String | Null = null
+        var query: Query | Null = null
+        var i = 0
+        if args[i] is IdentityKey
+            parent = args[i++]
+        if args[i] is Type
+            type = args[i++]
+        else
+            throw new Error("Not a valid Type: " + args[i])
+        if args[i] is Null
+            id = guid()
+        if args[i] is String
+            id = args[i++]
+        if args[i] is PlainObject
+            query = args[i++]
+        if args[i] is Array
+            query = { path: args[i++] }
+        return new Key({ parent, type, id, query })
+
+    static let parse = (...steps) ->
+        //  get namespace, possibly consuming first step
+        var namespace: Namespace
+        let first = steps[0]
+        if first is Namespace
+            namespace = first
+            steps.shift()
+        else
+            namespace = defaultNamespace
+        //  get the text of the key
+        let text = stringify(steps)
+        //  parse it
+        let props = parseKey(text)
+        //  pull out the properties
+        var parent: IdentityKey | Null = null
+        var type: Type
+        var id: String | Null = null
+        var query: Query | Null = null
+        if props.type
+            let foundType = namespace[props.type]
+            if (foundType == null)
+                throw new Error("Type not found in namespace: " + props.type + ". Did you forget @Model.register()")
+            type = foundType
+        else
+            throw new Error("Type is required")
+        if props.parent
+            parent = Key.parse(namespace, props.parent)
+        if props.query
+            //  TODO: Really should completely normalize query
+            //  so that equivalent queries always match string format
+            if (props.query && props.query.where is EmptyObject)
+                delete props.query.where
+            query = deepFreeze(props.query)
+        if props.id
+            id = props.id
+        return new Key({ parent, type, id, query })
+
+//     get(model: T) {
+//         return JSONPointer.get(model, this.query.path)
+//     }
+
+//     /**
+//      * Creates a patch using the query.path and the value.
+//      */
+//     patch(value): Patch<T>
+//     /**
+//      * Applies a patch to the model using the query.path and the value.
+//      */
+//     patch(model: T, value): T
+//     patch(modelOrValue: T | any, value?) {
+//         if (arguments.length == 1) {
+//             return createPatch(this.query.path, modelOrValue)
+//         }
+//         else {
+//             return JSONPointer.patch(modelOrValue, this.query.path, value)
+//         }
+
+//     }
+
+//     static readonly regex = keyRegex
+
+// }

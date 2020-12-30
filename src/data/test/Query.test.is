@@ -1,0 +1,14 @@
+import "assert"
+    strict as assert
+import ..Query
+    createSortCompareFunction
+
+data class Person
+    var recursive: Object
+
+let alpha   = new Person({ recursive: { name: "Alpha"   } })
+let beta    = new Person({ recursive: { name: "Beta"    } })
+let charlie = new Person({ recursive: { name: "Charlie" } })
+let unsorted = [charlie, alpha, beta]
+let sorted = unsorted.slice(0).sort(createSortCompareFunction({ sort: [{ "recursive.name": true }] }))
+assert.deepEqual(sorted, [alpha, beta, charlie])

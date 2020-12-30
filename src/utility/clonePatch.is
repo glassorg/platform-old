@@ -1,0 +1,41 @@
+import .common
+    Primitive
+    PlainObject
+    EmptyObject
+
+//  shallow clone, doesn't preserve type
+let clone = (value) ->
+    if value is Primitive
+        return value
+    if value is Array
+        return value.slice(0)
+    return { ...value }
+
+let clonePatch = (target, patch) ->
+    if patch isnt PlainObject
+        return patch
+
+    if patch is EmptyObject
+        return target ?? patch
+    
+    if target is Primitive
+        target = {}
+    
+    let cloneValues = clone(target)
+    for [property, propertyValue] in patch
+        let newValue = clonePatch(target[property], patch[property])
+        if newValue isnt Null
+            cloneValues[property] = newValue
+        else
+            delete cloneValues[property]
+
+    if target is Array || target is PlainObject
+        return cloneValues
+    return new target.constructor(cloneValues)
+
+export let fromPath = (path: Array<String | Number>, object) ->
+    if path is Null || path.length == 0
+        return object
+    return fromPath(path.slice(0, -1), { [path[path.length - 1]]: object })
+
+export default clonePatch

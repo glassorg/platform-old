@@ -1,0 +1,82 @@
+import .Key
+    QueryKey
+    IdentityKey
+
+// do we like this function type signature?
+export type Listener = (key: Key) => Void
+export type Unwatch = () => Void
+export type Callback = (value) => Void
+
+export default class Store
+    var addReadListener: (listener: Listener) => Void
+    var removeReadListener: (listener: Listener) => Void
+    var addWriteListener: (listener: Listener) => Void
+    var removeWriteListener: (listener: Listener) => Void
+    var ensureWatched: (key: Key) => boolean
+    var removeWatched: (key: Key) => boolean
+
+    var get: (key: Key, peek: Boolean) => Object | Array<Key> | Null
+    var patch: (key: IdentityKey, value) => Void
+
+    let peek = (key: Key) -> this.get(key, true)
+    let delete = (key: Key | Array<Key>) ->
+        if key is QueryKey
+            key = this.get(key)
+            if key is Null
+                throw new Error("Could not get keys to delete")
+        if key is Array
+            for k in key
+                this.patch(k, null)
+        else
+            this.patch(key, null)
+
+    let list = (key: QueryKey, peek = false) ->
+        let keys = this.get(key, peek)
+        if keys is Null
+            return
+        return
+            []
+                for itemKey in keys
+                    let item = this.get(itemKey, peek)
+                    if item isnt Null
+                        item
+
+    //  private does this matter?
+    var watchers: Map<String,Set> | Null = null
+    let watchListener = (key: Key) ->
+        let value = this.peek(key) ?? null
+        let watchers = this.watchers.get(key.toString())
+        if watchers isnt Null
+            for watcher in watchers.values()
+                watcher(value)
+
+    let watch = (key: Key, callback): Unwatch ->
+        if this.watchers is Null
+            this.watchers = new Map()
+            // TODO: Shouldn't there be a more convenient way to indicate a function needs to be bound to this?
+            this.addWriteListener(this.watchListener.bind(this))
+
+        var keyWatchers = this.watchers.get(key.toString())
+        if keyWatchers is Null
+            keyWatchers = new Set()
+            this.watchers.set(key.toString(), keyWatchers)
+        keyWatchers.add(callback)
+
+        let value = this.peek(key)
+        if value isnt Undefined
+            callback(value)
+        
+        return
+            ->
+                keyWatchers.delete(callback)
+
+//     private static _default: Store
+//     static get default(): Store {
+//         return Store._default
+//     }
+//     static set default(value: Store) {
+//         Store._default = value
+//     }
+
+// }
+

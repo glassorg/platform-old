@@ -1,0 +1,101 @@
+import ..Key
+    QueryKey
+    IdentityKey
+    isPossibleMatch
+import ...utility.clonePatch
+import ..Store
+    Listener
+import ..Namespace
+import .Table
+
+//
+// Base class for ModelSource implementations.
+// Also can serve as a simple in memory model source.
+//
+export default class MemoryStore extends Store
+
+    var tables = new Map()
+    var keys = new Map()
+    var values = new Map()
+    var writeListeners = new Set()
+    var readListeners = new Set()
+    var watched = new Set()
+
+    let getTable = (key: QueryKey) ->
+        var table = this.tables.get(key.toString())
+        if table is Null
+            table = new Table(key)
+            for ikey in this.keys.values()
+                if ikey is IdentityKey
+                    if isPossibleMatch(key, ikey)
+                        let model = this.peek(ikey)
+                        if model is Null
+                            throw new Error("Model is missing for key: " + ikey)
+                        table.update(ikey, model)
+            this.tables.set(key.toString(), table)
+        return table
+
+    let addReadListener = (listener: Listener) ->
+        this.readListeners.add(listener)
+
+    let removeReadListener = (listener: Listener) ->
+        this.readListeners.delete(listener)
+
+    let addWriteListener = (listener: Listener) ->
+        this.writeListeners.add(listener)
+
+    let removeWriteListener = (listener: Listener) ->
+        this.writeListeners.delete(listener)
+
+    let get = (key: Key, peek: Boolean = false) ->
+        // if it's a query make sure we have the corresponding table tracking changes
+        if !peek
+            this.notify(key, this.readListeners)
+            this.ensureWatched(key)
+
+        var value = this.values.get(key.toString())
+        if value is Null
+            // if it's a query key not explicitly cached then we create it.
+            if key is QueryKey
+                return this.getTable(key).getKeys(this)
+            // if a ModelClass provides a default value we return that when no value is present.
+            value = key.type.default ?? null
+        return value
+
+    let ensureWatched = (key: Key) ->
+        if this.watched.has(key.toString())
+            return false
+        this.watched.add(key.toString())
+        return true
+
+    let removeWatched = (key: Key) ->
+        return this.watched.delete(key.toString())
+
+    let patch = (key: IdentityKey, value) ->
+        value = clonePatch(this.get(key, true), value)
+        if key.type isnt Null && value isnt Null
+            if value isnt key.type
+                if key.type.coerce is Function
+                    value = key.type.coerce(value)
+                else
+                    throw new Error(value + " isnt type " + (key.type.name ?? key.type))
+
+        this.setValue(key, value)
+
+    let setValue = (key: Key, value) ->
+        if key is IdentityKey
+            if key.type isnt Null && value isnt Null
+                if value isnt key.type
+                    throw new Error(value + " isnt type " + (key.type.name ?? key.type))
+            if !this.keys.has(key.toString())
+                this.keys.set(key.toString(), key)
+            for table in this.tables.values()
+                if table.update(key, value)
+                    this.notify(table.key, this.writeListeners)
+        this.values.set(key.toString(), value)
+        this.notify(key, this.writeListeners)
+        return true
+
+    let notify = (key: Key, listeners: Set<Listener>) ->
+        for listener in listeners
+            listener(key)

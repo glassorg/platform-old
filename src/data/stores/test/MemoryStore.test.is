@@ -1,0 +1,88 @@
+import assert
+    strict as assert
+import ..MemoryStore
+import ...Model
+import ...Key
+    IdentityKey
+    QueryKey
+import ...Query
+    createPredicate
+
+type ShortName = String & == .trim() & .length <= 10
+
+let primitiveKey = Key.create(ShortName, "singleton")
+
+var store = new MemoryStore()
+var value = store.peek(primitiveKey)
+// assert.deepEqual(value, primitiveKey.type.default)
+
+store.patch(primitiveKey, "foo")
+value = store.peek(primitiveKey)
+assert.deepEqual(value, "foo")
+// make sure it validates so you cannot set invalid types
+assert.throws()
+    -> store.patch(primitiveKey, 12)
+
+data class Person extends Model
+    var name: String
+
+//  Query Peeking
+var queryKey = Key.create(Person, {})
+var persons = store.peek(queryKey)
+assert.deepEqual(persons, [])
+//  this also tests implied creation of Person via ionscript.Data.create function.
+store.patch(Key.create(Person, "Kris"), { name: "Kris" })
+persons = store.peek(queryKey)
+assert.deepEqual(JSON.stringify(persons), JSON.stringify(["Person/Kris"]))
+store.patch(Key.create(Person, "Kody"), { name: "Kody" })
+persons = store.peek(queryKey)
+assert.deepEqual(JSON.stringify(persons), JSON.stringify(["Person/Kris", "Person/Kody"]))
+
+//  Where Query Peeking
+store = new MemoryStore()
+queryKey = Key.create(Person, { where: { name: "Kody" }})
+persons = store.peek(queryKey)
+assert.deepEqual(persons, [])
+store.patch(Key.create(Person, "Kris"), { name: "Kris" })
+persons = store.peek(queryKey)
+assert.deepEqual(JSON.stringify(persons), JSON.stringify([]))
+store.patch(Key.create(Person, "Kody"), { name: "Kody" })
+persons = store.peek(queryKey)
+assert.deepEqual(JSON.stringify(persons), JSON.stringify(["Person/Kody"]))
+
+//  Full Query watching
+persons = null
+store = new MemoryStore()
+//  TODO: add unwatch test.
+var unwatch = store.watch()
+    Key.create(Person, {})
+    value ->
+        persons = value
+
+assert.deepEqual(persons, [])
+store.patch(Key.create(Person, "Kris"), { name: "Kris" })
+assert.deepEqual(JSON.stringify(persons), JSON.stringify(["Person/Kris"]))
+store.patch(Key.create(Person, "Kody"), { name: "Kody" })
+assert.deepEqual(JSON.stringify(persons), JSON.stringify(["Person/Kris", "Person/Kody"]))
+var personList = store.list(Key.create(Person, {}))
+assert.deepEqual(personList.length, 2)
+//  check unwatch
+persons = null
+unwatch()
+store.patch(Key.create(Person, "Kringle"), { name: "Kringle" })
+assert.deepEqual(persons, null)
+
+//  readListeners see queryKey key gets and regular gets
+var readKeys = []
+store = new MemoryStore()
+store.addReadListener()
+    key ->
+        readKeys.push(key.toString())
+
+queryKey = Key.create(Person, { where: { name: "Kris" }})
+store.get(queryKey)
+assert.deepEqual(readKeys, [queryKey.toString()])
+
+var singleKey = Key.create(Person, "Kris")
+store.get(singleKey)
+assert.deepEqual(readKeys, [queryKey.toString(), singleKey.toString()])

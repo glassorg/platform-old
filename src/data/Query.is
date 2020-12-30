@@ -1,0 +1,71 @@
+import ..utility.common.*
+    PlainObject
+import .getValue
+
+let ops = {}
+    "!=": (a, b) => a != b
+    "=" : (a, b) => a == b
+    ">" : (a, b) => a > b
+    "<" : (a, b) => a < b
+    ">=": (a, b) => a >= b
+    "<=": (a, b) => a <= b
+    contains: (a, b) => a is Array && a.indexOf(b) >= 0
+
+let fields = {}
+    offset: Number
+    limit: Number
+    where: Object
+    sort: Array
+    // path: Array
+
+let Query = new Type()
+    isQuery(value) ->
+        if value isnt PlainObject
+            return false
+        for [pname, pvalue] in value
+            let PType = fields[pname]
+            if PType is null
+                return false
+            if pvalue isnt PType
+                return false
+        return true
+
+export let createPredicate = (query: Query) ->
+    return
+        (model) ->
+            let { where } = query
+            if where isnt Null
+                for [name,value] in where
+                    if value is PlainObject
+                        for [op,opValue] in value
+                            if !ops[op](model[name], opValue)
+                                return false
+                    else
+                        if !ops["="](model[name], value)
+                            return false
+            return true
+
+let compare = (a, b) ->
+    if a == b
+        return 0
+    if a is Null
+        return -1
+    if b is Null
+        return 1
+    if a.constructor != b.constructor
+        a = a.constructor.name
+        b = b.constructor.name
+    return a < b ? -1 : +1
+
+export let createSortCompareFunction = (query: Query) ->
+    return
+        (a, b) ->
+            if query.sort
+                for sort in query.sort
+                    for [property, direction] in sort
+                        let order = compare(getValue(a, property), getValue(b, property))
+                        if order != 0
+                            return direction ? order : -order
+            return 0
+
+export default Query

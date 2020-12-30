@@ -1,18 +1,26 @@
 {
     "name": "@glas/platform",
-    "version": "0.1.76",
-    "main": "lib/index.js",
+    "version": "2.0.0",
+    "main": "index.js",
     "repository": "https://github.com/glassorg/platform.git",
     "author": "Kris Nye <krisnye@gmail.com>",
     "license": "MIT",
     "scripts": {
-        "setup": "yarn install && guild link",
-        "build": "guild build",
-        "watch": "guild watch",
-        "clean": "guild clean",
-        "deploy": "guild deploy"
+        "setup": "yarn install",
+        "build": "isc src lib && cp package.json lib",
+        "test": "gtest lib",
+        "debug": "node --inspect-brk node_modules/@glas/test/gtest.js lib",
+        "watch3:build": "nodemon -w src -e is -x yarn build",
+        "watch:build": "isc src lib -w",
+        "watch:test": "nodemon -w lib -x gtest lib",
+        "watch": "run-p watch:*"
     },
     "dependencies": {
+        "@glas/test": "^1.0.3",
+        "ionscript": "^0.4.1",
+        "npm-run-all": "^4.1.5"
+    },
+    "old-dependencies": {
         "@google-cloud/datastore": "^4.1.1",
         "@google-cloud/firestore": "^2.2.1",
         "@sendgrid/mail": "^6.3.1",
@@ -32,7 +40,7 @@
         "twilio": "^3.23.1",
         "typescript": "^4.0.2"
     },
-    "devDependencies": {
+    "old-devDependencies": {
         "@glas/build": "^0.2.6",
         "@glas/test": "^1.0.3",
         "@google-cloud/translate": "^2.1.2",
@@ -42,5 +50,9 @@
         "@types/jsdom": "^11.12.0",
         "@types/sjcl": "^1.0.28",
         "ava": "^1.0.1"
+    },
+    "devDependencies": {},
+    "peerDependencies": {
+        "react": "^17.0.1"
     }
 }

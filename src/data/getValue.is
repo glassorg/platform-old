@@ -1,0 +1,26 @@
+
+type PropertyOrPath = String | Number | Array<String|Number>
+
+let getValueInternal = (object, property: PropertyOrPath) ->
+    if object is Null || property is Null
+        return undefined
+
+    if property is Array
+        for step in property
+            object = object[step]
+            if object is Null
+                break
+        return object
+    
+    return object[property]
+
+let getArrayIfPropertyIsDotDelimitedPath = (property: PropertyOrPath) ->
+    if property is String && property.indexOf(".") >= 0
+        property = property.split(".")
+    return property
+
+export default getValue(object, property: PropertyOrPath) ->
+    return
+        getValueInternal()
+            object
+            getArrayIfPropertyIsDotDelimitedPath(property)

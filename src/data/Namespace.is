@@ -1,0 +1,6 @@
+import .Model
+
+export default class Namespace
+    let constructor = (...types) ->
+        for type in types
+            this[type.name] = type

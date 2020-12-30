@@ -1,0 +1,39 @@
+import "react"
+    useState
+    useEffect
+import ..data.stores.MemoryStore
+import ..data.Store
+import ..data.Key
+    IdentityKey
+
+export let createUseStore = (store: Store) ->
+    return
+        (keyOrType: Key | Type, idOrDefaultValue, defaultValue) ->
+            var key: Key
+            if keyOrType is Key
+                key = keyOrType
+                defaultValue = idOrDefaultValue
+            else
+                if idOrDefaultValue is Null
+                    throw new Error("Invalid id: " + idOrDefaultValue)
+                key = Key.create(keyOrType, idOrDefaultValue.toString())
+
+            var [value, setValue] = useState(store.peek(key) ?? defaultValue)
+
+            useEffect()
+                ->
+                    let unwatch = store.watch()
+                        key
+                        newValue ->
+                            if value != newValue
+                                setValue(newValue)
+                    return unwatch
+
+            let setStore = value ->
+                store.patch(key, value)
+            
+            return [value, setStore]
+
+export let store = new MemoryStore()
+let useStore = createUseStore(store)
+export default useStore

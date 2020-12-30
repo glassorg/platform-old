@@ -1,0 +1,53 @@
+import ..utility.clonePatch
+    fromPath
+
+let escape = (sequence: "~" | "/") -> sequence == "~" ? "~0" : "~1"
+let unescape = (sequence: "~0" | "~1") -> sequence == "~0" ? "~" : "/"
+let encode = (step: String | Number) -> typeof step == "number" ? step : step.replace(/[~\/]/g, escape)
+let decode = (step: String) -> step.replace(/~[01]/g, unescape)
+
+type JSONPointer = Array<String | Number>
+
+export default JSONPointer
+
+let emptyArray = Object.freeze([])
+
+export let parse = (jsonPointer: String) ->
+    if jsonPointer == null || jsonPointer.length == 0
+        return emptyArray
+    let steps = jsonPointer.split("/").map(decode)
+    if steps[0] == ""
+        steps.shift()
+    return steps
+
+export let stringify = (pointer: JSONPointer) ->
+    return pointer.length == 0 ? "" : "/" + pointer.map(encode).join("/")
+
+export let get = (value, pointer: JSONPointer = emptyArray) ->
+    for step in pointer
+        if value is Null
+            break
+        value = value[step]
+    return value
+
+export let set = (document, pointer: JSONPointer = emptyArray, value) ->
+    if pointer.length == 0
+        return value
+    
+    var target = document
+    for i in 0 .. pointer.length - 1
+        if target is Null
+            break
+        target = target[pointer[i]]
+
+    if target isnt Null
+        let lastStep = pointer[pointer.length - 1]
+        if value is Null
+            delete target[lastStep]
+        else
+            target[lastStep] = value
+
+    return document
+
+export let patch = (document, pointer: JSONPointer = emptyArray, value) ->
+    return pointer.length == 0 ? value : clonePatch(document, fromPath(pointer, value))
