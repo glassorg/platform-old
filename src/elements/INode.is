@@ -1,0 +1,4 @@
+
+type INode = .nodeType is Number
+
+export default INode

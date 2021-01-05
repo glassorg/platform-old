@@ -1,0 +1,92 @@
+import .INode
+
+export let extendElementAsVirtualNodeRoot = (element) ->
+    return
+        Object.defineProperties()
+            element
+            {}
+                previousSibling: {}
+                    writable: true
+                    value: null
+                nextSibling: {}
+                    writable: true
+                    value: null
+                firstChild: {}
+                    writable: true
+                    value: null
+                lastChild: {}
+                    writable: true
+                    value: null
+                appendChild: {}
+                    value: VirtualNode.prototype.appendChild
+                removeChild: {}
+                    value: VirtualNode.prototype.removeChild
+                insertBefore: {}
+                    value: VirtualNode.prototype.insertBefore
+
+export default class VirtualNode
+    let nodeType = 1
+
+    var id: String
+    var parentNode: INode | Null = null
+    var firstChild: INode | Null = null
+    var lastChild: INode | Null = null
+    var nextSibling: INode | Null = null
+    var previousSibling: INode | Null = null
+
+    // var component: Component
+    var factory: NodeFactory
+    var properties
+    var dirty: Boolean = false
+
+    // composition methods compatible with Html Node
+    appendChild(child) ->
+        return this.insertBefore(child, null)
+
+    removeChild(child) ->
+        if child.parentNode != this
+            throw new Error("node is not a child of this parentNode.")
+        if this.firstChild == child
+            this.firstChild = child.nextSibling
+        if this.lastChild == child
+            this.lastChild = child.previousSibling
+        if child.previousSibling != null
+            child.previousSibling.nextSibling = child.nextSibling
+        if child.nextSibling != null
+            child.nextSibling.previousSibling = child.previousSibling
+        child.parentNode = null
+        child.previousSibling = null
+        child.nextSibling = null
+        return child
+
+    insertBefore(child, ref) ->
+        if child.parentNode != null
+            child.parentNode.removeChild(child)
+        if ref is Null
+            child.previousSibling = this.lastChild
+            if child.previousSibling != null
+                child.previousSibling.nextSibling = child
+            if this.firstChild is Null
+                this.firstChild = child
+            this.lastChild = child
+        else
+            if ref.parentNode != this
+                throw new Error("Reference node is not a child")
+            child.previousSibling = ref.previousSibling
+            if child.previousSibling isnt Null
+                child.previousSibling.nextSibling = child
+            child.nextSibling = ref
+            ref.previousSibling = child
+            if this.firstChild == ref
+                this.firstChild = child
+        child.parentNode = this
+        return child
+
+    invalidate() ->
+        var node = this
+        while node?.dirty == false
+            node.dirty = true
+            node = node.parentNode
+
+    //  PROBLEM: This gets turned into a get function if it's a "let"
+    static var nodes = new Map()

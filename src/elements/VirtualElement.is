@@ -1,0 +1,7 @@
+import .VirtualNode
+
+export default class VirtualElement extends VirtualNode
+
+    setAttribute(name, value) ->
+        // console.log("VirtualElement.setAttribute", { name, value })
+        this[name] = value

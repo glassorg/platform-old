@@ -1,4 +1,4 @@
-import "react"
+import "preact"
     useState
     useEffect
 import ..data.stores.MemoryStore

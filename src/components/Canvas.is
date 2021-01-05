@@ -1,0 +1,39 @@
+import ..elements.VirtualNode
+    extendElementAsVirtualNodeRoot
+import ..elements.*
+import .ensureRootRepaintable
+import preact.hooks
+    useRef
+    useEffect
+
+//  extend the Canvas class as VirtualDomRoot
+//  It can not validly hold any normal elements anyways.
+if typeof HTMLCanvasElement == "function"
+    extendElementAsVirtualNodeRoot(HTMLCanvasElement.prototype)
+
+//  extend document.createElement to create named virtual nodes
+if typeof window != "undefined"
+    let lowerNameToElement = ()
+        for [key, value] in elements
+            key.toLowerCase(): value
+    let originalCreateElement = document.createElement.bind(document)
+    document.createElement = (name: String) ->
+        // customElements.
+        let Type = lowerNameToElement.get(name) ?? customElements.get(name)
+        if Type isnt Null
+            return new Type()
+        return originalCreateElement(name)
+
+
+export default Canvas({ children, ...other }) ->
+    let ref = useRef()
+    useEffect()
+        ->
+            let canvas = ref.current
+            let dimensions = 3
+            ensureRootRepaintable(canvas, dimensions)
+            canvas.dirty = true
+
+    return
+        <canvas ref={ref} {...other} />
+            children
