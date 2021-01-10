@@ -62,7 +62,7 @@ export default data struct Matrix4
         let b11 = m22 * m33 - m23 * m32
 
         // Calculate the determinant
-        let det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06
+        var det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06
 
         if !det
             throw new Error("Cannot invert matrix")
@@ -125,8 +125,8 @@ export default data struct Matrix4
             0, 0, 0, 1
 
     static rotation(axis: Vector3, angle: Number) ->
-        let { x, y, z } = axis
-        let len = Math.hypot(x, y, z)
+        var { x, y, z } = axis
+        var len = Math.hypot(x, y, z)
         var s
         var c
         var t
@@ -241,7 +241,7 @@ export default data struct Matrix4
 
     static transformation(translation: Vector3, scaling: Vector3 = new Vector3(1, 1, 1), axis: Vector3 = new Vector3(0, 0, 0), angle = 0) ->
         // TODO: This can be made much more efficient than this later.
-        let transform = Matrix4.translation(translation.x, translation.y, translation.z)
+        var transform = Matrix4.translation(translation.x, translation.y, translation.z)
         if scaling.x != 1 || scaling.y != 1 || scaling.z != 1
             transform = transform.multiply(Matrix4.scaling(scaling.x, scaling.y, scaling.z))
         if angle != 0

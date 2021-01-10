@@ -32,8 +32,10 @@ export default Canvas({ children, ...other }) ->
         ->
             let canvas = ref.current
             let dimensions = 3
-            ensureRootRepaintable(canvas, dimensions)
+            let deactivate = ensureRootRepaintable(canvas, dimensions)
             canvas.dirty = true
+            return ->
+                deactivate()
 
     return
         <canvas ref={ref} {...other} />

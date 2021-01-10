@@ -9,70 +9,71 @@ let children = *(parent) ->
         node = node.nextSibling
 
 export default ensureRootRepaintable(canvas, dimensions: 2 | 3) ->
-    if canvas.dirty != null
-        return
-
-//     bindPointerEvents(canvas)
-
-    var graphics: Graphics
-    let repaint = () ->
-        rafId = null
-        if graphics is Null
-            if (dimensions == 2)
-                let context = canvas.getContext("2d")
-                if (context is CanvasRenderingContext2D)
-                    graphics = new Graphics2D(context)
+    var active = true
+    if canvas.dirty is Null
+    //     bindPointerEvents(canvas)
+        var graphics: Graphics
+        let repaint = () ->
+            rafId = null
+            if graphics is Null
+                if (dimensions == 2)
+                    let context = canvas.getContext("2d")
+                    if (context is CanvasRenderingContext2D)
+                        graphics = new Graphics2D(context)
+                    else
+                        console.error("Expected a CanvasRenderingContext2D:", context)
                 else
-                    console.error("Expected a CanvasRenderingContext2D:", context)
-            else
-                let context = canvas.getContext("webgl2")
-                if (context is WebGL2RenderingContext)
-                    graphics = new Graphics3D(context)
-                else
-                    console.error("Expected a WebGL2RenderingContext:", context)
-        if graphics isnt Null
-            let time = Date.now()
-            frame++
-            if start is Null
-                start = time
-            graphics.time = (time - start) / 1000
-            // layout any children using the Dock layout.
-            var animating = false
-            graphics.begin()
-            layout(canvas)
-            for node in children(canvas)
-                if node.update?(graphics)
-                    animating = true
-            for node in children(canvas)
-                node.render?(graphics)
-            graphics.end()
-            dirty = false
-            if animating
-                canvas.dirty = true
+                    let context = canvas.getContext("webgl2")
+                    if (context is WebGL2RenderingContext)
+                        graphics = new Graphics3D(context)
+                    else
+                        console.error("Expected a WebGL2RenderingContext:", context)
+            if graphics isnt Null
+                let time = Date.now()
+                frame++
+                if start is Null
+                    start = time
+                graphics.time = (time - start) / 1000
+                // layout any children using the Dock layout.
+                var animating = false
+                graphics.begin()
+                layout(canvas)
+                for node in children(canvas)
+                    if node.update?(graphics)
+                        animating = true
+                for node in children(canvas)
+                    node.render?(graphics)
+                graphics.end()
+                dirty = false
+                if animating
+                    canvas.dirty = true
 
-    //         // update fps state
-    //         let checkFPSFrames = 100
-    //         if (frame % checkFPSFrames == 0 && canvas.id.length > 0)
-    //             let seconds = (time - (frameStart || start)) / 1000
-    //             frameStart = time
-    //             let fps = Math.round(checkFPSFrames / seconds)
-    //             Store.default.patch(Key.create(CanvasState, canvas.id), { fps })
+        //         // update fps state
+        //         let checkFPSFrames = 100
+        //         if (frame % checkFPSFrames == 0 && canvas.id.length > 0)
+        //             let seconds = (time - (frameStart || start)) / 1000
+        //             frameStart = time
+        //             let fps = Math.round(checkFPSFrames / seconds)
+        //             Store.default.patch(Key.create(CanvasState, canvas.id), { fps })
 
-    var dirty = false
-    var start: Number | Null = null
-    var frame = 0
-    var frameStart: Number | Null = null
-    var rafId: Number | Null = null
+        var dirty = false
+        var start: Number | Null = null
+        var frame = 0
+        var frameStart: Number | Null = null
+        var rafId: Number | Null = null
 
-    if canvas.dirty isnt Boolean
-        Object.defineProperties(canvas)
-            {}
-                dirty: {}
-                    get() -> dirty
-                    set(value: Boolean) ->
-                        if value != dirty
-                            dirty = value
-                            if value && rafId is Null
-                                //  was using c.requestAnimationFrame
-                                //  wasn't firing the first time on rendering repaint
-                                rafId = requestAnimationFrame(repaint)
+        if canvas.dirty isnt Boolean
+            Object.defineProperties(canvas)
+                {}
+                    dirty: {}
+                        get() -> dirty
+                        set(value: Boolean) ->
+                            if value != dirty
+                                dirty = value
+                                if value && rafId is Null && active
+                                    //  was using c.requestAnimationFrame
+                                    //  wasn't firing the first time on rendering repaint
+                                    rafId = requestAnimationFrame(repaint)
+
+    return ->
+        active = false
