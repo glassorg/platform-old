@@ -35,11 +35,11 @@ export default data struct Rectangle
                 y >= this.top
                 y <= this.bottom
     containsPoint(point) -> this.contains(point.x, point.y)
-    add(b: Spacing) ->
+    add(b: Spacing | Null) ->
         if !b || b.isZero
             return this
         return new Rectangle(this.x - b.left, this.y - b.top, this.width + b.left + b.right, this.height + b.top + b.bottom)
-    subtract(b: Spacing) ->
+    subtract(b: Spacing | Null) ->
         if !b || b.isZero
             return this
         return new Rectangle(this.x + b.left, this.y + b.top, this.width - b.left - b.right, this.height - b.top - b.bottom)

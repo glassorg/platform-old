@@ -5,7 +5,8 @@ import ..math.Color
 // import Capsule from "../../math/Capsule"
 import ..math.Rectangle
 import ..math.Vector3
-// import Dock, { layout } from "./Dock"
+import .Dock
+    layout
 import ..math.Spacing
 import ..math.Size
 import ..math.BoundingShape
@@ -19,7 +20,7 @@ import ..graphics.TextureBase
 import ..graphics.Graphics3D
 // import Graphics2D from "../Graphics2D"
 
-// type LayoutFunction = (container: Control) => Void
+type LayoutFunction = (container) => Void
 
 export default class Control extends SceneNode
 
@@ -39,10 +40,10 @@ export default class Control extends SceneNode
     transformValid: Boolean = false
     text: String
     fontSize: Number
-    // //  Layout function for positioning children.
-    // var layoutChildren: LayoutFunction = layout
-    // //  Layout options for self.
-    layout
+    //  Layout function for positioning children.
+    layoutChildren: LayoutFunction = layout
+    //  Layout options for self.
+    layout: Any
     set x(value) ->
         if this._x != value
             this.transformValid = false
@@ -82,7 +83,7 @@ export default class Control extends SceneNode
         return this._transform
 
     updateChildren(g: Graphics) ->
-        // this.layoutChildren(this)
+        this.layoutChildren?(this)
         return super.updateChildren(g)
 
     get size() -> new Size(this.width, this.height)

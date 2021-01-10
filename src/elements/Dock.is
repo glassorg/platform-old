@@ -1,5 +1,6 @@
 import .Control
 import ..math.Rectangle
+import ..math.Color
 
 export default enum Dock
     top = "top"
@@ -33,7 +34,7 @@ let options = {}
         return bounds
 
 export function layout()
-    container: Control
+    container
     bounds: Rectangle = new Rectangle(0, 0, container.width, container.height).subtract(container.padding)
     ->
     var child = container.firstChild

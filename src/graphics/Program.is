@@ -35,13 +35,13 @@ export default class Program extends Effect
 
     toString() -> this.id
 
-    // static var default3D: Program = new Program()
-    //     new VertexShader(VertexFormat.positionColorTexture, PositionColorTexture3D_VertexShader)
-    //     new FragmentShader(ColorTexture_FragmentShader)
-
     static default3D: Program = new Program()
-        new VertexShader(VertexFormat.positionColor, PositionColor3D_VertexShader)
-        new FragmentShader(Color_FragmentShader)
+        new VertexShader(VertexFormat.positionColorTexture, PositionColorTexture3D_VertexShader)
+        new FragmentShader(ColorTexture_FragmentShader)
+
+    // static default3D: Program = new Program()
+    //     new VertexShader(VertexFormat.positionColor, PositionColor3D_VertexShader)
+    //     new FragmentShader(Color_FragmentShader)
 
     static default2D: Program = new Program()
         new VertexShader(VertexFormat.positionColorTexture, PositionColorTexture2D_VertexShader)
