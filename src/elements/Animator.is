@@ -1,0 +1,14 @@
+import .SceneNode
+import ..graphics.Graphics
+
+export default class Animator<T> extends SceneNode
+
+    source: (time: Number) => T
+    target
+    property
+
+    update(g: Graphics) ->
+        let target = this.target ?? this.parentNode
+        let value = this.source(g.time)
+        target[this.property] = value
+        return true

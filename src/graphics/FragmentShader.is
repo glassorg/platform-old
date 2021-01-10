@@ -1,0 +1,3 @@
+import .Shader
+
+export default class FragmentShader extends Shader

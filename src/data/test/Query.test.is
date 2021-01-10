@@ -4,7 +4,7 @@ import ..Query
     createSortCompareFunction
 
 data class Person
-    var recursive: Object
+    recursive: Object
 
 let alpha   = new Person({ recursive: { name: "Alpha"   } })
 let beta    = new Person({ recursive: { name: "Beta"    } })

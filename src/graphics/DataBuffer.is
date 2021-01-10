@@ -1,0 +1,60 @@
+import .VertexFormat
+import .GL.*
+import .Graphics3D
+import .Primitive
+
+export enum DataType
+    Vertex = GL.ARRAY_BUFFER
+    Index = GL.ELEMENT_ARRAY_BUFFER
+
+export enum BufferUsage
+    staticDraw = GL.STATIC_DRAW
+    dynamicDraw = GL.DYNAMIC_DRAW
+    streamDraw = GL.STREAM_DRAW
+
+export default class DataBuffer
+
+    //  The graphics context this is attached to.
+    graphics: Graphics3D
+    //  The mode for rendering this vertex buffer.
+    primitive: Primitive
+    //  How many elements that are currently in this buffer.
+    size: Integer = 0
+    //  The intended usage for this buffer.
+    //  Usually STATIC_DRAW or STREAM_DRAW
+    usage: Integer
+    //  The underlying WebGLBuffer
+    glBuffer: WebGLBuffer
+    //  The offset where data starts within this glBuffer.
+    offset: Integer
+    //  The type of data stored, either Vertex or Index data. 
+    type: DataType
+
+    constructor()
+        graphics: Graphics3D
+        usage: BufferUsage
+        type: DataType
+        primitive: Primitive
+        glBuffer
+        offset = 0
+        ->
+        if glBuffer is Null
+            glBuffer = graphics.gl.createBuffer()
+        this.graphics = graphics
+        this.usage = usage
+        this.type = type
+        if glBuffer is Null
+            throw new Error("glBuffer required")
+        this.glBuffer = glBuffer
+        this.offset = offset
+        this.primitive = primitive
+
+    draw() ->
+
+    bind() ->
+        this.graphics.gl.bindBuffer(this.type, this.glBuffer)
+
+    setData(data: Uint32Array | Uint16Array | Float32Array, length: Integer = data.length) ->
+        this.bind()
+        this.graphics.gl.bufferData(this.type, data, this.usage, this.offset, length)
+        this.size = length

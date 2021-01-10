@@ -13,9 +13,10 @@ if typeof HTMLCanvasElement == "function"
 
 //  extend document.createElement to create named virtual nodes
 if typeof window != "undefined"
-    let lowerNameToElement = ()
-        for [key, value] in elements
-            key.toLowerCase(): value
+    let lowerNameToElement = new Map()
+        []
+            for [key, value] in elements
+                [key.toLowerCase(), value]
     let originalCreateElement = document.createElement.bind(document)
     document.createElement = (name: String) ->
         // customElements.

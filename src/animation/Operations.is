@@ -1,0 +1,29 @@
+
+//  TODO: Support multiline Object types
+type Operations = .add is Function & .subtract is Function & .scale is Function
+// type Operations<T> = {
+//     add(...values: T[]): T
+//     subtract(a: T, b: T): T
+//     scale(a: T, b: number): T
+// }
+
+let NumberOperations = {}
+    add(...values) ->
+        return +
+            ...values
+    subtract(a, b) -> a - b
+    scale(a, b) -> a * b
+
+let InstanceOperations = {}
+    add(...values) ->
+        var total = values[0]
+        for i in 1..values.length
+            total = total.add(values[i])
+        return total
+    subtract(a, b) -> a.subtract(b)
+    scale(a, b) -> a.scale(b)
+
+export function getOperations(type) ->
+    return type is Number ? NumberOperations : InstanceOperations
+
+export default Operations

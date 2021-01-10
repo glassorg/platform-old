@@ -1,0 +1,12 @@
+import .VertexFormat
+
+export default class DataStream 
+
+    vertexFormat: VertexFormat
+
+    write(components) ->
+    writePoints(components) ->
+    writeLines(components) ->
+    writeTriangles(components) ->
+    writeQuads(components) ->
+    flush(drawIfStream: Boolean) ->

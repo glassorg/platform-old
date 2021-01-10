@@ -1,0 +1,28 @@
+import .Control
+// import Dock from "./Dock"
+import ..graphics.Graphics
+import ..graphics.Graphics3D
+import ..graphics.Program
+import ..math.Matrix4
+
+export default class View extends Control
+
+    projection: Matrix4 = Matrix4.identity
+    // var layout = Dock.fill
+
+    constructor() ->
+        super()
+        this.effect = Program.default3D
+
+    drawChildren(g: Graphics) ->
+        let saveProjection = g.uniforms.projection
+        g.uniforms.projection = this.projection
+        if g is Graphics3D
+            // really we need the absolute x, y position taking ancestors into account
+            g.gl.viewport(g.width - this.width + this.x, g.height - this.height - this.y, this.width, this.height)
+        super.drawChildren(g)
+        if g is Graphics3D
+            // restore viewport
+            g.gl.viewport(0, 0, g.width, g.height)
+
+        g.uniforms.projection = saveProjection

@@ -1,0 +1,43 @@
+import .GL.*
+import .VertexFormat
+import .Graphics3D
+import .Primitive
+import .VertexBuffer
+import .DataBuffer
+    DataType
+    BufferUsage
+
+export enum ElementType
+    UnsignedShort = GL.UNSIGNED_SHORT
+    UnsignedInt = GL.UNSIGNED_INT
+
+export default class IndexBuffer extends DataBuffer
+
+    vertices: Array<VertexBuffer>
+    elementType: ElementType
+
+    constructor()
+        graphics: Graphics3D
+        usage: BufferUsage
+        vertices: VertexBuffer | VertexFormat | Array<VertexBuffer>
+        primitive = Primitive.triangles
+        glBuffer // WebGLBuffer
+        elementType = ElementType.UnsignedShort
+        offset: Integer = 0
+        size: Integer = 0
+        ->
+        super(graphics, usage, DataType.Index, primitive, glBuffer, offset)
+        this.size = size
+        this.elementType = elementType
+        if vertices isnt Array
+            if vertices isnt VertexBuffer
+                vertices = new VertexBuffer(graphics, usage, vertices, primitive) 
+            vertices = [ vertices ]
+        this.vertices = vertices
+
+    draw() ->
+        if this.size > 0
+            this.graphics.bindAttributes(this.vertices)
+            this.graphics.bindUniforms()
+            this.bind()
+            this.graphics.gl.drawElements(this.primitive, this.size, this.elementType, this.offset)

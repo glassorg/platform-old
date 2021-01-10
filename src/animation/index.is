@@ -1,0 +1,42 @@
+import .KeyFrameAnimation
+import .KeyFrame
+    Interpolation
+import .Operations
+    getOperations
+
+export type Animation = (time: Number) => Any
+
+// todo: more concise Array type
+// [Number, T] | [Number, T, Interpolation]
+type KeyFrameArray = Any
+
+export function fromKeyFrames<T>(frames: Animation<KeyFrame<T>>): Animation<T> ->
+    return KeyFrameAnimation.create(frames)
+
+export function fromArray<T>(frames: Array<KeyFrameArray<T>>): Animation<T> ->
+    return KeyFrameAnimation.create()
+        []
+            for values in frames
+                new KeyFrame(...values)
+
+export function constant<T>(a) -> (time: Number) => a
+
+export function scale<T>(a: Animation<T>, b: Animation<Number>): Animation<T> ->
+    return (time: Number) ->
+        let aValue = a(time)
+        let bValue = b(time)
+        let ops = getOperations(aValue.constructor)
+        return ops.scale(aValue, bValue)
+
+export function add<T>(...animations: Array<Animation<T>>): Animation<T> ->
+    return (time: Number) ->
+        let values = animations.map(a => a(time))
+        let ops = getOperations(values[0].constructor)
+        return ops.add(...values)
+
+export function subtract<T>(a: Animation<T>, b: Animation<T>): Animation<T> ->
+    return (time: Number) ->
+        let aValue = a(time)
+        let bValue = b(time)
+        let ops = getOperations(aValue.constructor)
+        return ops.subtract(aValue, bValue)

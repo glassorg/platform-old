@@ -1,0 +1,11 @@
+
+export enum Interpolation
+    none = 0
+    smooth = 1
+    linear = 2
+
+export default data struct KeyFrame<T>
+
+    time: Number
+    value // : T
+    interpolation: Interpolation = Interpolation.smooth

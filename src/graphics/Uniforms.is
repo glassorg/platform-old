@@ -1,0 +1,60 @@
+import .Graphics3D
+import ..math.Matrix4
+import ..math.Vector2
+import ..math.Vector3
+import .functions
+    equals
+import .Texture
+import .TextureBase
+
+type Uniforms = .modelView is Matrix4
+export default Uniforms
+
+class BaseUniforms
+
+    modelView: Matrix4 = Matrix4.identity
+    projection: Matrix4 = Matrix4.identity
+    screen: Vector2 = new Vector2(800, 600)
+
+    get modelViewProjection() -> this.projection.multiply(this.modelView)
+
+export function setUniform(g: Graphics3D, uniform, location, value) ->
+    if value is Null
+        return
+    let { gl } = g
+    if value is Number
+        value = [value]
+
+    if uniform.type == gl.FLOAT_MAT4
+        gl.uniformMatrix4fv(location, false, value)
+    else if uniform.type == gl.FLOAT_VEC4
+        gl.uniform4fv(location, value)
+    else if uniform.type == gl.FLOAT_VEC3
+        gl.uniform3fv(location, value)
+    else if uniform.type == gl.FLOAT_VEC2
+        gl.uniform2fv(location, value)
+    else if uniform.type == gl.FLOAT
+        gl.uniform1fv(location, value)
+    else if uniform.type == gl.SAMPLER_2D
+        if value is Null
+            value = Texture.default
+        let texture = value is TextureBase ? value.glTexture : g.getWebGLTexture(value)
+        let index = g.bindTexture(texture, uniform.name)
+        gl.uniform1i(location, index)
+    else
+        throw new Error("Unrecognized uniform type: " + uniform.type)
+
+export function createUniforms(gl, invalidate: (String) => void): Uniforms ->
+    return
+        new Proxy()
+            new BaseUniforms()
+            {}
+                set(obj, prop, value) ->
+                    //  if value is a string then it represents the path to a texture
+                    if value == obj[prop]
+                        return true
+                    //  we have to invalidate before changing the value
+                    //  or else the flushed vertices will be wrong
+                    invalidate(prop)
+                    obj[prop] = value
+                    return true

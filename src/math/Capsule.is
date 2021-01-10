@@ -1,0 +1,23 @@
+import .Line
+import .Sphere
+import .Matrix4
+import .Vector3
+
+// Represents a swept sphere with potentially different radius at the starting and ending points.
+export default data struct Capsule
+
+    var a: Sphere
+    var b: Sphere
+
+    line() -> new Line(this.a.center, this.b.center)
+    //  Gets the radius at a normalized position along the capsule.
+    getRadius(alpha = 0.5) -> this.a.radius * (1 - alpha) + this.b.radius * alpha
+    addRadius(value: Number) ->
+        return value == 0 ? this : new Capsule(this.a.addRadius(value), this.b.addRadius(value))
+    translate(v: Vector3) -> new Capsule(this.a.translate(v), this.b.translate(v))
+    transform(m: Matrix4) -> new Capsule(this.a.transform(m), this.b.transform(m))
+    // Returns the furthest point along a direction.
+    support(v: Vector3) ->
+        let supportA = this.a.support(v)
+        let supportB = this.b.support(v)
+        return supportA.dot(v) > supportB.dot(v) ? supportA : supportB

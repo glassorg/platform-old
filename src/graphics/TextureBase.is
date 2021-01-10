@@ -1,0 +1,10 @@
+import .functions
+    createTexture
+
+export default class TextureBase
+    glTexture: WebGLTexture
+    //  uv coordinates from 0-1
+    left: Number
+    top: Number
+    right: Number
+    bottom: Number

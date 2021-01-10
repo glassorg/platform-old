@@ -1,0 +1,15 @@
+
+type Version = 1 | 2 | 3
+
+export default class Shader
+
+    source: String
+    version: Version
+
+    constructor(source: String, version: Version = 3) ->
+        if version == 3
+            source =  "#version 300 es\n" + source
+        this.source = source
+        this.version = version
+
+    toString() -> this.source

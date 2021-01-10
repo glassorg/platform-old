@@ -7,12 +7,15 @@ let children = *(parent) ->
         node = node.nextSibling
 
 export default ensureRootRepaintable(canvas, dimensions: 2 | 3) ->
+    if canvas.dirty != null
+        return
+
 //     bindPointerEvents(canvas)
 
     var graphics: Graphics
     let repaint = () ->
         rafId = null
-        if (graphics is Null)
+        if graphics is Null
             if (dimensions == 2)
                 let context = canvas.getContext("2d")
                 if (context is CanvasRenderingContext2D)
@@ -32,7 +35,7 @@ export default ensureRootRepaintable(canvas, dimensions: 2 | 3) ->
                 start = time
             graphics.time = (time - start) / 1000
             // layout any children using the Dock layout.
-            let animating = false
+            var animating = false
             graphics.begin()
             // layout(canvas)
             for node in children(canvas)
@@ -71,4 +74,3 @@ export default ensureRootRepaintable(canvas, dimensions: 2 | 3) ->
                                 //  was using c.requestAnimationFrame
                                 //  wasn't firing the first time on rendering repaint
                                 rafId = requestAnimationFrame(repaint)
-    return repaint

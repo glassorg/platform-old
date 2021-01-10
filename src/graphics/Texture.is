@@ -1,0 +1,72 @@
+import .functions
+    createTexture
+import .TextureBase
+import ..math.Rectangle
+import .Graphics3D
+import .Graphics
+
+export default class Texture extends TextureBase
+
+    id: String
+    gl: WebGL2RenderingContext
+    glTexture: WebGLTexture
+    width: Number
+    height: Number
+    image: HTMLImageElement | Null = null
+
+    // the default image url is a white 1x1 pixel image.
+    static default = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQYV2P4////fwAJ+wP9BUNFygAAAABJRU5ErkJggg=="
+    static defaultUV = new Rectangle(0, 0, 1, 1)
+
+    constructor(gl: WebGL2RenderingContext, id: String, glTextureOrSrc: WebGLTexture | String = id, width, height, callback) ->
+        super()
+        this.id = id
+        this.gl = gl
+        if glTextureOrSrc is String
+            this.width = 1
+            this.height = 1
+            this.glTexture = createTexture()
+                gl
+                glTextureOrSrc
+                (image) =>
+                    let dynamic = id != glTextureOrSrc
+                    if (dynamic)
+                        this.image = image
+                    this.width = image.width
+                    this.height = image.height
+                    callback?()
+        else
+            this.glTexture = glTextureOrSrc
+            this.width = width
+            this.height = height
+
+    update(dataUrl: String, onload: ((image: HTMLImageElement) => void) | Null = null) ->
+        if this.image is Null
+            throw new Error("Only dynamic textures can be updated")
+        if this.image isnt Null
+            this.image.onload = () =>
+                let { gl } = this
+                gl.bindTexture(gl.TEXTURE_2D, this.glTexture)
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, this.image)
+                onload?(this.image)
+            this.image.src = dataUrl
+
+    //  Gets the left UV coordinate.
+    get left() -> 0
+    //  Gets the top UV coordinate.
+    get top() -> 0
+    //  Gets the right UV coordinate.
+    get right() -> 1
+    //  Gets the bottom UV coordinate.
+    get bottom() -> 1
+
+    //  ResourceLoader interface
+    static load(g: Graphics, id: String): Promise<Texture> ->
+        return
+            new Promise()
+                (resolve, reject) =>
+                    if g isnt Graphics3D
+                        throw new Error()
+                    let texture =
+                        new Texture(g.gl, id, id, undefined, undefined)
+                            () => resolve(texture)

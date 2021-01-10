@@ -1,0 +1,19 @@
+import .Shader
+import .VertexFormat
+import .Primitive
+
+export default class VertexShader extends Shader
+
+    vertexFormats: Array<VertexFormat>
+    primitive: Primitive
+
+    constructor()
+        vertexFormat: VertexFormat | Array<VertexFormat>
+        source: String
+        primitive: Primitive = vertexFormat is Array ? Primitive.models : Primitive.triangles
+        ->
+        super(source)
+        this.vertexFormats = Array.isArray(vertexFormat) ? vertexFormat : [vertexFormat]
+        this.primitive = primitive
+
+    get vertexFormat() -> this.vertexFormats[this.vertexFormats.length - 1]

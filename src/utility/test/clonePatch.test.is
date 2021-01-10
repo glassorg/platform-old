@@ -3,10 +3,10 @@ import assert
 import ..clonePatch
 
 data class Foo
-    var foo = 10
+    foo = 10
 
 data class Bar
-    var bar = 10
+    bar = 10
 
 let foo = new Foo({ x: 1, y: 2, bar: new Bar({ a: 10, b: 20 }) })
 let foo2 = clonePatch(foo, {x: 5, bar: { b: 40 }})

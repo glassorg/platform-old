@@ -14,14 +14,14 @@ import .Table
 //
 export default class MemoryStore extends Store
 
-    var tables = new Map()
-    var keys = new Map()
-    var values = new Map()
-    var writeListeners = new Set()
-    var readListeners = new Set()
-    var watched = new Set()
+    tables = new Map()
+    keys = new Map()
+    values = new Map()
+    writeListeners = new Set()
+    readListeners = new Set()
+    watched = new Set()
 
-    let getTable = (key: QueryKey) ->
+    getTable(key: QueryKey) ->
         var table = this.tables.get(key.toString())
         if table is Null
             table = new Table(key)
@@ -35,19 +35,19 @@ export default class MemoryStore extends Store
             this.tables.set(key.toString(), table)
         return table
 
-    let addReadListener = (listener: Listener) ->
+    addReadListener(listener: Listener) ->
         this.readListeners.add(listener)
 
-    let removeReadListener = (listener: Listener) ->
+    removeReadListener(listener: Listener) ->
         this.readListeners.delete(listener)
 
-    let addWriteListener = (listener: Listener) ->
+    addWriteListener(listener: Listener) ->
         this.writeListeners.add(listener)
 
-    let removeWriteListener = (listener: Listener) ->
+    removeWriteListener(listener: Listener) ->
         this.writeListeners.delete(listener)
 
-    let get = (key: Key, peek: Boolean = false) ->
+    get(key: Key, peek: Boolean = false) ->
         // if it's a query make sure we have the corresponding table tracking changes
         if !peek
             this.notify(key, this.readListeners)
@@ -62,16 +62,16 @@ export default class MemoryStore extends Store
             value = key.type.default ?? null
         return value
 
-    let ensureWatched = (key: Key) ->
+    ensureWatched(key: Key) ->
         if this.watched.has(key.toString())
             return false
         this.watched.add(key.toString())
         return true
 
-    let removeWatched = (key: Key) ->
+    removeWatched(key: Key) ->
         return this.watched.delete(key.toString())
 
-    let patch = (key: IdentityKey, value) ->
+    patch(key: IdentityKey, value) ->
         value = clonePatch(this.get(key, true), value)
         if key.type isnt Null && value isnt Null
             if value isnt key.type
@@ -82,7 +82,7 @@ export default class MemoryStore extends Store
 
         this.setValue(key, value)
 
-    let setValue = (key: Key, value) ->
+    setValue(key: Key, value) ->
         if key is IdentityKey
             if key.type isnt Null && value isnt Null
                 if value isnt key.type
@@ -96,6 +96,6 @@ export default class MemoryStore extends Store
         this.notify(key, this.writeListeners)
         return true
 
-    let notify = (key: Key, listeners: Set<Listener>) ->
+    notify(key: Key, listeners: Set<Listener>) ->
         for listener in listeners
             listener(key)

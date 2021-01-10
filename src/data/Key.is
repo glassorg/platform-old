@@ -90,20 +90,20 @@ export let isPossibleMatch = (query: QueryKey, key: IdentityKey) ->
 
 export default data class Key
 
-    var parent: Key | Null = null
-    var type: Type
+    parent: Key | Null = null
+    type: Type
     // public readonly type: ModelClass<T> | null
-    var id: String | Null = null
-    var query: Query | Null = null
+    id: String | Null = null
+    query: Query | Null = null
     // var string: String
     // var path: String
     // let toString = () =>
     //     return memoize
 
-    let toString = -> keyToString(this)
-    let toJSON = -> this.toString()
+    toString() -> keyToString(this)
+    toJSON() -> this.toString()
 
-    static let create = (...args) ->
+    static create(...args) ->
         var parent: IdentityKey | Null = null
         var type: Type | Null = null
         var id: String | Null = null
@@ -125,7 +125,7 @@ export default data class Key
             query = { path: args[i++] }
         return new Key({ parent, type, id, query })
 
-    static let parse = (...steps) ->
+    static parse(...steps) ->
         //  get namespace, possibly consuming first step
         var namespace: Namespace
         let first = steps[0]

@@ -1,0 +1,23 @@
+import .GL.*
+import .DataBuffer
+    BufferUsage
+import .IndexBuffer
+import .InstanceBuffer
+import .VertexStream
+
+let sizeOfFloat = 4
+
+export default class InstanceStream extends VertexStream 
+
+    buffer: InstanceBuffer
+
+    constructor(buffer: InstanceBuffer, count = 64 * 1024) ->
+        super(buffer, count)
+
+    writeInstance(instance: DataBuffer, components: Array<Number>) ->
+        if instance isnt IndexBuffer
+            throw new Error("Not supported yet")
+        if this.buffer.instance != instance
+            this.flush()
+            this.buffer.instance = instance
+        this.write(components)

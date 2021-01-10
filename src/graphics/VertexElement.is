@@ -1,0 +1,27 @@
+import .GL.*
+
+export default class VertexElement
+
+    name: String
+    size: Number
+    type: Number
+    normalize: Boolean
+    offset: Number
+    stride: Number
+
+    constructor()
+        name: String
+        size: Number
+        type: Number = GL.FLOAT
+        normalize: Boolean = type != GL.FLOAT
+        offset: Number = -1
+        stride: Number = -1
+        ->
+        this.name = name
+        this.size = size
+        this.type = type
+        this.normalize = normalize
+        this.offset = offset
+        this.stride = stride
+
+    toString() -> `${this.name},${this.size},${this.type}`

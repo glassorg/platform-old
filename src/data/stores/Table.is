@@ -11,21 +11,21 @@ import ..Store
 type Predicate = (value) => Boolean
 
 export default class Table
-    var key: QueryKey
-    var filter: Predicate
-    var keys = new Map()
-    var cachedKeys: Array<IdentityKey> | Null = null
+    key: QueryKey
+    filter: Predicate
+    keys = new Map()
+    cachedKeys: Array<IdentityKey> | Null = null
 
-    let constructor = (key: QueryKey) ->
+    constructor(key: QueryKey) ->
         this.key = key
         this.filter = createPredicate(key.query)
 
-    let invalidateCachedKeys = ->
+    invalidateCachedKeys() ->
         this.cachedKeys = null
 
-    let getKeyIterator = -> this.keys.values()
+    getKeyIterator() -> this.keys.values()
 
-    let createSortedKeys = (store: Store): Array<IdentityKey> ->
+    createSortedKeys(store: Store): Array<IdentityKey> ->
         if this.key.query.sort is Null || this.key.query.sort.length == 0
             return [...this.getKeyIterator()]
 
@@ -43,15 +43,15 @@ export default class Table
         //  convert back to keys and return
         return values.map(t => valueToKeyMap.get(t))
 
-    let getKeys = (store: Store) ->
+    getKeys(store: Store) ->
         if this.cachedKeys is Null
             this.cachedKeys = this.createSortedKeys(store)
         return this.cachedKeys
 
-    let update = (key: IdentityKey, record): Boolean ->
+    update(key: IdentityKey, record): Boolean ->
         if record isnt Null
             if isPossibleMatch(this.key, key) && this.filter(record)
-                if (!this.keys.has(key.toString()))
+                if !this.keys.has(key.toString())
                     this.invalidateCachedKeys()
                     this.keys.set(key.toString(), key)
                     return true

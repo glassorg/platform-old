@@ -1,0 +1,44 @@
+import .Control
+import ..math.Rectangle
+
+export default enum Dock
+    top = "top"
+    left = "left"
+    right = "right"
+    bottom = "bottom"
+    fill = "fill"
+    none = "none"
+
+let options = {}
+    top(child: Control, bounds: Rectangle) ->
+        let height = (child.optimumSize || child.size).add(child.margin).height
+        child.bounds = new Rectangle(bounds.x, bounds.y, bounds.width, height).subtract(child.margin)
+        return new Rectangle(bounds.x, bounds.y + height, bounds.width, bounds.height - height)
+    bottom(child: Control, bounds: Rectangle) ->
+        let height = (child.optimumSize || child.size).add(child.margin).height
+        child.bounds = new Rectangle(bounds.x, bounds.bottom - height, bounds.width, height).subtract(child.margin)
+        return new Rectangle(bounds.x, bounds.y, bounds.width, bounds.height - height)
+    left(child: Control, bounds: Rectangle) ->
+        let width = (child.optimumSize || child.size).add(child.margin).width
+        child.bounds = new Rectangle(bounds.x, bounds.y, width, bounds.height).subtract(child.margin)
+        return new Rectangle(bounds.x + width, bounds.y, bounds.width - width, bounds.height)
+    right(child: Control, bounds: Rectangle) ->
+        let width = (child.optimumSize || child.size).add(child.margin).width
+        child.bounds = new Rectangle(bounds.right - width, bounds.y, width, bounds.height).subtract(child.margin)
+        return new Rectangle(bounds.x, bounds.y, bounds.width - width, bounds.height)
+    fill(child: Control, bounds: Rectangle) ->
+        child.bounds = bounds.subtract(child.margin)
+        return bounds
+    none(child: Control, bounds: Rectangle) ->
+        return bounds
+
+export function layout()
+    container: Control
+    bounds: Rectangle = new Rectangle(0, 0, container.width, container.height).subtract(container.padding)
+    ->
+    var child = container.firstChild
+    while child isnt Null
+        if child is Control
+            let layout = options[child.layout] || options.none
+            bounds = layout(child, bounds)
+        child = child.nextSibling

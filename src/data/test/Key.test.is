@@ -8,10 +8,10 @@ import ..Key
 import ...utility.clonePatch
 
 data class Person extends Entity
-    var name: String
+    name: String
 
 data class Pet extends Entity
-    var name: String
+    name: String
 
 let namespace = new Namespace(Person, Pet)
 

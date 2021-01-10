@@ -1,34 +1,35 @@
-import .VirtualElement
+import .Control
+import .Dock
 import ..math.Color
-// import ..math.Matrix4
+import ..math.Matrix4
+import ..graphics.Program
+import ..graphics.Graphics3D
 
-export default class Screen extends VirtualElement
+export default class Screen extends Control
 
-    var width = 100
-    var height = 100
-    var backgroundColor = Color.transparent
-    var depth = 1
-    // var layout = Dock.fill
+    width = 100
+    height = 100
+    backgroundColor = Color.transparent
+    depth = 1
+    layout = Dock.fill
 
-    // constructor() {
-    //     super()
-    //     this.effect = Program.default2D
-    // }
+    constructor() ->
+        super()
+        this.effect = Program.default2D
 
-    render(g) ->
-        this.draw(g)
+    drawBackground(g) ->
 
     draw(g) ->
         g.clear(this.backgroundColor, this.depth)
 
-        // if (g is Graphics3D)
-        //     //  we always initialize a screen to a 2d pixel based projection
-        //     //  with top-left origin
-        //     g.uniforms.projection =
-        //         new Matrix4()
-        //             2 / this.width, 0, 0, 0
-        //             0, -2 / this.height, 0, 0
-        //             0, 0, -1, 0
-        //             -1, 1, 0, 1
+        if (g is Graphics3D)
+            //  we always initialize a screen to a 2d pixel based projection
+            //  with top-left origin
+            g.uniforms.projection =
+                new Matrix4()
+                    2 / this.width, 0, 0, 0
+                    0, -2 / this.height, 0, 0
+                    0, 0, -1, 0
+                    -1, 1, 0, 1
 
-        // super.draw(g)
+        super.draw(g)

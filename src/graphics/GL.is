@@ -1,0 +1,803 @@
+// The following defined constants and descriptions are directly ported from https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants.
+
+// Any copyright is dedicated to the Public Domain. http://creativecommons.org/publicdomain/zero/1.0/.
+
+// Contributors
+// https://developer.mozilla.org/en-US/profiles/Sheppy
+// https://developer.mozilla.org/en-US/profiles/fscholz
+// https://developer.mozilla.org/en-US/profiles/AtiX
+// https://developer.mozilla.org/en-US/profiles/Sebastianz
+
+// These constants are defined on the WebGLRenderingContext interface.
+
+// Clearing buffers
+// Constants passed to WebGLRenderingContext.clear() to clear buffer masks.
+export let DEPTH_BUFFER_BIT = 0x00000100
+export let STENCIL_BUFFER_BIT = 0x00000400
+export let COLOR_BUFFER_BIT = 0x00004000
+
+// Rendering primitives
+// Constants passed to WebGLRenderingContext.drawElements() or WebGLRenderingContext.drawArrays() to specify what kind of primitive to render.
+export let POINTS = 0x0000
+export let LINES = 0x0001
+export let LINE_LOOP = 0x0002
+export let LINE_STRIP = 0x0003
+export let TRIANGLES = 0x0004
+export let TRIANGLE_STRIP = 0x0005
+export let TRIANGLE_FAN = 0x0006
+
+// Blending modes
+// Constants passed to WebGLRenderingContext.blendFunc() or WebGLRenderingContext.blendFuncSeparate() to specify the blending mode (for both, RBG and alpha, or separately).
+export let ZERO = 0
+export let ONE = 1
+export let SRC_COLOR = 0x0300
+export let ONE_MINUS_SRC_COLOR = 0x0301
+export let SRC_ALPHA = 0x0302
+export let ONE_MINUS_SRC_ALPHA = 0x0303
+export let DST_ALPHA = 0x0304
+export let ONE_MINUS_DST_ALPHA = 0x0305
+export let DST_COLOR = 0x0306
+export let ONE_MINUS_DST_COLOR = 0x0307
+export let SRC_ALPHA_SATURATE = 0x0308
+export let CONSTANT_COLOR = 0x8001
+export let ONE_MINUS_CONSTANT_COLOR = 0x8002
+export let CONSTANT_ALPHA = 0x8003
+export let ONE_MINUS_CONSTANT_ALPHA = 0x8004
+
+// Blending equations
+// Constants passed to WebGLRenderingContext.blendEquation() or WebGLRenderingContext.blendEquationSeparate() to control how the blending is calculated (for both, RBG and alpha, or separately).
+export let FUNC_ADD = 0x8006
+export let FUNC_SUBSTRACT = 0x800a
+export let FUNC_REVERSE_SUBTRACT = 0x800b
+
+// Getting GL parameter information
+// Constants passed to WebGLRenderingContext.getParameter() to specify what information to return.
+export let BLEND_EQUATION = 0x8009
+export let BLEND_EQUATION_RGB = 0x8009
+export let BLEND_EQUATION_ALPHA = 0x883d
+export let BLEND_DST_RGB = 0x80c8
+export let BLEND_SRC_RGB = 0x80c9
+export let BLEND_DST_ALPHA = 0x80ca
+export let BLEND_SRC_ALPHA = 0x80cb
+export let BLEND_COLOR = 0x8005
+export let ARRAY_BUFFER_BINDING = 0x8894
+export let ELEMENT_ARRAY_BUFFER_BINDING = 0x8895
+export let LINE_WIDTH = 0x0b21
+export let ALIASED_POINT_SIZE_RANGE = 0x846d
+export let ALIASED_LINE_WIDTH_RANGE = 0x846e
+export let CULL_FACE_MODE = 0x0b45
+export let FRONT_FACE = 0x0b46
+export let DEPTH_RANGE = 0x0b70
+export let DEPTH_WRITEMASK = 0x0b72
+export let DEPTH_CLEAR_VALUE = 0x0b73
+export let DEPTH_FUNC = 0x0b74
+export let STENCIL_CLEAR_VALUE = 0x0b91
+export let STENCIL_FUNC = 0x0b92
+export let STENCIL_FAIL = 0x0b94
+export let STENCIL_PASS_DEPTH_FAIL = 0x0b95
+export let STENCIL_PASS_DEPTH_PASS = 0x0b96
+export let STENCIL_REF = 0x0b97
+export let STENCIL_VALUE_MASK = 0x0b93
+export let STENCIL_WRITEMASK = 0x0b98
+export let STENCIL_BACK_FUNC = 0x8800
+export let STENCIL_BACK_FAIL = 0x8801
+export let STENCIL_BACK_PASS_DEPTH_FAIL = 0x8802
+export let STENCIL_BACK_PASS_DEPTH_PASS = 0x8803
+export let STENCIL_BACK_REF = 0x8ca3
+export let STENCIL_BACK_VALUE_MASK = 0x8ca4
+export let STENCIL_BACK_WRITEMASK = 0x8ca5
+export let VIEWPORT = 0x0ba2
+export let SCISSOR_BOX = 0x0c10
+export let COLOR_CLEAR_VALUE = 0x0c22
+export let COLOR_WRITEMASK = 0x0c23
+export let UNPACK_ALIGNMENT = 0x0cf5
+export let PACK_ALIGNMENT = 0x0d05
+export let MAX_TEXTURE_SIZE = 0x0d33
+export let MAX_VIEWPORT_DIMS = 0x0d3a
+export let SUBPIXEL_BITS = 0x0d50
+export let RED_BITS = 0x0d52
+export let GREEN_BITS = 0x0d53
+export let BLUE_BITS = 0x0d54
+export let ALPHA_BITS = 0x0d55
+export let DEPTH_BITS = 0x0d56
+export let STENCIL_BITS = 0x0d57
+export let POLYGON_OFFSET_UNITS = 0x2a00
+export let POLYGON_OFFSET_FACTOR = 0x8038
+export let TEXTURE_BINDING_2D = 0x8069
+export let SAMPLE_BUFFERS = 0x80a8
+export let SAMPLES = 0x80a9
+export let SAMPLE_COVERAGE_VALUE = 0x80aa
+export let SAMPLE_COVERAGE_INVERT = 0x80ab
+export let COMPRESSED_TEXTURE_FORMATS = 0x86a3
+export let VENDOR = 0x1f00
+export let RENDERER = 0x1f01
+export let VERSION = 0x1f02
+export let IMPLEMENTATION_COLOR_READ_TYPE = 0x8b9a
+export let IMPLEMENTATION_COLOR_READ_FORMAT = 0x8b9b
+export let BROWSER_DEFAULT_WEBGL = 0x9244
+
+// Buffers
+// Constants passed to WebGLRenderingContext.bufferData(), WebGLRenderingContext.bufferSubData(), WebGLRenderingContext.bindBuffer(), or WebGLRenderingContext.getBufferParameter().
+export let STATIC_DRAW = 0x88e4
+export let STREAM_DRAW = 0x88e0
+export let DYNAMIC_DRAW = 0x88e8
+export let ARRAY_BUFFER = 0x8892
+export let ELEMENT_ARRAY_BUFFER = 0x8893
+export let BUFFER_SIZE = 0x8764
+export let BUFFER_USAGE = 0x8765
+
+// Vertex attributes
+// Constants passed to WebGLRenderingContext.getVertexAttrib().
+export let CURRENT_VERTEX_ATTRIB = 0x8626
+export let VERTEX_ATTRIB_ARRAY_ENABLED = 0x8622
+export let VERTEX_ATTRIB_ARRAY_SIZE = 0x8623
+export let VERTEX_ATTRIB_ARRAY_STRIDE = 0x8624
+export let VERTEX_ATTRIB_ARRAY_TYPE = 0x8625
+export let VERTEX_ATTRIB_ARRAY_NORMALIZED = 0x886a
+export let VERTEX_ATTRIB_ARRAY_POINTER = 0x8645
+export let VERTEX_ATTRIB_ARRAY_BUFFER_BINDING = 0x889f
+
+// Culling
+// Constants passed to WebGLRenderingContext.cullFace().
+export let CULL_FACE = 0x0b44
+export let FRONT = 0x0404
+export let BACK = 0x0405
+export let FRONT_AND_BACK = 0x0408
+
+// Enabling and disabling
+// Constants passed to WebGLRenderingContext.enable() or WebGLRenderingContext.disable().
+export let BLEND = 0x0be2
+export let DEPTH_TEST = 0x0b71
+export let DITHER = 0x0bd0
+export let POLYGON_OFFSET_FILL = 0x8037
+export let SAMPLE_ALPHA_TO_COVERAGE = 0x809e
+export let SAMPLE_COVERAGE = 0x80a0
+export let SCISSOR_TEST = 0x0c11
+export let STENCIL_TEST = 0x0b90
+
+// Errors
+// Constants returned from WebGLRenderingContext.getError().
+export let NO_ERROR = 0
+export let INVALID_ENUM = 0x0500
+export let INVALID_VALUE = 0x0501
+export let INVALID_OPERATION = 0x0502
+export let OUT_OF_MEMORY = 0x0505
+export let CONTEXT_LOST_WEBGL = 0x9242
+
+// Front face directions
+// Constants passed to WebGLRenderingContext.frontFace().
+export let CW = 0x0900
+export let CCW = 0x0901
+
+// Hints
+// Constants passed to WebGLRenderingContext.hint().
+export let DONT_CARE = 0x1100
+export let FASTEST = 0x1101
+export let NICEST = 0x1102
+export let GENERATE_MIPMAP_HINT = 0x8192
+
+// Data types
+export let BYTE = 0x1400
+export let UNSIGNED_BYTE = 0x1401
+export let SHORT = 0x1402
+export let UNSIGNED_SHORT = 0x1403
+export let INT = 0x1404
+export let UNSIGNED_INT = 0x1405
+export let FLOAT = 0x1406
+
+// Pixel formats
+export let DEPTH_COMPONENT = 0x1902
+export let ALPHA = 0x1906
+export let RGB = 0x1907
+export let RGBA = 0x1908
+export let LUMINANCE = 0x1909
+export let LUMINANCE_ALPHA = 0x190a
+
+// Pixel types
+export let PIXEL_UNSIGNED_BYTE = 0x1401
+export let PIXEL_UNSIGNED_SHORT_4_4_4_4 = 0x8033
+export let PIXEL_UNSIGNED_SHORT_5_5_5_1 = 0x8034
+export let PIXEL_UNSIGNED_SHORT_5_6_5 = 0x8363
+
+// Shaders
+// Constants passed to WebGLRenderingContext.getShaderParameter().
+export let FRAGMENT_SHADER = 0x8b30
+export let VERTEX_SHADER = 0x8b31
+export let COMPILE_STATUS = 0x8b81
+export let DELETE_STATUS = 0x8b80
+export let LINK_STATUS = 0x8b82
+export let VALIDATE_STATUS = 0x8b83
+export let ATTACHED_SHADERS = 0x8b85
+export let ACTIVE_ATTRIBUTES = 0x8b89
+export let ACTIVE_UNIFORMS = 0x8b86
+export let MAX_VERTEX_ATTRIBS = 0x8869
+export let MAX_VERTEX_UNIFORM_VECTORS = 0x8dfb
+export let MAX_VARYING_VECTORS = 0x8dfc
+export let MAX_COMBINED_TEXTURE_IMAGE_UNITS = 0x8b4d
+export let MAX_VERTEX_TEXTURE_IMAGE_UNITS = 0x8b4c
+export let MAX_TEXTURE_IMAGE_UNITS = 0x8872
+export let MAX_FRAGMENT_UNIFORM_VECTORS = 0x8dfd
+export let SHADER_TYPE = 0x8b4f
+export let SHADING_LANGUAGE_VERSION = 0x8b8c
+export let CURRENT_PROGRAM = 0x8b8d
+
+// Depth or stencil tests
+// Constants passed to WebGLRenderingContext.stencilFunc().
+export let NEVER = 0x0200
+export let ALWAYS = 0x0207
+export let LESS = 0x0201
+export let EQUAL = 0x0202
+export let LEQUAL = 0x0203
+export let GREATER = 0x0204
+export let GEQUAL = 0x0206
+export let NOTEQUAL = 0x0205
+
+// Stencil actions
+// Constants passed to WebGLRenderingContext.stencilOp().
+export let KEEP = 0x1e00
+export let REPLACE = 0x1e01
+export let INCR = 0x1e02
+export let DECR = 0x1e03
+export let INVERT = 0x150a
+export let INCR_WRAP = 0x8507
+export let DECR_WRAP = 0x8508
+
+// Textures
+// Constants passed to WebGLRenderingContext.texParameteri(), WebGLRenderingContext.texParameterf(), WebGLRenderingContext.bindTexture(), WebGLRenderingContext.texImage2D(), and others.
+export let NEAREST = 0x2600
+export let LINEAR = 0x2601
+export let NEAREST_MIPMAP_NEAREST = 0x2700
+export let LINEAR_MIPMAP_NEAREST = 0x2701
+export let NEAREST_MIPMAP_LINEAR = 0x2702
+export let LINEAR_MIPMAP_LINEAR = 0x2703
+export let TEXTURE_MAG_FILTER = 0x2800
+export let TEXTURE_MIN_FILTER = 0x2801
+export let TEXTURE_WRAP_S = 0x2802
+export let TEXTURE_WRAP_T = 0x2803
+export let TEXTURE_2D = 0x0de1
+export let TEXTURE = 0x1702
+export let TEXTURE_CUBE_MAP = 0x8513
+export let TEXTURE_BINDING_CUBE_MAP = 0x8514
+export let TEXTURE_CUBE_MAP_POSITIVE_X = 0x8515
+export let TEXTURE_CUBE_MAP_NEGATIVE_X = 0x8516
+export let TEXTURE_CUBE_MAP_POSITIVE_Y = 0x8517
+export let TEXTURE_CUBE_MAP_NEGATIVE_Y = 0x8518
+export let TEXTURE_CUBE_MAP_POSITIVE_Z = 0x8519
+export let TEXTURE_CUBE_MAP_NEGATIVE_Z = 0x851a
+export let MAX_CUBE_MAP_TEXTURE_SIZE = 0x851c
+export let TEXTURE0 = 0x84c0
+export let TEXTURE1 = 0x84c1
+export let TEXTURE2 = 0x84c2
+export let TEXTURE3 = 0x84c3
+export let TEXTURE4 = 0x84c4
+export let TEXTURE5 = 0x84c5
+export let TEXTURE6 = 0x84c6
+export let TEXTURE7 = 0x84c7
+export let TEXTURE8 = 0x84c8
+export let TEXTURE9 = 0x84c9
+export let TEXTURE10 = 0x84ca
+export let TEXTURE11 = 0x84cb
+export let TEXTURE12 = 0x84cc
+export let TEXTURE13 = 0x84cd
+export let TEXTURE14 = 0x84ce
+export let TEXTURE15 = 0x84cf
+export let TEXTURE16 = 0x84d0
+export let TEXTURE17 = 0x84d1
+export let TEXTURE18 = 0x84d2
+export let TEXTURE19 = 0x84d3
+export let TEXTURE20 = 0x84d4
+export let TEXTURE21 = 0x84d5
+export let TEXTURE22 = 0x84d6
+export let TEXTURE23 = 0x84d7
+export let TEXTURE24 = 0x84d8
+export let TEXTURE25 = 0x84d9
+export let TEXTURE26 = 0x84da
+export let TEXTURE27 = 0x84db
+export let TEXTURE28 = 0x84dc
+export let TEXTURE29 = 0x84dd
+export let TEXTURE30 = 0x84de
+export let TEXTURE31 = 0x84df
+export let ACTIVE_TEXTURE = 0x84e0
+export let REPEAT = 0x2901
+export let CLAMP_TO_EDGE = 0x812f
+export let MIRRORED_REPEAT = 0x8370
+
+// Uniform types
+export let FLOAT_VEC2 = 0x8b50
+export let FLOAT_VEC3 = 0x8b51
+export let FLOAT_VEC4 = 0x8b52
+export let INT_VEC2 = 0x8b53
+export let INT_VEC3 = 0x8b54
+export let INT_VEC4 = 0x8b55
+export let BOOL = 0x8b56
+export let BOOL_VEC2 = 0x8b57
+export let BOOL_VEC3 = 0x8b58
+export let BOOL_VEC4 = 0x8b59
+export let FLOAT_MAT2 = 0x8b5a
+export let FLOAT_MAT3 = 0x8b5b
+export let FLOAT_MAT4 = 0x8b5c
+export let SAMPLER_2D = 0x8b5e
+export let SAMPLER_CUBE = 0x8b60
+
+// Shader precision-specified types
+export let LOW_FLOAT = 0x8df0
+export let MEDIUM_FLOAT = 0x8df1
+export let HIGH_FLOAT = 0x8df2
+export let LOW_INT = 0x8df3
+export let MEDIUM_INT = 0x8df4
+export let HIGH_INT = 0x8df5
+
+// Framebuffers and renderbuffers
+export let FRAMEBUFFER = 0x8d40
+export let RENDERBUFFER = 0x8d41
+export let RGBA4 = 0x8056
+export let RGB5_A1 = 0x8057
+export let RGB565 = 0x8d62
+export let DEPTH_COMPONENT16 = 0x81a5
+export let STENCIL_INDEX = 0x1901
+export let STENCIL_INDEX8 = 0x8d48
+export let DEPTH_STENCIL = 0x84f9
+export let RENDERBUFFER_WIDTH = 0x8d42
+export let RENDERBUFFER_HEIGHT = 0x8d43
+export let RENDERBUFFER_INTERNAL_FORMAT = 0x8d44
+export let RENDERBUFFER_RED_SIZE = 0x8d50
+export let RENDERBUFFER_GREEN_SIZE = 0x8d51
+export let RENDERBUFFER_BLUE_SIZE = 0x8d52
+export let RENDERBUFFER_ALPHA_SIZE = 0x8d53
+export let RENDERBUFFER_DEPTH_SIZE = 0x8d54
+export let RENDERBUFFER_STENCIL_SIZE = 0x8d55
+export let FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE = 0x8cd0
+export let FRAMEBUFFER_ATTACHMENT_OBJECT_NAME = 0x8cd1
+export let FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL = 0x8cd2
+export let FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE = 0x8cd3
+export let COLOR_ATTACHMENT0 = 0x8ce0
+export let DEPTH_ATTACHMENT = 0x8d00
+export let STENCIL_ATTACHMENT = 0x8d20
+export let DEPTH_STENCIL_ATTACHMENT = 0x821a
+export let NONE = 0
+export let FRAMEBUFFER_COMPLETE = 0x8cd5
+export let FRAMEBUFFER_INCOMPLETE_ATTACHMENT = 0x8cd6
+export let FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT = 0x8cd7
+export let FRAMEBUFFER_INCOMPLETE_DIMENSIONS = 0x8cd9
+export let FRAMEBUFFER_UNSUPPORTED = 0x8cdd
+export let FRAMEBUFFER_BINDING = 0x8ca6
+export let RENDERBUFFER_BINDING = 0x8ca7
+export let MAX_RENDERBUFFER_SIZE = 0x84e8
+export let INVALID_FRAMEBUFFER_OPERATION = 0x0506
+
+// Pixel storage modes
+// Constants passed to WebGLRenderingContext.pixelStorei().
+export let UNPACK_FLIP_Y_WEBGL = 0x9240
+export let UNPACK_PREMULTIPLY_ALPHA_WEBGL = 0x9241
+export let UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243
+
+// Additional constants defined WebGL 2
+// These constants are defined on the WebGL2RenderingContext interface. All WebGL 1 constants are also available in a WebGL 2 context.
+
+// Getting GL parameter information
+// Constants passed to WebGLRenderingContext.getParameter() to specify what information to return.
+export let READ_BUFFER = 0x0c02
+export let UNPACK_ROW_LENGTH = 0x0cf2
+export let UNPACK_SKIP_ROWS = 0x0cf3
+export let UNPACK_SKIP_PIXELS = 0x0cf4
+export let PACK_ROW_LENGTH = 0x0d02
+export let PACK_SKIP_ROWS = 0x0d03
+export let PACK_SKIP_PIXELS = 0x0d04
+export let TEXTURE_BINDING_3D = 0x806a
+export let UNPACK_SKIP_IMAGES = 0x806d
+export let UNPACK_IMAGE_HEIGHT = 0x806e
+export let MAX_3D_TEXTURE_SIZE = 0x8073
+export let MAX_ELEMENTS_VERTICES = 0x80e8
+export let MAX_ELEMENTS_INDICES = 0x80e9
+export let MAX_TEXTURE_LOD_BIAS = 0x84fd
+export let MAX_FRAGMENT_UNIFORM_COMPONENTS = 0x8b49
+export let MAX_VERTEX_UNIFORM_COMPONENTS = 0x8b4a
+export let MAX_ARRAY_TEXTURE_LAYERS = 0x88ff
+export let MIN_PROGRAM_TEXEL_OFFSET = 0x8904
+export let MAX_PROGRAM_TEXEL_OFFSET = 0x8905
+export let MAX_VARYING_COMPONENTS = 0x8b4b
+export let FRAGMENT_SHADER_DERIVATIVE_HINT = 0x8b8b
+export let RASTERIZER_DISCARD = 0x8c89
+export let VERTEX_ARRAY_BINDING = 0x85b5
+export let MAX_VERTEX_OUTPUT_COMPONENTS = 0x9122
+export let MAX_FRAGMENT_INPUT_COMPONENTS = 0x9125
+export let MAX_SERVER_WAIT_TIMEOUT = 0x9111
+export let MAX_ELEMENT_INDEX = 0x8d6b
+
+// Textures
+// Constants passed to WebGLRenderingContext.texParameteri(), WebGLRenderingContext.texParameterf(), WebGLRenderingContext.bindTexture(), WebGLRenderingContext.texImage2D(), and others.
+export let RED = 0x1903
+export let RGB8 = 0x8051
+export let RGBA8 = 0x8058
+export let RGB10_A2 = 0x8059
+export let TEXTURE_3D = 0x806f
+export let TEXTURE_WRAP_R = 0x8072
+export let TEXTURE_MIN_LOD = 0x813a
+export let TEXTURE_MAX_LOD = 0x813b
+export let TEXTURE_BASE_LEVEL = 0x813c
+export let TEXTURE_MAX_LEVEL = 0x813d
+export let TEXTURE_COMPARE_MODE = 0x884c
+export let TEXTURE_COMPARE_FUNC = 0x884d
+export let SRGB = 0x8c40
+export let SRGB8 = 0x8c41
+export let SRGB8_ALPHA8 = 0x8c43
+export let COMPARE_REF_TO_TEXTURE = 0x884e
+export let RGBA32F = 0x8814
+export let RGB32F = 0x8815
+export let RGBA16F = 0x881a
+export let RGB16F = 0x881b
+export let TEXTURE_2D_ARRAY = 0x8c1a
+export let TEXTURE_BINDING_2D_ARRAY = 0x8c1d
+export let R11F_G11F_B10F = 0x8c3a
+export let RGB9_E5 = 0x8c3d
+export let RGBA32UI = 0x8d70
+export let RGB32UI = 0x8d71
+export let RGBA16UI = 0x8d76
+export let RGB16UI = 0x8d77
+export let RGBA8UI = 0x8d7c
+export let RGB8UI = 0x8d7d
+export let RGBA32I = 0x8d82
+export let RGB32I = 0x8d83
+export let RGBA16I = 0x8d88
+export let RGB16I = 0x8d89
+export let RGBA8I = 0x8d8e
+export let RGB8I = 0x8d8f
+export let RED_INTEGER = 0x8d94
+export let RGB_INTEGER = 0x8d98
+export let RGBA_INTEGER = 0x8d99
+export let R8 = 0x8229
+export let RG8 = 0x822b
+export let R16F = 0x822d
+export let R32F = 0x822e
+export let RG16F = 0x822f
+export let RG32F = 0x8230
+export let R8I = 0x8231
+export let R8UI = 0x8232
+export let R16I = 0x8233
+export let R16UI = 0x8234
+export let R32I = 0x8235
+export let R32UI = 0x8236
+export let RG8I = 0x8237
+export let RG8UI = 0x8238
+export let RG16I = 0x8239
+export let RG16UI = 0x823a
+export let RG32I = 0x823b
+export let RG32UI = 0x823c
+export let R8_SNORM = 0x8f94
+export let RG8_SNORM = 0x8f95
+export let RGB8_SNORM = 0x8f96
+export let RGBA8_SNORM = 0x8f97
+export let RGB10_A2UI = 0x906f
+export let TEXTURE_IMMUTABLE_FORMAT = 0x912f
+export let TEXTURE_IMMUTABLE_LEVELS = 0x82df
+
+// Pixel types
+export let UNSIGNED_INT_2_10_10_10_REV = 0x8368
+export let UNSIGNED_INT_10F_11F_11F_REV = 0x8c3b
+export let UNSIGNED_INT_5_9_9_9_REV = 0x8c3e
+export let FLOAT_32_UNSIGNED_INT_24_8_REV = 0x8dad
+export let UNSIGNED_INT_24_8 = 0x84fa
+export let HALF_FLOAT = 0x140b
+export let RG = 0x8227
+export let RG_INTEGER = 0x8228
+export let INT_2_10_10_10_REV = 0x8d9f
+
+// Queries
+export let CURRENT_QUERY = 0x8865
+export let QUERY_RESULT = 0x8866
+export let QUERY_RESULT_AVAILABLE = 0x8867
+export let ANY_SAMPLES_PASSED = 0x8c2f
+export let ANY_SAMPLES_PASSED_CONSERVATIVE = 0x8d6a
+
+// Draw buffers
+export let MAX_DRAW_BUFFERS = 0x8824
+export let DRAW_BUFFER0 = 0x8825
+export let DRAW_BUFFER1 = 0x8826
+export let DRAW_BUFFER2 = 0x8827
+export let DRAW_BUFFER3 = 0x8828
+export let DRAW_BUFFER4 = 0x8829
+export let DRAW_BUFFER5 = 0x882a
+export let DRAW_BUFFER6 = 0x882b
+export let DRAW_BUFFER7 = 0x882c
+export let DRAW_BUFFER8 = 0x882d
+export let DRAW_BUFFER9 = 0x882e
+export let DRAW_BUFFER10 = 0x882f
+export let DRAW_BUFFER11 = 0x8830
+export let DRAW_BUFFER12 = 0x8831
+export let DRAW_BUFFER13 = 0x8832
+export let DRAW_BUFFER14 = 0x8833
+export let DRAW_BUFFER15 = 0x8834
+export let MAX_COLOR_ATTACHMENTS = 0x8cdf
+export let COLOR_ATTACHMENT1 = 0x8ce1
+export let COLOR_ATTACHMENT2 = 0x8ce2
+export let COLOR_ATTACHMENT3 = 0x8ce3
+export let COLOR_ATTACHMENT4 = 0x8ce4
+export let COLOR_ATTACHMENT5 = 0x8ce5
+export let COLOR_ATTACHMENT6 = 0x8ce6
+export let COLOR_ATTACHMENT7 = 0x8ce7
+export let COLOR_ATTACHMENT8 = 0x8ce8
+export let COLOR_ATTACHMENT9 = 0x8ce9
+export let COLOR_ATTACHMENT10 = 0x8cea
+export let COLOR_ATTACHMENT11 = 0x8ceb
+export let COLOR_ATTACHMENT12 = 0x8cec
+export let COLOR_ATTACHMENT13 = 0x8ced
+export let COLOR_ATTACHMENT14 = 0x8cee
+export let COLOR_ATTACHMENT15 = 0x8cef
+
+// Samplers
+export let SAMPLER_3D = 0x8b5f
+export let SAMPLER_2D_SHADOW = 0x8b62
+export let SAMPLER_2D_ARRAY = 0x8dc1
+export let SAMPLER_2D_ARRAY_SHADOW = 0x8dc4
+export let SAMPLER_CUBE_SHADOW = 0x8dc5
+export let INT_SAMPLER_2D = 0x8dca
+export let INT_SAMPLER_3D = 0x8dcb
+export let INT_SAMPLER_CUBE = 0x8dcc
+export let INT_SAMPLER_2D_ARRAY = 0x8dcf
+export let UNSIGNED_INT_SAMPLER_2D = 0x8dd2
+export let UNSIGNED_INT_SAMPLER_3D = 0x8dd3
+export let UNSIGNED_INT_SAMPLER_CUBE = 0x8dd4
+export let UNSIGNED_INT_SAMPLER_2D_ARRAY = 0x8dd7
+export let MAX_SAMPLES = 0x8d57
+export let SAMPLER_BINDING = 0x8919
+
+// Buffers
+export let PIXEL_PACK_BUFFER = 0x88eb
+export let PIXEL_UNPACK_BUFFER = 0x88ec
+export let PIXEL_PACK_BUFFER_BINDING = 0x88ed
+export let PIXEL_UNPACK_BUFFER_BINDING = 0x88ef
+export let COPY_READ_BUFFER = 0x8f36
+export let COPY_WRITE_BUFFER = 0x8f37
+export let COPY_READ_BUFFER_BINDING = 0x8f36
+export let COPY_WRITE_BUFFER_BINDING = 0x8f37
+
+// Data types
+export let FLOAT_MAT2x3 = 0x8b65
+export let FLOAT_MAT2x4 = 0x8b66
+export let FLOAT_MAT3x2 = 0x8b67
+export let FLOAT_MAT3x4 = 0x8b68
+export let FLOAT_MAT4x2 = 0x8b69
+export let FLOAT_MAT4x3 = 0x8b6a
+export let UNSIGNED_INT_VEC2 = 0x8dc6
+export let UNSIGNED_INT_VEC3 = 0x8dc7
+export let UNSIGNED_INT_VEC4 = 0x8dc8
+export let UNSIGNED_NORMALIZED = 0x8c17
+export let SIGNED_NORMALIZED = 0x8f9c
+
+// Vertex attributes
+export let VERTEX_ATTRIB_ARRAY_INTEGER = 0x88fd
+export let VERTEX_ATTRIB_ARRAY_DIVISOR = 0x88fe
+
+// Transform feedback
+export let TRANSFORM_FEEDBACK_BUFFER_MODE = 0x8c7f
+export let MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS = 0x8c80
+export let TRANSFORM_FEEDBACK_VARYINGS = 0x8c83
+export let TRANSFORM_FEEDBACK_BUFFER_START = 0x8c84
+export let TRANSFORM_FEEDBACK_BUFFER_SIZE = 0x8c85
+export let TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN = 0x8c88
+export let MAX_TRANSFORM_FEEDBACK_INTERLEAVED_COMPONENTS = 0x8c8a
+export let MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS = 0x8c8b
+export let INTERLEAVED_ATTRIBS = 0x8c8c
+export let SEPARATE_ATTRIBS = 0x8c8d
+export let TRANSFORM_FEEDBACK_BUFFER = 0x8c8e
+export let TRANSFORM_FEEDBACK_BUFFER_BINDING = 0x8c8f
+export let TRANSFORM_FEEDBACK = 0x8e22
+export let TRANSFORM_FEEDBACK_PAUSED = 0x8e23
+export let TRANSFORM_FEEDBACK_ACTIVE = 0x8e24
+export let TRANSFORM_FEEDBACK_BINDING = 0x8e25
+
+// Framebuffers and renderbuffers
+export let FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING = 0x8210
+export let FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE = 0x8211
+export let FRAMEBUFFER_ATTACHMENT_RED_SIZE = 0x8212
+export let FRAMEBUFFER_ATTACHMENT_GREEN_SIZE = 0x8213
+export let FRAMEBUFFER_ATTACHMENT_BLUE_SIZE = 0x8214
+export let FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE = 0x8215
+export let FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE = 0x8216
+export let FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE = 0x8217
+export let FRAMEBUFFER_DEFAULT = 0x8218
+export let DEPTH24_STENCIL8 = 0x88f0
+export let DRAW_FRAMEBUFFER_BINDING = 0x8ca6
+export let READ_FRAMEBUFFER = 0x8ca8
+export let DRAW_FRAMEBUFFER = 0x8ca9
+export let READ_FRAMEBUFFER_BINDING = 0x8caa
+export let RENDERBUFFER_SAMPLES = 0x8cab
+export let FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER = 0x8cd4
+export let FRAMEBUFFER_INCOMPLETE_MULTISAMPLE = 0x8d56
+
+// Uniforms
+export let UNIFORM_BUFFER = 0x8a11
+export let UNIFORM_BUFFER_BINDING = 0x8a28
+export let UNIFORM_BUFFER_START = 0x8a29
+export let UNIFORM_BUFFER_SIZE = 0x8a2a
+export let MAX_VERTEX_UNIFORM_BLOCKS = 0x8a2b
+export let MAX_FRAGMENT_UNIFORM_BLOCKS = 0x8a2d
+export let MAX_COMBINED_UNIFORM_BLOCKS = 0x8a2e
+export let MAX_UNIFORM_BUFFER_BINDINGS = 0x8a2f
+export let MAX_UNIFORM_BLOCK_SIZE = 0x8a30
+export let MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS = 0x8a31
+export let MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS = 0x8a33
+export let UNIFORM_BUFFER_OFFSET_ALIGNMENT = 0x8a34
+export let ACTIVE_UNIFORM_BLOCKS = 0x8a36
+export let UNIFORM_TYPE = 0x8a37
+export let UNIFORM_SIZE = 0x8a38
+export let UNIFORM_BLOCK_INDEX = 0x8a3a
+export let UNIFORM_OFFSET = 0x8a3b
+export let UNIFORM_ARRAY_STRIDE = 0x8a3c
+export let UNIFORM_MATRIX_STRIDE = 0x8a3d
+export let UNIFORM_IS_ROW_MAJOR = 0x8a3e
+export let UNIFORM_BLOCK_BINDING = 0x8a3f
+export let UNIFORM_BLOCK_SIZE = 0x8a40
+export let UNIFORM_BLOCK_ACTIVE_UNIFORMS = 0x8a42
+export let UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES = 0x8a43
+export let UNIFORM_BLOCK_REFERENCED_BY_VERTEX_SHADER = 0x8a44
+export let UNIFORM_BLOCK_REFERENCED_BY_FRAGMENT_SHADER = 0x8a46
+
+// Sync objects
+export let OBJECT_TYPE = 0x9112
+export let SYNC_CONDITION = 0x9113
+export let SYNC_STATUS = 0x9114
+export let SYNC_FLAGS = 0x9115
+export let SYNC_FENCE = 0x9116
+export let SYNC_GPU_COMMANDS_COMPLETE = 0x9117
+export let UNSIGNALED = 0x9118
+export let SIGNALED = 0x9119
+export let ALREADY_SIGNALED = 0x911a
+export let TIMEOUT_EXPIRED = 0x911b
+export let CONDITION_SATISFIED = 0x911c
+export let WAIT_FAILED = 0x911d
+export let SYNC_FLUSH_COMMANDS_BIT = 0x00000001
+
+// Miscellaneous constants
+export let COLOR = 0x1800
+export let DEPTH = 0x1801
+export let STENCIL = 0x1802
+export let MIN = 0x8007
+export let MAX = 0x8008
+export let DEPTH_COMPONENT24 = 0x81a6
+export let STREAM_READ = 0x88e1
+export let STREAM_COPY = 0x88e2
+export let STATIC_READ = 0x88e5
+export let STATIC_COPY = 0x88e6
+export let DYNAMIC_READ = 0x88e9
+export let DYNAMIC_COPY = 0x88ea
+export let DEPTH_COMPONENT32F = 0x8cac
+export let DEPTH32F_STENCIL8 = 0x8cad
+export let INVALID_INDEX = 0xffffffff
+export let TIMEOUT_IGNORED = -1
+export let MAX_CLIENT_WAIT_TIMEOUT_WEBGL = 0x9247
+
+// Constants defined in WebGL extensions
+
+// ANGLE_instanced_arrays
+// The ANGLE_instanced_arrays extension is part of the WebGL API and allows to draw the same object, or groups of similar objects multiple times, if they share the same vertex data, primitive count and type
+export let VERTEX_ATTRIB_ARRAY_DIVISOR_ANGLE = 0x88fe
+
+// WEBGL_debug_renderer_info
+// The WEBGL_debug_renderer_info extension is part of the WebGL API and exposes two constants with information about the graphics driver for debugging purposes
+export let UNMASKED_VENDOR_WEBGL = 0x9245
+export let UNMASKED_RENDERER_WEBGL = 0x9246
+
+// EXT_texture_filter_anisotropic
+// The EXT_texture_filter_anisotropic extension is part of the WebGL API and exposes two constants for anisotropic filtering (AF)
+export let MAX_TEXTURE_MAX_ANISOTROPY_EXT = 0x84ff
+export let TEXTURE_MAX_ANISOTROPY_EXT = 0x84fe
+
+// WEBGL_compressed_texture_s3tc
+// The WEBGL_compressed_texture_s3tc extension is part of the WebGL API and exposes four S3TC compressed texture formats
+export let COMPRESSED_RGB_S3TC_DXT1_EXT = 0x83f0
+export let COMPRESSED_RGBA_S3TC_DXT1_EXT = 0x83f1
+export let COMPRESSED_RGBA_S3TC_DXT3_EXT = 0x83f2
+export let COMPRESSED_RGBA_S3TC_DXT5_EXT = 0x83f3
+
+// WEBGL_compressed_texture_etc
+// The WEBGL_compressed_texture_etc extension is part of the WebGL API and exposes 10 ETC/EAC compressed texture formats
+export let COMPRESSED_R11_EAC = 0x9270
+export let COMPRESSED_SIGNED_R11_EAC = 0x9271
+export let COMPRESSED_RG11_EAC = 0x9272
+export let COMPRESSED_SIGNED_RG11_EAC = 0x9273
+export let COMPRESSED_RGB8_ETC2 = 0x9274
+export let COMPRESSED_RGBA8_ETC2_EAC = 0x9275
+export let COMPRESSED_SRGB8_ETC2 = 0x9276
+export let COMPRESSED_SRGB8_ALPHA8_ETC2_EAC = 0x9277
+export let COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2 = 0x9278
+export let COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2 = 0x9279
+
+// WEBGL_compressed_texture_pvrtc
+// The WEBGL_compressed_texture_pvrtc extension is part of the WebGL API and exposes four PVRTC compressed texture formats
+export let COMPRESSED_RGB_PVRTC_4BPPV1_IMG = 0x8c00
+export let COMPRESSED_RGBA_PVRTC_4BPPV1_IMG = 0x8c02
+export let COMPRESSED_RGB_PVRTC_2BPPV1_IMG = 0x8c01
+export let COMPRESSED_RGBA_PVRTC_2BPPV1_IMG = 0x8c03
+
+// WEBGL_compressed_texture_etc1
+// The WEBGL_compressed_texture_etc1 extension is part of the WebGL API and exposes the ETC1 compressed texture format
+export let COMPRESSED_RGB_ETC1_WEBGL = 0x8d64
+
+// WEBGL_compressed_texture_atc
+// The WEBGL_compressed_texture_atc extension is part of the WebGL API and exposes 3 ATC compressed texture formats. ATC is a proprietary compression algorithm for compressing textures on handheld devices
+export let COMPRESSED_RGB_ATC_WEBGL = 0x8c92
+export let COMPRESSED_RGBA_ATC_EXPLICIT_ALPHA_WEBGL = 0x8c92
+export let COMPRESSED_RGBA_ATC_INTERPOLATED_ALPHA_WEBGL = 0x87ee
+
+// WEBGL_depth_texture
+// The WEBGL_depth_texture extension is part of the WebGL API and defines 2D depth and depth-stencil textures
+export let UNSIGNED_INT_24_8_WEBGL = 0x84fa
+
+// OES_texture_half_float
+// The OES_texture_half_float extension is part of the WebGL API and adds texture formats with 16- (aka half float) and 32-bit floating-point components
+export let HALF_FLOAT_OES = 0x8d61
+
+// WEBGL_color_buffer_float
+// The WEBGL_color_buffer_float extension is part of the WebGL API and adds the ability to render to 32-bit floating-point color buffers
+export let RGBA32F_EXT = 0x8814
+export let RGB32F_EXT = 0x8815
+export let FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE_EXT = 0x8211
+export let UNSIGNED_NORMALIZED_EXT = 0x8c17
+
+// EXT_blend_minmax
+// The EXT_blend_minmax extension is part of the WebGL API and extends blending capabilities by adding two new blend equations: the minimum or maximum color components of the source and destination colors
+export let MIN_EXT = 0x8007
+export let MAX_EXT = 0x8008
+
+// EXT_sRGB
+// The EXT_sRGB extension is part of the WebGL API and adds sRGB support to textures and framebuffer objects
+export let SRGB_EXT = 0x8c40
+export let SRGB_ALPHA_EXT = 0x8c42
+export let SRGB8_ALPHA8_EXT = 0x8c43
+export let FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING_EXT = 0x8210
+
+// OES_standard_derivatives
+// The OES_standard_derivatives extension is part of the WebGL API and adds the GLSL derivative functions dFdx, dFdy, and fwidth
+export let FRAGMENT_SHADER_DERIVATIVE_HINT_OES = 0x8b8b
+
+// WEBGL_draw_buffers
+// The WEBGL_draw_buffers extension is part of the WebGL API and enables a fragment shader to write to several textures, which is useful for deferred shading, for example
+export let COLOR_ATTACHMENT0_WEBGL = 0x8ce0
+export let COLOR_ATTACHMENT1_WEBGL = 0x8ce1
+export let COLOR_ATTACHMENT2_WEBGL = 0x8ce2
+export let COLOR_ATTACHMENT3_WEBGL = 0x8ce3
+export let COLOR_ATTACHMENT4_WEBGL = 0x8ce4
+export let COLOR_ATTACHMENT5_WEBGL = 0x8ce5
+export let COLOR_ATTACHMENT6_WEBGL = 0x8ce6
+export let COLOR_ATTACHMENT7_WEBGL = 0x8ce7
+export let COLOR_ATTACHMENT8_WEBGL = 0x8ce8
+export let COLOR_ATTACHMENT9_WEBGL = 0x8ce9
+export let COLOR_ATTACHMENT10_WEBGL = 0x8cea
+export let COLOR_ATTACHMENT11_WEBGL = 0x8ceb
+export let COLOR_ATTACHMENT12_WEBGL = 0x8cec
+export let COLOR_ATTACHMENT13_WEBGL = 0x8ced
+export let COLOR_ATTACHMENT14_WEBGL = 0x8cee
+export let COLOR_ATTACHMENT15_WEBGL = 0x8cef
+export let DRAW_BUFFER0_WEBGL = 0x8825
+export let DRAW_BUFFER1_WEBGL = 0x8826
+export let DRAW_BUFFER2_WEBGL = 0x8827
+export let DRAW_BUFFER3_WEBGL = 0x8828
+export let DRAW_BUFFER4_WEBGL = 0x8829
+export let DRAW_BUFFER5_WEBGL = 0x882a
+export let DRAW_BUFFER6_WEBGL = 0x882b
+export let DRAW_BUFFER7_WEBGL = 0x882c
+export let DRAW_BUFFER8_WEBGL = 0x882d
+export let DRAW_BUFFER9_WEBGL = 0x882e
+export let DRAW_BUFFER10_WEBGL = 0x882f
+export let DRAW_BUFFER11_WEBGL = 0x8830
+export let DRAW_BUFFER12_WEBGL = 0x8831
+export let DRAW_BUFFER13_WEBGL = 0x8832
+export let DRAW_BUFFER14_WEBGL = 0x8833
+export let DRAW_BUFFER15_WEBGL = 0x8834
+export let MAX_COLOR_ATTACHMENTS_WEBGL = 0x8cdf
+export let MAX_DRAW_BUFFERS_WEBGL = 0x8824
+
+// OES_vertex_array_object
+// The OES_vertex_array_object extension is part of the WebGL API and provides vertex array objects (VAOs) which encapsulate vertex array states. These objects keep pointers to vertex data and provide names for different sets of vertex data
+export let VERTEX_ARRAY_BINDING_OES = 0x85b5
+
+// EXT_disjoint_timer_query
+// The EXT_disjoint_timer_query extension is part of the WebGL API and provides a way to measure the duration of a set of GL commands, without stalling the rendering pipeline
+export let QUERY_COUNTER_BITS_EXT = 0x8864
+export let CURRENT_QUERY_EXT = 0x8865
+export let QUERY_RESULT_EXT = 0x8866
+export let QUERY_RESULT_AVAILABLE_EXT = 0x8867
+export let TIME_ELAPSED_EXT = 0x88bf
+export let TIMESTAMP_EXT = 0x8e28
+export let GPU_DISJOINT_EXT = 0x8fbb

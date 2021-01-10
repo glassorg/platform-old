@@ -1,2 +1,5 @@
+export import .Animator
 export import .Screen
-
+export import .Triangle
+export import .View
+export import .Control

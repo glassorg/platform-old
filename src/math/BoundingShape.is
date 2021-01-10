@@ -1,0 +1,9 @@
+import .Capsule
+import .Line
+import .Vector3
+
+export default class BoundingShape
+    // returns something truthy if this bounding shape intersects this capsule at all
+    intersectsCapsule(capsule: Capsule) ->
+    // Returns the closest point to the line which lies within this bounding shape.
+    getClosestPoint(line: Line): Vector3 ->

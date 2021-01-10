@@ -10,11 +10,11 @@ let dom = new JSDOM("<html><head></head><body></body></html>")
 let document = dom.window.document
 
 class TestNode extends VirtualNode
-    var name: String
+    name: String
     constructor(name: String) ->
         super()
         this.name = name
-    toString() -> this.name
+    toString() -> this.name + ":" + this.nodeType
 
 do
     // VirtualNode properties are initially null

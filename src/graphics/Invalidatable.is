@@ -1,0 +1,4 @@
+
+type Invalidatable = .invalidate is Function
+
+export default Invalidatable

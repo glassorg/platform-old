@@ -1,0 +1,52 @@
+import .VertexFormat
+import "./shaders/PositionColor3D.vert" * as PositionColor3D_VertexShader
+import "./shaders/Color.frag" * as Color_FragmentShader
+import "./shaders/PositionColor2D.vert" * as PositionColor2D_VertexShader
+import "./shaders/PositionTexture3D.vert" * as PositionTexture3D_VertexShader
+import "./shaders/Texture.frag" * as Texture_FragmentShader
+import "./shaders/PositionColorTexture3D.vert" * as PositionColorTexture3D_VertexShader
+import "./shaders/PositionColorTexture2D.vert" * as PositionColorTexture2D_VertexShader
+import "./shaders/ColorTexture.frag" * as ColorTexture_FragmentShader
+import .VertexShader
+import .FragmentShader
+import .Graphics3D
+import .Effect
+
+//  Shader program declaration.
+//  Specifies the shader sources and the vertex format.
+export default class Program extends Effect
+
+    id: String
+    vertexShader: VertexShader
+    fragmentShader: FragmentShader
+
+    constructor(vertexShader: VertexShader, fragmentShader: FragmentShader) ->
+        super()
+        this.id = `${vertexShader}:${fragmentShader}`
+        this.vertexShader = vertexShader
+        this.fragmentShader = fragmentShader
+
+    // a Program implements the most basic Effect interface
+    render(g: Graphics3D, callback: (g: Graphics3D) => void) ->
+        let saveProgram = g.program
+        g.program = this
+        callback(g)
+        g.program = saveProgram
+
+    toString() -> this.id
+
+    // static var default3D: Program = new Program()
+    //     new VertexShader(VertexFormat.positionColorTexture, PositionColorTexture3D_VertexShader)
+    //     new FragmentShader(ColorTexture_FragmentShader)
+
+    static default3D: Program = new Program()
+        new VertexShader(VertexFormat.positionColor, PositionColor3D_VertexShader)
+        new FragmentShader(Color_FragmentShader)
+
+    static default2D: Program = new Program()
+        new VertexShader(VertexFormat.positionColorTexture, PositionColorTexture2D_VertexShader)
+        Program.default3D.fragmentShader
+
+    static texture3D: Program = new Program()
+        new VertexShader(VertexFormat.positionTexture, PositionTexture3D_VertexShader)
+        new FragmentShader(Texture_FragmentShader)

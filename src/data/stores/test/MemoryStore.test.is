@@ -24,7 +24,7 @@ assert.throws()
     -> store.patch(primitiveKey, 12)
 
 data class Person extends Model
-    var name: String
+    name: String
 
 //  Query Peeking
 var queryKey = Key.create(Person, {})

@@ -1,0 +1,34 @@
+import .VertexFormat
+import .Graphics3D
+import .DataBuffer
+    DataType
+    BufferUsage
+import .Primitive
+
+export default class VertexBuffer extends DataBuffer
+
+    //  The format of the vertices stored in this buffer.
+    vertexFormat: VertexFormat
+
+    constructor()
+        graphics: Graphics3D
+        usage: BufferUsage
+        vertexFormat: VertexFormat
+        primitive: Primitive = Primitive.triangles
+        glBuffer: WebGLBuffer | Null = null
+        offset: Number = 0
+        ->
+        super(graphics, usage, DataType.Vertex, primitive, glBuffer, offset)
+        this.vertexFormat = vertexFormat
+
+    //  Used for instanced rendering.
+    //  @see https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/vertexAttribDivisor
+    //  0 means this contains normal non instanced vertex attributes
+    get vertexDivisor() -> 0
+
+    draw() ->
+        if this.size > 0
+            this.graphics.bindAttributes([this])
+            this.graphics.bindUniforms()
+            let vertexCount = this.size / this.vertexFormat.components
+            this.graphics.gl.drawArrays(this.primitive, 0, vertexCount)

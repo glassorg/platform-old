@@ -3,7 +3,7 @@ import ..utility.clonePatch
 
 let escape = (sequence: "~" | "/") -> sequence == "~" ? "~0" : "~1"
 let unescape = (sequence: "~0" | "~1") -> sequence == "~0" ? "~" : "/"
-let encode = (step: String | Number) -> typeof step == "number" ? step : step.replace(/[~\/]/g, escape)
+let encode = (step: String | Number) -> step is Number ? step : step.replace(/[~\/]/g, escape)
 let decode = (step: String) -> step.replace(/~[01]/g, unescape)
 
 type JSONPointer = Array<String | Number>

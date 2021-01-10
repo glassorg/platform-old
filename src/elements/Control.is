@@ -1,0 +1,125 @@
+import .SceneNode
+import ..graphics.Graphics
+import ..math.Color
+// import Pickable, { isPickable } from "./Pickable"
+// import Capsule from "../../math/Capsule"
+import ..math.Rectangle
+import ..math.Vector3
+// import Dock, { layout } from "./Dock"
+import ..math.Spacing
+import ..math.Size
+import ..math.BoundingShape
+import ..math.Line
+// import Pickable from "./Pickable"
+// import PickResult from "./PickResult"
+import ..math.Matrix4
+import ..math.functions
+    equals
+import ..graphics.TextureBase
+import ..graphics.Graphics3D
+// import Graphics2D from "../Graphics2D"
+
+// type LayoutFunction = (container: Control) => Void
+
+export default class Control extends SceneNode
+
+    _x: Number = 0
+    _y: Number = 0
+    width: Number = 100
+    height: Number = 50
+    backgroundColor: Color
+    backgroundImage: String | TextureBase
+    color: Color = Color.black
+    margin: Spacing = Spacing.zero
+    padding: Spacing = Spacing.zero
+    pickRadius: Number
+    minimumSize: Size
+    maximumSize: Size
+    optimumSize: Size
+    transformValid: Boolean = false
+    text: String
+    fontSize: Number
+    // //  Layout function for positioning children.
+    // var layoutChildren: LayoutFunction = layout
+    // //  Layout options for self.
+    layout
+    set x(value) ->
+        if this._x != value
+            this.transformValid = false
+            this._x = value
+    get x() -> this._x
+    set y(value) ->
+        if this._y != value
+            this.transformValid = false
+            this._y = value
+    get y() -> this._y
+
+    draw(g: Graphics) ->
+        this.drawBackground(g)
+        super.draw(g)
+    //     // if this.text && g is Graphics2D
+    //     //     let c = g.context
+    //     //     if this.fontSize
+    //     //         c.font = `normal ${this.fontSize}px sans-serif`
+    //     //     c.fillStyle = this.color.toString()
+    //     //     c.textAlign = "center"
+    //     //     c.textBaseline = "middle"
+    //     //     // right now only draws centered
+    //     //     c.fillText(this.text, this.width / 2, this.height / 2, this.width)
+
+    drawBackground(g: Graphics) ->
+        if this.backgroundColor || this.backgroundImage
+            g.fillRectangle(0, 0, this.width, this.height, this.backgroundColor || Color.white, this.backgroundImage)
+
+    calculateLocalTransform() ->
+        return (this.x != 0 || this.y != 0) ? Matrix4.translation(this.x, this.y, 0) : null
+
+    _transform: Matrix4 | Null
+    get transform() ->
+        if !this.transformValid
+            this._transform = this.calculateLocalTransform()
+            this.transformValid = true
+        return this._transform
+
+    updateChildren(g: Graphics) ->
+        // this.layoutChildren(this)
+        return super.updateChildren(g)
+
+    get size() -> new Size(this.width, this.height)
+    set size(value) ->
+        this.width = value.width
+        this.height = value.height
+    get bounds() -> new Rectangle(this.x, this.y, this.width, this.height)
+    set bounds(value) ->
+        this.x = value.x
+        this.y = value.y
+        this.width = value.width
+        this.height = value.height
+    get position() -> new Vector3(this.x, this.y)
+    set position(value) ->
+        this.x = value.x
+        this.y = value.y
+    get boundingShape() -> new Rectangle(0, 0, this.width, this.height)
+
+    get isVisible() ->
+        return this.backgroundImage || (this.backgroundColor && this.backgroundColor.isVisible)
+
+    _pickable: Pickable
+    get pickable() ->
+        var value = this._pickable
+        if value is Null
+            value = Pickable.children
+            if this.isVisible || this.onpointerdown || this.onpointerup || this.onpointermove
+                value |= Pickable.self
+        return value
+
+    set pickable(value: Pickable) ->
+        this._pickable = value
+
+    //  pick children in reverse because we render the latter ones on top of the former
+    get pickChildrenReverse() -> true
+    pickSelf(ray: Capsule) ->
+        if this.pickRadius
+            ray = ray.addRadius(this.pickRadius)
+        let intersection = this.boundingShape.intersectsCapsule(ray)
+        return intersection ? new PickResult(this, intersection) : null

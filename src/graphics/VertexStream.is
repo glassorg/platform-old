@@ -1,0 +1,53 @@
+import .VertexBuffer
+import .GL.*
+import .VertexFormat
+import .DataStream
+import .DataBuffer
+    BufferUsage
+
+let sizeOfFloat = 4
+
+export default class VertexStream extends DataStream
+
+    buffer: VertexBuffer
+    floatData: Float32Array
+    uintData: Uint32Array
+    size: Integer = 0
+
+    constructor(buffer: VertexBuffer, count = 64 * 1024) ->
+        super()
+        this.buffer = buffer
+        let data = new ArrayBuffer(count * sizeOfFloat)
+        this.floatData = new Float32Array(data)
+        this.uintData = new Uint32Array(data)
+
+    get vertexFormat() -> this.buffer.vertexFormat
+    set vertexFormat(value) ->
+        this.buffer.vertexFormat = value
+    //  Fills the underlying buffer with the streaming data
+    //  then optionally draws it.
+    flush(draw = true) ->
+        if this.size > 0
+            this.buffer.setData(this.floatData, this.size)
+            if draw && this.buffer.usage == BufferUsage.streamDraw
+                this.buffer.draw()
+            this.size = 0
+    get vertexCount() -> this.size / this.buffer.vertexFormat.components
+    willFlush(componentCount: Integer) -> this.size + componentCount > this.floatData.length
+    write(components) ->
+        if this.willFlush(components.length)
+            this.flush()
+        let floatElements = this.buffer.vertexFormat.floatElements
+        for i in 0 .. components.length
+            if floatElements[i % floatElements.length]
+                this.floatData[this.size++] = components[i]
+            else
+                this.uintData[this.size++] = components[i]
+    writePoints(components) ->
+        this.write(components)
+    writeLines(components) ->
+        this.write(components)
+    writeTriangles(components) ->
+        this.write(components)
+    writeQuads(components) ->
+        throw new Error("not implemented yet, we have to copy a bunch of components")

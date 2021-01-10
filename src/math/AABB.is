@@ -1,0 +1,55 @@
+import .Vector3
+import .Ray
+
+export default data struct AABB
+
+    center: Vector3
+    dimensions: Vector3
+
+    normal(point: Vector3) ->
+        let dx = (point.x - this.center.x) / this.dimensions.x
+        let dy = (point.y - this.center.y) / this.dimensions.y
+        let dz = (point.z - this.center.z) / this.dimensions.z
+        let max = Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz))
+        let keepSignIfMax = (v) => Math.abs(v) >= max ? Math.sign(v) : 0
+        return new Vector3()
+            keepSignIfMax(dx)
+            keepSignIfMax(dy)
+            keepSignIfMax(dz)
+
+    raycastDistance(ray: Ray, front = true) ->
+        let b = this.center
+        let d = this.dimensions
+        let p = ray.point
+        let h = ray.unitHeading
+
+        // Overlap times for projection on each axis.
+        let tx0 = (b.x - p.x - d.x) / h.x
+        let ty0 = (b.y - p.y - d.y) / h.y
+        let tz0 = (b.z - p.z - d.z) / h.z
+
+        let tx1 = (b.x - p.x + d.x) / h.x
+        let ty1 = (b.y - p.y + d.y) / h.y
+        let tz1 = (b.z - p.z + d.z) / h.z
+
+        // Overlaps in 3D when every axis is overlapped.
+        let maxDistance = Math.min()
+            Math.max(tx0, tx1)
+            Math.max(ty0, ty1)
+            Math.max(tz0, tz1)
+
+        let minDistance = Math.max()
+            Math.min(tx0, tx1)
+            Math.min(ty0, ty1)
+            Math.min(tz0, tz1)
+
+        if maxDistance <= minDistance
+            return null
+
+        return front ? minDistance : maxDistance
+
+    raycast(ray: Ray, front = true) ->
+        let distance = this.raycastDistance(ray, front)
+        if distance is Null
+            return null
+        return ray.getPosition(distance)

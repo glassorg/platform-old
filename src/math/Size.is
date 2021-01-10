@@ -1,0 +1,15 @@
+import .Spacing
+
+export default data struct Size
+
+    var width: Number
+    var height: Number
+
+    add(b: Spacing) ->
+        if !b || b.isZero
+            return this
+        return new Size(this.width + b.left + b.right, this.height + b.top + b.bottom)
+    subtract(b: Spacing) ->
+        if !b || b.isZero
+            return this
+        return new Size(this.width - b.left - b.right, this.height - b.top - b.bottom)

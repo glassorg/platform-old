@@ -1,0 +1,24 @@
+
+export default data struct Spacing
+
+    var left: Number = 0
+    var top: Number = 0
+    var right: Number = 0
+    var bottom: Number = 0
+
+    negate() ->
+        if this.isZero
+            return this
+        return new Spacing(-this.left, -this.top, -this.right, -this.bottom)
+    add(b: Spacing) ->
+        if b.isZero
+            return this
+        return new Spacing(this.left + b.left, this.top + b.top, this.right + b.right, this.bottom + b.bottom)
+    subtract(b: Spacing) ->
+        if b.isZero
+            return this
+        return new Spacing(this.left - b.left, this.top - b.top, this.right - b.right, this.bottom - b.bottom)
+    get isZero() ->
+        return this == Spacing.zero || (this.left == 0 && this.top == 0 && this.right == 0 && this.bottom == 0)
+
+    static var zero = new Spacing()

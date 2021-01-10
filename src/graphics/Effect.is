@@ -1,0 +1,5 @@
+// import .Graphics3D
+
+export default class Effect
+
+    // render(g: Graphics3D, callback: (g: Graphics3D) => void) ->

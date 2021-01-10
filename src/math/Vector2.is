@@ -1,0 +1,68 @@
+import .Matrix4
+import .functions
+    equivalent
+
+export default data struct Vector2
+
+    var x: Number
+    var y: Number
+
+    *[Symbol.iterator]() ->
+        yield this.x
+        yield this.y
+    add(v: Vector2) -> new Vector2(this.x + v.x, this.y + v.y)
+    subtract(v: Vector2) -> new Vector2(this.x - v.x, this.y - v.y)
+    multiply(v: Vector2) -> new Vector2(this.x * v.x, this.y * v.y)
+    scale(f: Number) -> new Vector2(this.x * f, this.y * f)
+    negate() -> new Vector2(- this.x, - this.y)
+    dot(v: Vector2)-> this.x * v.x + this.y * v.y
+    cross(v: Vector2) ->
+        return
+            new Vector2()
+                this.y * v.z - this.z * v.y
+                this.z * v.x - this.x * v.z
+    equals(v: Vector2) -> this.x == v.x && this.y == v.y
+    equivalent(v: Vector2) ->
+        return
+            &&
+                equivalent(this.x, v.x)
+                equivalent(this.y, v.y)
+    lerp(v: Vector2, alpha: Number) ->
+        return
+            new Vector2()
+                this.x + alpha * (v.x - this.x)
+                this.y + alpha * (v.y - this.y)
+    projection(v: Vector2) -> this.scale(v.dot(this) / this.lengthSquared())
+    rejection(v: Vector2) ->
+        let s = v.dot(this) / this.lengthSquared()
+        return
+            new Vector2()
+                v.x - this.x * s
+                v.y - this.y * s
+    lengthSquared() -> this.x * this.x + this.y * this.y
+    length() -> Math.hypot(this.x, this.y)
+    normalize() ->
+        let invLength = 1 / this.length()
+        return new Vector2(this.x * invLength, this.y * invLength)
+    translate(v: Vector2) -> this.add(v)
+    transform(m: Matrix4) ->
+        let { x, y, z } = this
+        let w = (m.m03 * x + m.m13 * y + m.m23 * z + m.m33) || 1.0
+        return
+            new Vector2()
+                (m.m00 * x + m.m10 * y + m.m20 * z + m.m30) / w
+                (m.m01 * x + m.m11 * y + m.m21 * z + m.m31) / w
+    writeTo(array, index: Number) ->
+        array[index + 0] = this.x
+        array[index + 1] = this.y
+    toArray() -> [this.x, this.y]
+    toFloat32Array() -> new Float32Array(this.toArray())
+    toString() -> `(${this.x},${this.y})`
+    static let zero = new Vector2(0, 0)
+    static add(vectors) ->
+        let x = 0
+        let y = 0
+        for v in vectors
+            x += v.x
+            y += v.y
+        return new Vector2(x, y)

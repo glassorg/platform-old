@@ -3,6 +3,6 @@ import .Key
     IdentityKey
 
 export default data class Entity extends Model
-    var key: IdentityKey | Null = null
+    key: IdentityKey | Null = null
 
 // how to implement a model... without flat importing everything?

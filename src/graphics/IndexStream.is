@@ -1,0 +1,78 @@
+import .GL.*
+import .IndexBuffer
+import .VertexFormat
+import .VertexStream
+import .Primitive
+import .DataStream
+import .DataBuffer
+    BufferUsage
+
+let sizeOfUint16 = 2
+let pointOffsets = [0]
+let lineOffsets = [0, 1]
+let triangleOffsets = [0, 1, 2]
+let quadOffsets = [0, 1, 2, 2, 1, 3]
+
+export default class IndexStream extends DataStream
+
+    data: Uint16Array
+    vertices: VertexStream
+    buffer: IndexBuffer
+    size: Number = 0
+
+    constructor(buffer: IndexBuffer, count = 64 * 1024) ->
+        super()
+        this.buffer = buffer
+        this.vertices = new VertexStream(buffer.vertices[0], count)
+        let data = new ArrayBuffer(count * sizeOfUint16)
+        this.data = new Uint16Array(data)
+
+    get vertexFormat() -> this.vertices.vertexFormat
+    set vertexFormat(value: VertexFormat) ->
+        this.buffer.vertices[0].vertexFormat = value
+
+    //  Fills the underlying buffer with the streaming data
+    //  then optionally draws it.
+    flush(draw = true) ->
+        if this.size > 0
+            this.vertices.flush(false)
+            this.buffer.setData(this.data, this.size)
+            if draw && this.buffer.usage == BufferUsage.streamDraw
+                this.buffer.draw()
+            this.size = 0
+
+    willFlush(indexCount: Number) -> this.size + indexCount > this.data.length
+
+    countVerticesAndFlushIfNeeded(componentCount: Number, indicesPerVertex = 1) ->
+        let vertexCount = componentCount / this.vertices.buffer.vertexFormat.components
+        let indexCount = vertexCount * indicesPerVertex
+        if this.willFlush(indexCount) || this.vertices.willFlush(componentCount)
+            this.flush()
+        return vertexCount
+
+    writeInternal(components: Array<Number>, offsets: Array<Number>, primitive: Primitive, expectedVertexFactor = offsets.length) ->
+        if this.buffer.primitive != primitive
+            throw new Error(`Wrong primitive type: ${primitive}`)
+        let vertexCount = this.countVerticesAndFlushIfNeeded(components.length)
+        if vertexCount % expectedVertexFactor != 0
+            throw new Error(`Invalid Number of vertices: ${vertexCount}`)
+        let index = this.vertices.vertexCount
+        this.vertices.write(components)
+        // we manually write the indices to avoid allocating an intermediate array
+        let indexCount = vertexCount / expectedVertexFactor * offsets.length
+        for i in 0..indexCount
+            let primitiveIndex = Math.floor(i / offsets.length)
+            let offset = offsets[i % offsets.length]
+            this.data[this.size++] = index + primitiveIndex * offsets.length + offset
+
+    write(components: Array<Number>) ->
+        // when someone uses this write, we don't really want to error check them
+        this.writeInternal(components, pointOffsets, this.buffer.primitive, 1)
+    writePoints(components: Array<Number>) ->
+        this.writeInternal(components, pointOffsets, Primitive.points)
+    writeLines(components: Array<Number>) ->
+        this.writeInternal(components, lineOffsets, Primitive.lines)
+    writeTriangles(components: Array<Number>) ->
+        this.writeInternal(components, triangleOffsets, Primitive.triangles)
+    writeQuads(components: Array<Number>) ->
+        this.writeInternal(components, quadOffsets, Primitive.triangles, 4)
