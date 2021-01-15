@@ -1,34 +1,38 @@
-import .SceneNode
-import ..graphics.Graphics
+import .Node
 import ..math.Color
-// import Pickable, { isPickable } from "./Pickable"
-// import Capsule from "../../math/Capsule"
+import ..math.Capsule
 import ..math.Rectangle
 import ..math.Vector3
-import .Dock
-    layout
 import ..math.Spacing
 import ..math.Size
 import ..math.BoundingShape
 import ..math.Line
-// import Pickable from "./Pickable"
-// import PickResult from "./PickResult"
 import ..math.Matrix4
 import ..math.functions
+import .Dock
+    layout
+import .Pickable
+import .PickResult
     equals
-import ..graphics.TextureBase
-import ..graphics.Graphics3D
+import ..TextureBase
+import ..Graphics
+import ..Graphics3D
 // import Graphics2D from "../Graphics2D"
 
 type LayoutFunction = (container) => Void
 
-export default class Control extends SceneNode
+export default class Control extends Node
 
     _x: Number = 0
     _y: Number = 0
     width: Number = 100
     height: Number = 50
-    backgroundColor: Color
+    _backgroundColor: Color | Null = null
+    get backgroundColor() -> this._backgroundColor
+    set backgroundColor(value) ->
+        if this._backgroundColor != value
+            this._backgroundColor = value
+            this.invalidate()
     backgroundImage: String | TextureBase
     color: Color = Color.black
     margin: Spacing = Spacing.zero
@@ -58,15 +62,15 @@ export default class Control extends SceneNode
     draw(g: Graphics) ->
         this.drawBackground(g)
         super.draw(g)
-    //     // if this.text && g is Graphics2D
-    //     //     let c = g.context
-    //     //     if this.fontSize
-    //     //         c.font = `normal ${this.fontSize}px sans-serif`
-    //     //     c.fillStyle = this.color.toString()
-    //     //     c.textAlign = "center"
-    //     //     c.textBaseline = "middle"
-    //     //     // right now only draws centered
-    //     //     c.fillText(this.text, this.width / 2, this.height / 2, this.width)
+        // if this.text && g is Graphics2D
+        //     let c = g.context
+        //     if this.fontSize
+        //         c.font = `normal ${this.fontSize}px sans-serif`
+        //     c.fillStyle = this.color.toString()
+        //     c.textAlign = "center"
+        //     c.textBaseline = "middle"
+        //     // right now only draws centered
+        //     c.fillText(this.text, this.width / 2, this.height / 2, this.width)
 
     drawBackground(g: Graphics) ->
         if this.backgroundColor || this.backgroundImage

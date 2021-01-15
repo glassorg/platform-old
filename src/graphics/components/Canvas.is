@@ -2,9 +2,14 @@ import ..elements.VirtualNode
     extendElementAsVirtualNodeRoot
 import ..elements.*
 import .ensureRootRepaintable
+import .bindPointerEvents
+import ..Graphics
+    GraphicsContext
+import preact.*
 import preact.hooks
-    useRef
     useEffect
+    useRef
+    useState
 
 //  extend the Canvas class as VirtualDomRoot
 //  It can not validly hold any normal elements anyways.
@@ -25,18 +30,26 @@ if typeof window != "undefined"
             return new Type()
         return originalCreateElement(name)
 
-
 export default Canvas({ children, ...other }) ->
+    //  TODO: Fix the destructuring syntax to accept default values
+    // let { dimensions = 3, childre, ...other } = props
     let ref = useRef()
+    let [graphics, setGraphics] = useState(null)
     useEffect()
         ->
             let canvas = ref.current
             let dimensions = 3
-            let deactivate = ensureRootRepaintable(canvas, dimensions)
+            let unbindPaint = ensureRootRepaintable(canvas, dimensions, setGraphics)
             canvas.dirty = true
+            let unbindPointerEvents = bindPointerEvents(canvas)
             return ->
-                deactivate()
-
+                unbindPaint()
+                unbindPointerEvents()
+        []
+    if ref.current
+        ref.current.dirty = true
     return
-        <canvas ref={ref} {...other} />
-            children
+        <GraphicsContext.Provider value={graphics} />
+            <canvas ref={ref} {...other} />
+                if graphics
+                    children

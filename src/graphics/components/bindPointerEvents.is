@@ -1,0 +1,44 @@
+import ..elements.INode
+import ..elements.VirtualNode
+import .functions
+    getPosition
+import ..math.Vector3
+import ..math.Capsule
+import ..math.Sphere
+
+export default function bindPointerEvents(canvas) ->
+    var pointerTarget: INode | null = null
+    function pick(e: PointerEvent) ->
+        let firstChild = canvas.firstChild
+        if firstChild is INode
+            let position = getPosition(e)
+            let front = new Vector3(position.x, position.y, 0)
+            let back = new Vector3(position.x, position.y, 1)
+            let ray = new Capsule(new Sphere(front, 0), new Sphere(back, 0))
+            let picked = firstChild.pick(ray)
+            // console.log("picked: ", picked ? { id: picked.node.id, x: picked.position.x, y: picked.position.y } : null)
+            let pickedNode = picked ? picked.node : null
+            if pointerTarget != pickedNode
+                if pointerTarget
+                    pointerTarget.dispatchEvent(new PointerEvent("pointerout", e))
+                pointerTarget = pickedNode
+                if pointerTarget
+                    pointerTarget.dispatchEvent(new PointerEvent("pointerover", e))
+            return pointerTarget
+        return null
+
+    // add some event routing
+    let events = ["pointerdown", "pointerup", "pointermove"]
+    let handler = (e) ->
+        // bubble these events
+        var target = pick(e)
+        while target is VirtualNode
+            target.dispatchEvent(e)
+            // should probably see if stopPropagation called.
+            target = target.parentNode
+    for event in events
+        canvas.addEventListener(event, handler)
+    
+    return ->
+        for event in events
+            canvas.removeEventListener(event, handler)

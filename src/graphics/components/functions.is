@@ -1,0 +1,37 @@
+import ..elements.INode
+import ..math.Vector2
+
+export function *children(parent: INode, includeSelf = false) ->
+    if includeSelf
+        yield parent
+    var node = parent.firstChild
+    while node isnt Null
+        yield node
+        node = node.nextSibling
+
+export function *ancestors(node: INode, includeSelf = false) ->
+    if includeSelf
+        yield node
+    while node isnt Null
+        node = node.parentNode
+        yield node
+
+export function getClientPosition(element: HTMLElement) ->
+    let bounds = element.getClientRects()[0]
+    return new Vector2(bounds.left, bounds.top)
+
+export function getPosition(e: MouseEvent, element: HTMLElement = e.target) ->
+    let bounds = element.getClientRects()[0]
+    return new Vector2(e.clientX - bounds.left, e.clientY - bounds.top)
+
+export function isAncestorOrSelf(self: INode, possibleAncestor: INode) ->
+    for child in children(self, true)
+        if node == possibleAncestor
+            return true
+    return false
+
+export function getAncestor(element: HTMLElement, predicate: (ancestor: HTMLElement) => Boolean) ->
+    for ancestor in ancestors(element)
+        if predicate(ancestor)
+            return ancestor
+    return null

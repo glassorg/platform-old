@@ -1,9 +1,10 @@
 import .Control
 import .Dock
+import .Pickable
 import ..math.Color
 import ..math.Matrix4
-import ..graphics.Program
-import ..graphics.Graphics3D
+import ..Program
+import ..Graphics3D
 
 export default class Screen extends Control
 
@@ -12,16 +13,16 @@ export default class Screen extends Control
     backgroundColor = Color.transparent
     depth = 1
     layout = Dock.fill
+    pickable = Pickable.self | Pickable.children
 
     constructor() ->
         super()
         this.effect = Program.default2D
 
     drawBackground(g) ->
-
-    draw(g) ->
         g.clear(this.backgroundColor, this.depth)
 
+    draw(g) ->
         if (g is Graphics3D)
             //  we always initialize a screen to a 2d pixel based projection
             //  with top-left origin

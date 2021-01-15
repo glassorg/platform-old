@@ -1,0 +1,7 @@
+import .BrowserStore
+import ..Serializer
+
+export default class LocalStore extends BrowserStore
+
+    constructor(serializer: Serializer) ->
+        super(localStorage, serializer)

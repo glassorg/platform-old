@@ -11,6 +11,8 @@ import .Namespace
 import .defaultNamespace
 import .JSONPointer.*
 import ..utility.guid
+import .Serializer
+    typeKey
 
 export type QueryKey = Key & .id is Null
 export type IdentityKey = Key & .id isnt Null
@@ -101,7 +103,10 @@ export default data class Key
     //     return memoize
 
     toString() -> keyToString(this)
-    toJSON() -> this.toString()
+    toJSON() -> { [typeKey]: Key.name, value: this.toString() }
+
+    static fromJSON(object, namespace) ->
+        return Key.parse(namespace, object.value)
 
     static create(...args) ->
         var parent: IdentityKey | Null = null

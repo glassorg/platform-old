@@ -1,5 +1,6 @@
 import .VertexFormat
 import .GL.*
+import .Graphics
 import .Graphics3D
 import .Primitive
 
@@ -58,3 +59,12 @@ export default class DataBuffer
         this.bind()
         this.graphics.gl.bufferData(this.type, data, this.usage, this.offset, length)
         this.size = length
+
+    delete() ->
+        this.graphics.gl.deleteBuffer(this.glBuffer)
+
+    //  ResourceLoader interface
+    static async load(g: Graphics, id: (g: Graphics) => DataBuffer): DataBuffer -> id(g)
+    static unload(g: Graphics, id: (g: Graphics) => DataBuffer, resource: DataBuffer) ->
+        resource.delete()
+

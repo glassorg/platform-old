@@ -1,0 +1,7 @@
+import .BrowserStore
+import ..Serializer
+
+export default class SessionStore extends BrowserStore
+
+    constructor(serializer: Serializer) ->
+        super(sessionStorage, serializer)

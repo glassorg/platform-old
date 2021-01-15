@@ -1,0 +1,70 @@
+import assert
+    strict as assert
+import ..Model
+import ..Entity
+import ..Serializer
+import ...graphics.math.Vector3
+import ..Namespace
+import ..Key
+
+type DateString = /^\d{4}-(0[1-9]|10|11|12)-(0[1-9]|[1-2][0-9]|30|31)$/
+
+export default data class SerializerPerson extends Entity
+    name: String
+    birthDate: DateString
+    favoriteNumber: Integer = 7
+    array: Array<Integer>
+    position: Vector3
+
+class Foo extends SerializerPerson
+
+let namespace = new Namespace(Key, SerializerPerson, Vector3)
+
+let { stringify, parse } = new Serializer(namespace, { indent: 4 })
+
+// Vector Structure Serialization
+do
+    let v = new Vector3(1, 3, 2)
+    let s = stringify(v)
+    assert(s is String)
+    let parsed = parse(s)
+    assert.deepEqual(v, parsed)
+    assert(parsed is Vector3)
+
+// Vector Nested Types
+do
+    let foo = new SerializerPerson()
+        {}
+            key: Key.create(SerializerPerson, "Joe")
+            id: "foo"
+            name: "Joe"
+            birthDate: "2021-01-12"
+            position: new Vector3(10, 20, 30)
+            array: [1,2,3]
+    let s = stringify(foo)
+    let parsed = parse(s)
+    assert(parsed.position is Vector3)
+
+// Serialization of primitives
+do
+    let text = "foo"
+    let stext = stringify(text)
+    let ptext = parse(stext)
+    assert.deepEqual(text, ptext)
+
+// Serialization of typed objects
+    let modified = { by: "krisnye@gmail.com", date: Date.parse("1971-12-09T12:00:00") }
+    let persons = []
+        new SerializerPerson()
+            {}
+                key: Key.create(SerializerPerson, "kris")
+                name: "Kris Nye"
+                birthDate: "1971-12-09"
+                created: modified
+                updated: modified
+                array: [12, 20, 13]
+                position: new Vector3(10, 20, 30)
+    assert.deepEqual(persons[0].favoriteNumber, 7)
+    let personString = stringify(persons)
+    let parsedSerializerPerson = parse(personString)
+    assert.deepEqual(persons, parsedSerializerPerson)

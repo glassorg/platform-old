@@ -1,0 +1,46 @@
+import .Namespace
+
+function getId(constructor) -> constructor.id ?? constructor.name
+
+export let typeKey = ""
+//  we are not using the JSON replacer or reviver because our minimal traversal is more efficent
+//  when parsing and we need a custom traversal when stringifying
+export default class Serializer
+
+    indent: Number
+    namespace: Namespace
+
+    constructor(namespace: Namespace, options) ->
+        this.namespace = namespace
+        this.indent = options?.indent || 0
+        //  TODO: member with => should be bound to instance like these
+        this.parse = this.parse.bind(this)
+        this.stringify = this.stringify.bind(this)
+        this.replacer = this.replacer.bind(this)
+        this.reviver = this.reviver.bind(this)
+
+    reviver(key, value) ->
+        if value is Object
+            let type = value[typeKey]
+            if this.namespace.hasOwnProperty(type)
+                let ctor = this.namespace[type]
+                return ctor.fromJSON?(value, this.namespace) ?? new ctor(value)
+        return value
+
+    parse(text: String) ->
+        return JSON.parse(text, this.reviver)
+
+    replacer(key, value) ->
+        if value is Array
+            return [...value]
+        if value is Object
+            let type = value.constructor.name
+            if this.namespace.hasOwnProperty(type)
+                return { [typeKey]: type, ...value }
+            else
+                return { ...value }
+        return value
+
+    stringify(root) ->
+        // root = this.toJSON(root)
+        return JSON.stringify(root, this.replacer, this.indent > 0 ? this.indent : undefined)

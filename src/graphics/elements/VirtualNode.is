@@ -40,6 +40,22 @@ export default class VirtualNode
 
     get nodeType() -> 1
 
+    eventListeners
+    dispatchEvent(e) ->
+        let handler = this.eventListeners?[e.type]
+        if handler
+            handler.call(this, e)
+    addEventListener(name, handler) ->
+        if this[name] isnt Null
+            throw new Error(`Event ${name} already has a handler`)
+        if this.eventListeners is Null
+            this.eventListeners = {}
+        this.eventListeners[name] = handler
+    removeEventListener(name, handler) ->
+        if this.eventListeners?[name] != handler
+            throw new Error(`Event ${name} is not the handler`)
+        this.eventListeners[name] = null
+
     // composition methods compatible with Html Node
     appendChild(child) ->
         return this.insertBefore(child, null)

@@ -4,3 +4,6 @@ export default class VirtualElement extends VirtualNode
 
     setAttribute(name, value) ->
         this[name] = value
+
+    removeAttribute(name) ->
+        this[name] = false

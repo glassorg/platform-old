@@ -1,0 +1,126 @@
+import .IndexArray
+import .IndexBuffer
+import .DataBuffer
+    BufferUsage
+import .Graphics3D
+import .Primitive
+import .VertexArray
+import .VertexBuffer
+import .VertexFormat
+import .math.Vector3
+
+export function getFaceNormal(a: Vector3, b: Vector3, c: Vector3) ->
+    return a.subtract(b).cross(a.subtract(c))
+
+function getVertexCacheKey(position: Vector3) -> position.toString()
+
+export default class Mesh
+
+    vertices: VertexArray
+    indexes: IndexArray
+    primitive: Primitive
+
+    constructor(vertices: VertexArray | VertexFormat, indexes: IndexArray = new IndexArray(), primitive = Primitive.triangles) ->
+        this.vertices = vertices is VertexArray ? vertices : new VertexArray(vertices)
+        this.indexes = indexes
+        this.primitive = primitive
+
+    createIndexBuffer(g: Graphics3D, usage = BufferUsage.staticDraw) ->
+        let ib = new IndexBuffer()
+            g
+            usage
+            this.vertices.format
+            this.primitive
+            undefined
+            this.indexes.type
+        return this.writeTo(ib)
+
+    writeTo(ib: IndexBuffer) ->
+        ib.vertices[0].setData(this.vertices.floatData)
+        ib.setData(this.indexes.data)
+        return ib
+
+    // TODO: share vertices by position cache
+    subdivideFace(faceIndex: Number, keyFunction: ((position: Vector3) => Any) = getVertexCacheKey, cache: Map<Any,Number> = new Map()) ->
+        let faceVertexIndex0 = faceIndex * 3
+
+        let getInterpolatedVertex = (a: Number, b: Number) =>
+            if keyFunction && cache
+                let position = this.vertices.get(a, "position", Vector3).lerp(this.vertices.get(b, "position", Vector3), 0.5)
+                let key = keyFunction(position)
+                let cached = cache.get(key)
+                if cached isnt Null
+                    return cached
+                else
+                    let newVertexIndex = this.vertices.addInterpolatedVertex(a, b)
+                    cache.set(key, newVertexIndex)
+                    return newVertexIndex 
+            return this.vertices.addInterpolatedVertex(a, b)
+
+        let a = this.indexes.get(faceVertexIndex0 + 0)
+        let b = this.indexes.get(faceVertexIndex0 + 1)
+        let c = this.indexes.get(faceVertexIndex0 + 2)
+        //  create 3 new interpolated vertices
+        let ab = getInterpolatedVertex(a, b)
+        let bc = getInterpolatedVertex(b, c)
+        let ca = getInterpolatedVertex(c, a)
+        // first change old vertex to now be face a -> ab -> ca
+        this.indexes.set(faceVertexIndex0 + 1, ab)
+        this.indexes.set(faceVertexIndex0 + 2, ca)
+        // now add three new faces
+        //       A
+        //     /   \
+        //   CA --- AB
+        //  /  \   /  \
+        // C --- BC --- B
+        this.indexes.push()
+            ab, b, bc
+            ca, bc, c
+            ca, ab, bc
+
+    subdivideAllFaces(steps = 0, keyFunction: (position: Vector3) => Any = getVertexCacheKey) ->
+        let cache = new Map()
+        // console.log("Before: ", { v: this.vertices.length, i: this.indexes.length })
+        for count in 0 .. steps
+            let faceCount = this.indexes.length / 3
+            for face in faceCount - 1 ... 0
+                this.subdivideFace(face, keyFunction, cache)
+            // console.log(`After: ${count}`, { v: this.vertices.length, i: this.indexes.length })
+        this.checkValid()
+        return this
+
+    checkValid() ->
+        //  TODO: make loop counter optional argument on for value, index in expression
+        var index = 0
+        for i in this.indexes
+            index++
+            if i >= this.vertices.length
+                throw new Error(`Invalid Index at position ${index}: ${i}`)
+
+    computeNormals() ->
+        if this.primitive != Primitive.triangles
+            throw new Error("Can only generate normals on triangles")
+
+        let faceNormals: Array<Vector3> = new Array(this.indexes.length / 3)
+        let vertexFaces: Array<Array<Number>> = []
+        for i in 0 .. this.vertices.length
+            vertexFaces[i] = []
+        for faceVertexIndex0 in 0 .. this.indexes.length by 3
+            let ai = this.indexes.get(faceVertexIndex0 + 0)
+            let bi = this.indexes.get(faceVertexIndex0 + 1)
+            let ci = this.indexes.get(faceVertexIndex0 + 2)
+            vertexFaces[ai].push(faceVertexIndex0)
+            vertexFaces[bi].push(faceVertexIndex0)
+            vertexFaces[ci].push(faceVertexIndex0)
+            faceNormals[faceVertexIndex0] = getFaceNormal()
+                this.vertices.get(ai, "position")
+                this.vertices.get(bi, "position")
+                this.vertices.get(ci, "position")
+
+        for vi in 0 .. this.vertices.length
+            // for every vertex, get the surrounding faces normals
+            let normals = vertexFaces[vi].map(fi => faceNormals[fi])
+            // now set the normal on that vertex
+            let normal = Vector3.add(normals).normalize()
+            this.vertices.set(vi, "normal", normal)
+        return this

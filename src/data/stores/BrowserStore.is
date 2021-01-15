@@ -1,0 +1,59 @@
+import ..Key
+    IdentityKey
+    QueryKey
+import ..Serializer
+import .MemoryStore
+
+type Storage = .length is Integer & .key is Function
+
+//  local stores extend memory stores and then operate as a write-through cache
+//  we DO NOT watch the localStorage object in realtime.
+export default class BrowserStore extends MemoryStore
+
+    storage: Storage
+    serializer: Serializer
+    loaded = new Set()
+
+    constructor(storage: Storage, serializer: Serializer) ->
+        super()
+        this.serializer = serializer
+        this.storage = storage
+
+    ensureLoaded(key: Key) ->
+        let checkLoadedKey = key is QueryKey ? key.schema : key.string
+        if !this.loaded.has(checkLoadedKey)
+            this.loaded.add(checkLoadedKey)
+            if key is IdentityKey
+                let value = this.storage.getItem(key.string)
+                if value isnt Null
+                    let model = this.serializer.parse(value)
+                    this.setValue(key, model)
+            else
+                let filter = key.schema.name + "/"
+                // iterate all keys and try to load values
+                for i in 0 .. this.storage.length
+                    let keyString = this.storage.key(i)
+                    if keyString != null && keyString.startsWith(filter) && Key.isProbablyIdentityKey(keyString)
+                        try
+                            let modelKey = Key.parse(this.serializer.namespace, keyString)
+                            this.ensureLoaded(modelKey)
+                        catch e
+                            // console.warn(e)
+                            console.warn(`data.BrowserStore invalid key (${keyString})`)
+                            // storage.removeItem(keyString)
+
+    get(key: Key, peek: Boolean = false) ->
+        this.ensureLoaded(key)
+        return super.get(key, peek)
+
+    setValue(key: Key, value: Value) ->
+        let changed = super.setValue(key, value)
+        // we only store model keys in local storage, never query keys
+        if changed && Key.isModelKey(key)
+            if value isnt Null
+                if key.type isnt Null && value.constructor != key.type
+                    value = new key.type(value)
+                this.storage.setItem(key.string, this.serializer.stringify(value))
+            else
+                this.storage.removeItem(key.string)
+        return changed

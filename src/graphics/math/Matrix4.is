@@ -117,7 +117,7 @@ export default data struct Matrix4
             return a ?? null
         return a.multiply(b)
 
-    static var identity =
+    static identity =
         new Matrix4()
             1, 0, 0, 0
             0, 1, 0, 0

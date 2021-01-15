@@ -1,6 +1,11 @@
 import .Model
 
 export default class Namespace
+
     constructor(...types) ->
         for type in types
-            this[type.name] = type
+            this.add(type)
+
+    add(type) ->
+        this[type.name] = type
+        return this

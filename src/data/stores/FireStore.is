@@ -1,0 +1,171 @@
+import ..Key
+    IdentityKey
+    QueryKey
+import .MemoryStore
+import ..Serializer
+import ..Namespace
+import ...utility.common.*
+import "@google-cloud/firestore"
+    Firestore as GoogleFirestore
+    Query as GoogleQuery
+    WhereFilterOp
+
+export let serializedProperty = "_"
+
+export type Snapshot = .data is Function & .exists is Boolean & .ref.path is String
+
+export function getIndexedValues(entity: Entity) ->
+    let values = {}
+    let deleted = entity.deleted isnt Null
+    common.traverse()
+        entity
+        entity.constructor
+        (value, schema, ancestors, path) =>
+            if schema.index && (!deleted || path[0] == "deleted")
+                //  initially we used ".", but that prevents queries from working
+                //  in google firestore
+                let name = path.join("_")
+                values[name] = value
+    return values
+
+let getSerializer = common.memoize(ns -> new Serializer(ns))
+
+function serialize(entity: Entity, namespace: Namespace) ->
+    //  remove the type
+    let values = Object.assign({}, entity)
+    //  remove the key
+    delete values.key
+    return getSerializer(namespace).stringify(values)
+
+function deserialize(key: IdentityKey, serialized: string, namespace: Namespace) ->
+    let values = getSerializer(namespace).parse(serialized)
+    //  restore the key
+    values.key = key
+    //  restore the type
+    return new key.type(values)
+
+export function toDocumentValues(entity: Entity, namespace: Namespace) ->
+    return { [serializedProperty]: serialize(entity, namespace), ...getIndexedValues(entity) }
+
+function getKey(namespace: Namespace, doc: Snapshot): IdentityKey ->
+    return Key.parse(namespace, doc.ref.path)
+
+export function toEntity(namespace: Namespace, doc: Snapshot, key: IdentityKey = getKey(namespace, doc)): T | Null ->
+    if !doc.exists
+        return null
+    let data = doc.data()
+    return deserialize(key, data[serializedProperty], namespace)
+
+export function toGoogleQuery(db, key: Key) ->
+    let { parent, type, query } = key
+    let gquery = db.collection(key.path)
+    if query
+        if query.limit isnt Null
+            gquery = gquery.limit(query.limit)
+        if query.offset isnt Null
+            gquery = gquery.startAt(query.offset)
+        if query.sort
+            for sort in query.sort
+                for [name,direction] in sort
+                    if sort.hasOwnProperty(name)
+                        gquery = gquery.orderBy(name, direction ? "asc" : "desc")
+        if query.where
+            let where = query.where
+            for [name,value] in where
+                if value is Object
+                    for [op,opValue] in value
+                        // convert op to google format
+                        let googleOp = op == "contains" ? "array-contains" : op
+                        gquery = gquery.where(name, googleOp, opValue)
+                else
+                    gquery = gquery.where(name, "==", value)
+    return gquery
+
+export default class FireStore extends MemoryStore
+
+    namespace: Namespace
+    serializer: Serializer
+    db
+
+//     constructor(namespace: Namespace, app: firebase.app.App) ->
+    constructor(namespace: Namespace, app) ->
+        super()
+        this.namespace = namespace
+        this.serializer = new Serializer(namespace)
+        this.db = app.firestore()
+
+    ensureWatched(key: Key) ->
+        if !super.ensureWatched(key)
+            return false
+
+        let handleEntities = (entities: Map<Key,Entity|Null>) =>
+            // now... do we store individual query results, or entire result sets?
+            // for now let's just store the whole value till we can analyze
+            for key in entities.keys()
+                this.watched.add(key.string)
+                let entity = entities.get(key)
+                super.setValue(key, entity)
+            // store the results for the keys query
+            if key is QueryKey && key.query isnt Null && key.query.limit isnt Null
+                let keys = []
+                for entity in entities.values()
+                    if entity isnt Null
+                        keys.push(entity.key)
+                super.setValue(key, keys)
+            if key is IdentityKey && entities.size == 0
+                super.setValue(key, null)
+
+        console.log("FireStore.ensureWatched: " + key)
+
+        if key is QueryKey
+            // query set of entities
+            let collectionRef = toGoogleQuery(this.db, key)
+            collectionRef.onSnapshot()
+                snapshot =>
+                    let keys = []
+                    // save each doc
+                    for doc in snapshot.docs
+                        let key = getKey(this.namespace, doc)
+                        this.watched.add(key.string)
+                        let entity = toEntity(this.namespace, doc, key)
+                        super.setValue(key, entity)
+                        if entity isnt Null
+                            keys.push(key)
+                    // save keys as result of query.
+                    super.setValue(key, keys)
+        else
+            let docRef = this.db.doc(key.path)
+            docRef.onSnapshot()
+                doc =>
+                    let key = getKey(this.namespace, doc)
+                    let entity = toEntity(this.namespace, doc, key)
+                    super.setValue(key, entity)
+        return true
+
+    setValue(key: Key, value: Value) ->
+        let changed = super.setValue(key, value)
+        if changed && key is IdentityKey
+            //  mark this entity as watched
+            this.watched.add(key.toString())
+            if value isnt Null
+                if key.type isnt Null && value.constructor != key.type
+                    value = new key.type(value)
+
+            let docRef = this.db.doc(key.path)
+            if value isnt Null
+                docRef.set(toDocumentValues(value, this.namespace), { merge: true })
+                .then()
+                    =>
+                        console.log(`FireStore.setValue updated`)
+                .catch()
+                    e =>
+                        console.error(`FireStore.setValue update error:`, e)
+            else
+                docRef.delete()
+                .then()
+                    () =>
+                        console.log(`FireStore.setValue deleted`)
+                .catch()
+                    e =>
+                        console.error(`FireStore.setValue delete error`, e)
+        return changed

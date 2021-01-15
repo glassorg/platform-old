@@ -1,7 +1,7 @@
 import .functions
     createTexture
 import .TextureBase
-import ..math.Rectangle
+import .math.Rectangle
 import .Graphics3D
 import .Graphics
 
@@ -70,3 +70,4 @@ export default class Texture extends TextureBase
                     let texture =
                         new Texture(g.gl, id, id, undefined, undefined)
                             () => resolve(texture)
+    static unload() -> throw new Error("Not implemented")

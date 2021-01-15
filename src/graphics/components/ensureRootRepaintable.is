@@ -1,18 +1,13 @@
-import ..graphics.Graphics3D
+import ..Graphics3D
 import ..elements.Dock
     layout
+import .functions
+    children
 
-let children = *(parent) ->
-    var node = parent.firstChild
-    while node isnt Null
-        yield node
-        node = node.nextSibling
-
-export default ensureRootRepaintable(canvas, dimensions: 2 | 3) ->
-    var active = true
+export default ensureRootRepaintable(canvas, dimensions: 2 | 3, graphicsCallback) ->
     if canvas.dirty is Null
     //     bindPointerEvents(canvas)
-        var graphics: Graphics
+        var graphics: Graphics = canvas.graphics
         let repaint = () ->
             rafId = null
             if graphics is Null
@@ -28,6 +23,9 @@ export default ensureRootRepaintable(canvas, dimensions: 2 | 3) ->
                         graphics = new Graphics3D(context)
                     else
                         console.error("Expected a WebGL2RenderingContext:", context)
+                // store on the canvas
+                canvas.graphics = graphics
+                graphicsCallback?(graphics)
             if graphics isnt Null
                 let time = Date.now()
                 frame++
@@ -65,15 +63,19 @@ export default ensureRootRepaintable(canvas, dimensions: 2 | 3) ->
         if canvas.dirty isnt Boolean
             Object.defineProperties(canvas)
                 {}
+                    active: {}
+                        value: true
+                        writable: true
                     dirty: {}
                         get() -> dirty
                         set(value: Boolean) ->
                             if value != dirty
                                 dirty = value
-                                if value && rafId is Null && active
+                                if value && rafId is Null && canvas.active
                                     //  was using c.requestAnimationFrame
                                     //  wasn't firing the first time on rendering repaint
                                     rafId = requestAnimationFrame(repaint)
 
+    canvas.dirty = canvas.active = true
     return ->
-        active = false
+        canvas.dirty = canvas.active = false

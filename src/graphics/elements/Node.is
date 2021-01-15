@@ -1,14 +1,14 @@
 import .VirtualElement
-import ..graphics.Graphics
+import ..Graphics
 import ..math.Capsule
 import ..math.BoundingShape
 import .Pickable
 // import PickResult from "./PickResult"
 import ..math.Matrix4
-import ..graphics.Effect
-import ..graphics.Program
+import ..Effect
+import ..Program
 
-export default class SceneNode extends VirtualElement
+export default class Node extends VirtualElement
 
     _boundingShape: BoundingShape
     _pickable: Pickable
@@ -26,18 +26,21 @@ export default class SceneNode extends VirtualElement
 
     get transform() -> this._transform
     set transform(value) ->
+        this.invalidate()
         this._transform = value
 
     get boundingShape() -> this._boundingShape
     set boundingShape(value) ->
+        this.invalidate()
         this._boundingShape = value
 
     get pickable() -> this._pickable
     set pickable(value) ->
+        this.invalidate()
         this._pickable = value
 
     calculateWorldTransform(parentTransform, localTransform) ->
-        return Matrix4.multiply(parentTransform, localTransform) || Matrix4.identity
+        return Matrix4.multiply(parentTransform, localTransform) ?? Matrix4.identity
 
     update(g: Graphics): Boolean ->
         var animating = false
@@ -87,60 +90,44 @@ export default class SceneNode extends VirtualElement
             node?.render(g)
             node = node.nextSibling
 
-//     public pick(ray: Capsule): PickResult | null {
-//         let pickable = this.pickable
-//         if (pickable is Null) {
-//             pickable = Pickable.children
-//         }
-//         if (pickable != Pickable.none) {
-//             let { transform: localTransform } = this
-//             if (localTransform) {
-//                 ray = ray.transform(localTransform.inverse())
-//             }
-//         }
-//         if (pickable & Pickable.children) {
-//             let boundingShape = this.boundingShape
-//             if (boundingShape is Null || boundingShape.intersectsCapsule(ray)) {
-//                 let result = this.pickChildren(ray)
-//                 if (result isnt Null) {
-//                     return result
-//                 }
-//             }
-//         }
-
-//         if (pickable & Pickable.self) {
-//             let result = this.pickSelf(ray)
-//             if (result isnt Null) {
-//                 return result
-//             }
-//         }
-
-//         return null
-//     }
+    pick(ray: Capsule): PickResult | Null ->
+        // debugger
+        var pickable = this.pickable
+        if pickable is Null
+            pickable = Pickable.children
+        if pickable != Pickable.none
+            let { transform: localTransform } = this
+            if localTransform
+                ray = ray.transform(localTransform.inverse())
+        if pickable & Pickable.children
+            let boundingShape = this.boundingShape
+            if (boundingShape is Null || boundingShape.intersectsCapsule(ray))
+                let result = this.pickChildren(ray)
+                if result isnt Null
+                    return result
+        if pickable & Pickable.self
+            let result = this.pickSelf(ray)
+            if result isnt Null
+                return result
+        return null
 
     pickSelf(ray: Capsule): PickResult | Null -> null
 
     get pickChildrenReverse() -> false
-//     protected pickChildren(ray: Capsule): PickResult | null {
-//         // //  we iterate children from last to first since later children are on top.
-//         let reverse = this.pickChildrenReverse
-//         for (let child = reverse ? this.lastChild : this.firstChild;
-//             child isnt Null;
-//             child = reverse ? child.previousSibling : child.nextSibling) {
-//             if (child instanceof Node) {
-//                 let result = child.pick(ray)
-//                 if (result isnt Null) {
-//                     return result
-//                 }
-//             }
-//         }
-//         return null
-//     }
+    pickChildren(ray: Capsule): PickResult | Null ->
+        // //  we iterate children from last to first since later children are on top.
+        let reverse = this.pickChildrenReverse
+        var child = reverse ? this.lastChild : this.firstChild
+        while child isnt Null
+            if child is Node
+                let result = child.pick(ray)
+                if result isnt Null
+                    return result
+            child = reverse ? child.previousSibling : child.nextSibling
+        return null
 
-//     onpointerover?: (e: PointerEvent) => void
-//     onpointerout?: (e: PointerEvent) => void
-//     onpointermove?: (e: PointerEvent) => void
-//     onpointerdown?: (e: PointerEvent) => void
-//     onpointerup?: (e: PointerEvent) => void
-
-// }
+    onPointerOver: (e: PointerEvent) => Void
+    onPointerOut:  (e: PointerEvent) => Void
+    onPointerMove: (e: PointerEvent) => Void
+    onPointerDown: (e: PointerEvent) => Void
+    onPointerUp:   (e: PointerEvent) => Void

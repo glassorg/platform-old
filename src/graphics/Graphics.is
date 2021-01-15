@@ -1,8 +1,16 @@
-import ..math.Color
-import ..math.Matrix4
+import .math.Color
+import .math.Matrix4
 import .ResourceManager
 import .ResourceLoader
 import .Invalidatable
+import preact.*
+import preact.hooks
+    useContext
+    useEffect
+    useState
+
+export let GraphicsContext = preact.createContext(null)
+export function useGraphics() -> useContext(GraphicsContext)
 
 export default abstract class Graphics
 
@@ -10,6 +18,11 @@ export default abstract class Graphics
     resources: ResourceManager
     // timing
     time = 0
+    uniforms: .modelView is Matrix4 & .projection is Matrix4
+
+    constructor() ->
+        this.resources = new ResourceManager(this)
+ 
     // properties
     abstract get width(): Number ->
     abstract get height(): Number ->
@@ -18,7 +31,6 @@ export default abstract class Graphics
     abstract end() ->
     // transformation
     //            { modelView: Matrix4, projection: Matrix4 }
-    uniforms: .modelView is Matrix4 & .projection is Matrix4
     abstract get transform(): Matrix4 ->
     abstract set transform(value: Matrix4) ->
     // drawing
@@ -29,10 +41,20 @@ export default abstract class Graphics
         throw new Error()
     // request redraw
     abstract invalidate() ->
-
     //  Shorthand for Graphics.resources.getResource(loader, id, dependent)
-    resource(loader: ResourceLoader, id: String, dependent: Invalidatable): T | Null ->
-        return this.resources.get(loader, id, dependent)
+    // resource(loader: ResourceLoader, id, dependent: Invalidatable): T | Null ->
+    //     return this.resources.get(loader, id, dependent)
 
-    constructor() ->
-        this.resources = new ResourceManager(this)
+    useResource(loader: ResourceLoader, id) ->
+        // let's do this
+        let [value, setValue] = useState(null)
+
+        useEffect()
+            =>
+                let unwatch = this.resources.use(loader, id)
+                    (loaderValue) =>
+                        setValue(loaderValue)
+                return unwatch
+            [loader, id]
+
+        return value

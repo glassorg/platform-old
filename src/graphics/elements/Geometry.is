@@ -1,0 +1,30 @@
+import .Node
+import ..Graphics3D
+import ..IndexBuffer
+import ..DataBuffer
+
+export default class Geometry extends Node
+
+    //  DataBuffer | Null
+    //  but... preact is converting null to a ""
+    buffer
+    id: String | (g: Graphics3D) => DataBuffer
+    instance: Array<Number>
+
+    // render(g) ->
+    //     debugger
+    //     super.render(g)
+
+    drawSelf(g: Graphics3D) ->
+        if this.buffer is Null
+            if this.id is Null
+                throw new Error("You must specify either buffer or id property")
+            console.log("TODO: make resource loading of index buffers work")
+            // this.buffer = g.resource(DataBuffer, this.id, this)
+
+        //  still have to check because it might not have been loaded yet.
+        if this.buffer
+            if this.instance
+                g.instanceStream.writeInstance(this.buffer, this.instance)
+            else
+                this.buffer.draw()

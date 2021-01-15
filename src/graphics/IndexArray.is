@@ -1,0 +1,60 @@
+import .VertexFormat
+import .VertexElement
+import .GL.*
+import .math.Vector3
+import .math.Vector2
+import .IndexBuffer
+    ElementType
+import .functions
+    transfer
+
+export default class IndexArray
+
+    type: ElementType
+    data: Uint32Array | Uint16Array
+    _length = 0
+
+    constructor(capacity = 256, type: ElementType = ElementType.UnsignedShort) ->
+        this.type = type
+        this.setCapacity(capacity)
+
+    get length() -> this._length
+
+    get buffer() -> this.data?.buffer
+
+    ensureCapacity(capacity: Number) ->
+        if this.capacity < capacity
+            this.grow(capacity)
+
+    setMinLength(length: Number) ->
+        this.ensureCapacity(length)
+        this._length = Math.max(this._length, length)
+
+    get capacity() -> this.data?.length ?? 0
+
+    grow(minimum = 0) ->
+        this.setCapacity(Math.max(minimum, this.capacity * 2))
+
+    setCapacity(capacity: Number) ->
+        if capacity != this.capacity
+            let newSize = capacity * (this.type == ElementType.UnsignedShort ? 2 : 4)
+            let buffer = this.buffer ? transfer(this.buffer, newSize) : new ArrayBuffer(newSize)
+            this.data = new (this.type == ElementType.UnsignedShort ? Uint16Array : Uint32Array)(buffer)
+
+    push(...values: Array<Number>) ->
+        let length = this.length
+        this.setMinLength(length + values.length)
+        this.data.set(values, length)
+
+    get(index: Number) -> this.data[index]
+    set(index: Number, value: Number) ->
+        this.setMinLength(index + 1)
+        this.data[index] = value
+
+    setData(data: Array<Number>) ->
+        this._length = data.length
+        this.setCapacity(this._length)
+        this.data.set(data, 0)
+        return this
+
+    toArray() -> [...this.data]

@@ -5,6 +5,7 @@ import "./shaders/PositionColor2D.vert" * as PositionColor2D_VertexShader
 import "./shaders/PositionTexture3D.vert" * as PositionTexture3D_VertexShader
 import "./shaders/Texture.frag" * as Texture_FragmentShader
 import "./shaders/PositionColorTexture3D.vert" * as PositionColorTexture3D_VertexShader
+import "./shaders/PositionNormal.vert" * as PositionNormal_VertexShader
 import "./shaders/PositionColorTexture2D.vert" * as PositionColorTexture2D_VertexShader
 import "./shaders/ColorTexture.frag" * as ColorTexture_FragmentShader
 import .VertexShader
@@ -41,6 +42,10 @@ export default class Program extends Effect
 
     static positionColor = new Program()
         new VertexShader(VertexFormat.positionColor, PositionColor3D_VertexShader)
+        new FragmentShader(Color_FragmentShader)
+
+    static positionNormal = new Program()
+        new VertexShader(VertexFormat.positionNormal, PositionNormal_VertexShader)
         new FragmentShader(Color_FragmentShader)
 
     static positionColorTexture2D = new Program()

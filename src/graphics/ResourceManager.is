@@ -1,12 +1,12 @@
 import .ResourceLoader
 // import .Graphics
-import ..elements.SceneNode
+import .elements.Node
 import .Invalidatable
 
 class ResourceInfo
     loading = false
-    dependents = new Set()
-    value
+    observers = new Set()
+    value = null
 
 export default class ResourceManager
 
@@ -17,42 +17,59 @@ export default class ResourceManager
         this.g = g
         this.resources = new Map()
 
-    info(loader: ResourceLoader<T>, id: String): ResourceInfo<T> ->
-        let resources = this.resources.get(loader)
+    info(loader: ResourceLoader<T>, id): ResourceInfo<T> ->
+        var resources = this.resources.get(loader)
         if resources is Null
             resources = new Map()
             this.resources.set(loader, resources)
-        let info = resources.get(id)
+        var info = resources.get(id)
         if info is Null
             info = new ResourceInfo()
             resources.set(id, info)
         return info
 
-    // TODO: Continue, and consider AssignmentExpressions.
-    load(loader: ResourceLoader<T>, id: String): Promise<T> ->
+    load(loader: ResourceLoader<T>, id): Promise<T> ->
         return
             new Promise()
                 (resolve, reject) =>
-                    let result = this.get(loader, id)
-                        {}
-                            invalidate(value) ->
-                                resolve(value)
+                    let result =
+                        this.get()
+                            loader
+                            id
+                            {}
+                                invalidate(value) ->
+                                    resolve(value)
                     if result isnt Null
                         resolve(result)
 
-    get(loader: ResourceLoader<T>, id: String, dependent: Invalidatable): T | Null ->
+    use(loader: ResourceLoader<T>, id, observer: (value) => Void): T | Null ->
         let info = this.info(loader, id)
-        if !info.loading
+        info.observers.add(observer)
+
+        if info.value isnt Null
+            observer(info.value)
+        else if !info.loading
+            console.log("Loading resource", { loader, id })
             info.loading = true
             loader.load(this.g, id)
             .then()
                 value =>
                     info.value = value
-                    for dependent in info.dependents.values()
-                        dependent.invalidate(value)
+                    for observer in info.observers
+                        observer(value)
             .catch()
                 e =>
                     console.error(`Error loading resource '${id}':`, e)
-        if dependent && info.value is Null
-            info.dependents.add(dependent)
-        return info.value ?? null
+
+        return ->
+            info.observers.delete(observer)
+            if info.observers.size == 0
+                console.log("release resource", { loader, id })
+
+    get(loader: ResourceLoader<T>, id, observer: Invalidatable): T | Null ->
+        console.log("ResourceManager.get is deprecated, use ResourceManager.use")
+        this.use(loader, id)
+            (value) =>
+                observer?.invalidate()
+        let info = this.info(loader, id)
+        return info.value

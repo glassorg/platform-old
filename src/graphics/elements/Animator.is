@@ -1,7 +1,7 @@
-import .SceneNode
-import ..graphics.Graphics
+import .Node
+import ..Graphics
 
-export default class Animator<T> extends SceneNode
+export default class Animator<T> extends Node
 
     source: (time: Number) => T
     target

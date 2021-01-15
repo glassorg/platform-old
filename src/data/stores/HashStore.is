@@ -1,0 +1,47 @@
+import ..Serializer
+import ..Model
+import .LocalStore
+
+class HashStorage // implements Storage
+    hash: Object
+    keys: Array<String> | Null = null
+
+    constructor() ->
+        this.hash = this.getHash()
+
+    getKeys() ->
+        if !this.keys
+            this.keys = Object.keys(this.hash)
+        return this.keys
+
+    getHash() ->
+        try
+            let hash = location.hash.slice(1).trim()
+            if hash.length > 0
+                return JSON.parse(decodeURIComponent(hash))
+        catch e
+            console.warn(e)
+        return {}
+
+    updateHash() ->
+        location.hash = JSON.stringify(this.hash)
+        this.keys = null
+
+    get length() -> this.getKeys().length
+    key(index: number) -> this.getKeys()[index]
+    getItem(key: string) -> this.hash[key]
+    setItem(key: string, value: string) ->
+        this.hash[key] = value
+        this.updateHash()
+    removeItem(key: string) ->
+        delete this.hash[key]
+        this.updateHash()
+    clear() ->
+        this.hash = {}
+        this.updateHash()
+
+export default class HashStore extends LocalStore
+
+    constructor(serializer: Serializer) ->
+        super(new HashStorage(), serializer)
+

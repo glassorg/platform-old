@@ -1,18 +1,27 @@
 import .Control
 import .Dock
-import ..graphics.Graphics
-import ..graphics.Graphics3D
-import ..graphics.Program
+import ..Graphics
+import ..Graphics3D
+import ..Program
 import ..math.Matrix4
 
 export default class View extends Control
 
     projection: Matrix4 = Matrix4.identity
     layout = Dock.fill
+    effect = Program.default3D
 
-    constructor() ->
-        super()
-        this.effect = Program.default3D
+    //  a view resets the world transform
+    calculateWorldTransform(parentTransform, localTransform) -> Matrix4.identity
+
+    drawBackground(g: Graphics) ->
+        // this would draw in wrong coordinate space
+
+    render(g: Graphics) ->
+        // we draw background in the parents coordinate space before we reset ours
+        if this.backgroundColor || this.backgroundImage
+            g.fillRectangle(this.x, this.y, this.width, this.height, this.backgroundColor ?? Color.white, this.backgroundImage)
+        super.render(g)
 
     drawChildren(g: Graphics) ->
         let saveProjection = g.uniforms.projection

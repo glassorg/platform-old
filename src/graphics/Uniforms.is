@@ -1,7 +1,7 @@
 import .Graphics3D
-import ..math.Matrix4
-import ..math.Vector2
-import ..math.Vector3
+import .math.Matrix4
+import .math.Vector2
+import .math.Vector3
 import .functions
     equals
 import .Texture

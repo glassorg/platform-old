@@ -6,11 +6,13 @@ import .VertexBuffer
 import .DataBuffer
     DataType
     BufferUsage
+import .ResourceLoader
 
 export enum ElementType
     UnsignedShort = GL.UNSIGNED_SHORT
     UnsignedInt = GL.UNSIGNED_INT
 
+// implements ResourceLoader
 export default class IndexBuffer extends DataBuffer
 
     vertices: Array<VertexBuffer>
@@ -41,3 +43,8 @@ export default class IndexBuffer extends DataBuffer
             this.graphics.bindUniforms()
             this.bind()
             this.graphics.gl.drawElements(this.primitive, this.size, this.elementType, this.offset)
+
+    delete() ->
+        super.delete()
+        for vb in this.vertices
+            vb.delete()
