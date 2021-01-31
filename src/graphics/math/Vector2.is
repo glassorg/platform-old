@@ -4,8 +4,8 @@ import .functions
 
 export default data struct Vector2
 
-    var x: Number
-    var y: Number
+    var x: F32
+    var y: F32
 
     *[Symbol.iterator]() ->
         yield this.x
@@ -13,7 +13,7 @@ export default data struct Vector2
     add(v: Vector2) -> new Vector2(this.x + v.x, this.y + v.y)
     subtract(v: Vector2) -> new Vector2(this.x - v.x, this.y - v.y)
     multiply(v: Vector2) -> new Vector2(this.x * v.x, this.y * v.y)
-    scale(f: Number) -> new Vector2(this.x * f, this.y * f)
+    scale(f: F32) -> new Vector2(this.x * f, this.y * f)
     negate() -> new Vector2(- this.x, - this.y)
     dot(v: Vector2)-> this.x * v.x + this.y * v.y
     cross(v: Vector2) ->
@@ -27,7 +27,7 @@ export default data struct Vector2
             &&
                 equivalent(this.x, v.x)
                 equivalent(this.y, v.y)
-    lerp(v: Vector2, alpha: Number) ->
+    lerp(v: Vector2, alpha: F32) ->
         return
             new Vector2()
                 this.x + alpha * (v.x - this.x)
@@ -52,7 +52,7 @@ export default data struct Vector2
             new Vector2()
                 (m.m00 * x + m.m10 * y + m.m20 * z + m.m30) / w
                 (m.m01 * x + m.m11 * y + m.m21 * z + m.m31) / w
-    writeTo(array, index: Number) ->
+    writeTo(array, index: F32) ->
         array[index + 0] = this.x
         array[index + 1] = this.y
     toArray() -> [this.x, this.y]

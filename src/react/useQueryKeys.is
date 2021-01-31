@@ -5,7 +5,7 @@ import ..data.Key
 import ..data.Query
 import ..data.Store
 
-export let createUseQuery = (store: Store) ->
+export let createUseQueryKeys = (store: Store) ->
     let useStore = createUseStore(store)
     return
         (type: Type | Key, query: Query | Null) ->
@@ -13,4 +13,4 @@ export let createUseQuery = (store: Store) ->
             let [value, setValue] = useStore(key)
             return value ?? []
 
-export default createUseQuery(store)
+export default createUseQueryKeys(store)

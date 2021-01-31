@@ -5,8 +5,7 @@ import .ensureRootRepaintable
 import .bindPointerEvents
 import ..Graphics
     GraphicsContext
-import preact.*
-import preact.hooks
+import react
     useEffect
     useRef
     useState

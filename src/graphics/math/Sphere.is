@@ -6,7 +6,7 @@ import .Ray
 export default data struct Sphere
 
     var center: Vector3 = Vector3.zero
-    var radius: Number = 1
+    var radius: F32 = 1
 
     translate(v: Vector3) -> new Sphere(this.center.translate(v), this.radius)
 
@@ -19,7 +19,7 @@ export default data struct Sphere
     // Returns the furthest point along a direction.
     support(v: Vector3) -> v.normalize().scale(this.radius).add(this.center)
 
-    addRadius(value: Number) -> value == 0 ? this : new Sphere(this.center, this.radius + value)
+    addRadius(value: F32) -> value == 0 ? this : new Sphere(this.center, this.radius + value)
 
     raycastDistance(ray: Ray, front = true) ->
         let toSphere = this.center.subtract(ray.point)

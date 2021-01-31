@@ -13,10 +13,10 @@ import .functions
 
 export default data struct Rectangle
 
-    var x: Number
-    var y: Number
-    var width: Number
-    var height: Number
+    var x: F32
+    var y: F32
+    var width: F32
+    var height: F32
 
     get top() -> this.y
     get left() -> this.x
@@ -27,7 +27,7 @@ export default data struct Rectangle
     get topRight() -> new Vector2(this.right, this.bottom)
     get bottomLeft() -> new Vector2(this.left, this.bottom)
 
-    contains(x: Number, y: Number) ->
+    contains(x: F32, y: F32) ->
         return
             &&
                 x >= this.left

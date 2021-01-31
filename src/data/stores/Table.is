@@ -14,52 +14,39 @@ export default class Table
     key: QueryKey
     filter: Predicate
     keys = new Map()
-    cachedKeys: Array<IdentityKey> | Null = null
+    values: Array | Null = null
 
-    constructor(key: QueryKey) ->
+    constructor(key: QueryKey, values: Array | Null = null) ->
         this.key = key
         this.filter = createPredicate(key.query)
+        this.values = values
 
-    invalidateCachedKeys() ->
-        this.cachedKeys = null
+    invalidateValues() ->
+        this.values = null
 
-    getKeyIterator() -> this.keys.values()
+    getValues(store: Store) ->
+        if this.values is Null
+            this.values = []
+            for key in this.keys.values()
+                let value = store.peek(key)
+                if value isnt Null
+                    this.values.push([key, value])
+            if this.key.query.sort isnt Null && this.key.query.sort.length > 0
+                this.values.sort(createSortCompareFunction(this.key.query))
+        return this.values
 
-    createSortedKeys(store: Store): Array<IdentityKey> ->
-        if this.key.query.sort is Null || this.key.query.sort.length == 0
-            return [...this.getKeyIterator()]
-
-        //  get value for each key
-        var values = []
-        var valueToKeyMap = new Map()
-        for key in this.getKeyIterator()
-            let value = store.peek(key)
-            if value isnt Null
-                values.push(value)
-                valueToKeyMap.set(value, key)
-
-        //  sort values
-        values.sort(createSortCompareFunction(this.key.query))
-        //  convert back to keys and return
-        return values.map(t => valueToKeyMap.get(t))
-
-    getKeys(store: Store) ->
-        if this.cachedKeys is Null
-            this.cachedKeys = this.createSortedKeys(store)
-        return this.cachedKeys
-
-    update(key: IdentityKey, record): Boolean ->
-        if record isnt Null
-            if isPossibleMatch(this.key, key) && this.filter(record)
+    update(key: IdentityKey, value): Boolean ->
+        if value isnt Null
+            if isPossibleMatch(this.key, key) && this.filter(value)
                 if !this.keys.has(key.toString())
-                    this.invalidateCachedKeys()
+                    this.invalidateValues()
                     this.keys.set(key.toString(), key)
                     return true
             else
-                record = null
+                value = null
 
-        if record is Null && this.keys.has(key.toString())
-            this.invalidateCachedKeys()
+        if value is Null && this.keys.has(key.toString())
+            this.invalidateValues()
             this.keys.delete(key.toString())
             return true
         return false

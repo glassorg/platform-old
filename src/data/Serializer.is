@@ -22,9 +22,12 @@ export default class Serializer
     reviver(key, value) ->
         if value is Object
             let type = value[typeKey]
-            if this.namespace.hasOwnProperty(type)
-                let ctor = this.namespace[type]
-                return ctor.fromJSON?(value, this.namespace) ?? new ctor(value)
+            if type isnt Null
+                if this.namespace.hasOwnProperty(type)
+                    let ctor = this.namespace[type]
+                    return ctor.fromJSON?(value, this.namespace) ?? new ctor(value)
+                else
+                    throw new Error(`Type '${type}' is not in namespace so cannot be deserialized`)
         return value
 
     parse(text: String) ->

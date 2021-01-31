@@ -9,16 +9,21 @@ import ..Key
 
 type DateString = /^\d{4}-(0[1-9]|10|11|12)-(0[1-9]|[1-2][0-9]|30|31)$/
 
+data class SubItem
+    x: Number
+    y: Number
+
 export default data class SerializerPerson extends Entity
     name: String
     birthDate: DateString
     favoriteNumber: Integer = 7
     array: Array<Integer>
     position: Vector3
+    subItem: SubItem = new SubItem({ x: 1, y: 2 })
 
 class Foo extends SerializerPerson
 
-let namespace = new Namespace(Key, SerializerPerson, Vector3)
+let namespace = new Namespace(Key, SerializerPerson, Vector3, SubItem)
 
 let { stringify, parse } = new Serializer(namespace, { indent: 4 })
 
@@ -30,6 +35,7 @@ do
     let parsed = parse(s)
     assert.deepEqual(v, parsed)
     assert(parsed is Vector3)
+    // also check subItem
 
 // Vector Nested Types
 do
@@ -41,9 +47,11 @@ do
             birthDate: "2021-01-12"
             position: new Vector3(10, 20, 30)
             array: [1,2,3]
+            subItem: new SubItem({ x: 10, y: 20 })
     let s = stringify(foo)
     let parsed = parse(s)
     assert(parsed.position is Vector3)
+    assert(parsed.subItem is SubItem && parsed.subItem.y == 20)
 
 // Serialization of primitives
 do
@@ -53,6 +61,7 @@ do
     assert.deepEqual(text, ptext)
 
 // Serialization of typed objects
+do
     let modified = { by: "krisnye@gmail.com", date: Date.parse("1971-12-09T12:00:00") }
     let persons = []
         new SerializerPerson()

@@ -1,0 +1,64 @@
+import react
+    createContext
+    useState
+    useEffect
+    useContext
+
+// https://github.com/firebase/firebaseui-web-react
+import react-firebaseui.StyledFirebaseAuth
+import "firebase/auth"
+import firebase.app as firebase
+
+export let UserContext = createContext(null)
+export function useUser() -> useContext(UserContext)
+
+export data class User
+    displayName: String
+    email: String
+    emailVerified: Boolean
+    isAnonymous: Boolean
+    phoneNumber: String | Null
+    photoURL: String | Null
+    refreshToken: String | Null
+
+let uiConfig = {}
+    // Popup signin flow rather than redirect flow
+    signInFlow: "popup"
+    // We will display Google and Facebook as auth providers
+    signInOptions: []
+        firebase.auth.GoogleAuthProvider.PROVIDER_ID
+        firebase.auth.EmailAuthProvider.PROVIDER_ID
+    callbacks: {}
+        // Avoid redirects after sign-in
+        signInSuccessWithAuthResult() -> false
+    signInSuccessUrl: document.location.toString()
+    // Terms of service url/callback
+    tosUrl: "/terms"
+    // Privacy policy url/callback
+    privacyPolicyUrl() ->
+        window.location.assign("/privacy")
+
+export function signOut() ->
+    firebase.auth().signOut()
+
+export default function Authentication(props) ->
+    let [user, setUser] = useState(undefined)
+
+    // Listen to the Firebase Auth state and set the local state.
+    useEffect()
+        ->
+            let unregisterAuthObserver = firebase.auth().onAuthStateChanged()
+                (user) ->
+                    if user isnt Null
+                        user = new User(user)
+                    setUser(user)
+            return unregisterAuthObserver
+        []
+
+    return
+        <UserContext.Provider value={user} />
+            if user isnt Undefined
+                if user is Null
+                    <StyledFirebaseAuth key="s" uiConfig={uiConfig} firebaseAuth={firebase.auth()} />
+                else
+                    props.children

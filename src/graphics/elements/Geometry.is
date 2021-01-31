@@ -11,17 +11,7 @@ export default class Geometry extends Node
     id: String | (g: Graphics3D) => DataBuffer
     instance: Array<Number>
 
-    // render(g) ->
-    //     debugger
-    //     super.render(g)
-
     drawSelf(g: Graphics3D) ->
-        if this.buffer is Null
-            if this.id is Null
-                throw new Error("You must specify either buffer or id property")
-            console.log("TODO: make resource loading of index buffers work")
-            // this.buffer = g.resource(DataBuffer, this.id, this)
-
         //  still have to check because it might not have been loaded yet.
         if this.buffer
             if this.instance

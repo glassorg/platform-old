@@ -1,33 +1,34 @@
-import "preact"
+import react
     useState
     useEffect
-import ..data.stores.MemoryStore
-import ..data.Store
-import ..data.Key
-    IdentityKey
+import ..data
+    .stores.MemoryStore
+    .Store
+    .Key
+        IdentityKey
 
 export let createUseStore = (store: Store) ->
     return
-        (keyOrType: Key | Type, idOrDefaultValue, defaultValue) ->
+        (keyOrType: Key | Type, idOrQueryOrDefaultValue, defaultValue) ->
             var key: Key
             if keyOrType is Key
                 key = keyOrType
-                defaultValue = idOrDefaultValue
+                defaultValue = idOrQueryOrDefaultValue
             else
-                if idOrDefaultValue is Null
-                    throw new Error("Invalid id: " + idOrDefaultValue)
-                key = Key.create(keyOrType, idOrDefaultValue.toString())
+                if idOrQueryOrDefaultValue is Null
+                    throw new Error("Invalid id: " + idOrQueryOrDefaultValue)
+                key = Key.create(keyOrType, idOrQueryOrDefaultValue)
 
-            var [value, setValue] = useState(store.peek(key) ?? defaultValue)
+            var [value, setValue] = useState(defaultValue)
 
             useEffect()
                 ->
                     let unwatch = store.watch()
                         key
                         newValue ->
-                            if value != newValue
-                                setValue(newValue)
+                            setValue(newValue)
                     return unwatch
+                [key.toString()]
 
             let setStore = value ->
                 store.patch(key, value)

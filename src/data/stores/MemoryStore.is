@@ -4,98 +4,123 @@ import ..Key
     isPossibleMatch
 import ...utility.clonePatch
 import ..Store
-    Listener
+    Observer
 import ..Namespace
 import .Table
 
+// We need better type format
+// probably type Result = [String, Object | Array]
+// type Result = Array & .[0] is String & .[1] is Object | Array
 //
 // Base class for ModelSource implementations.
 // Also can serve as a simple in memory model source.
-//
 export default class MemoryStore extends Store
 
     tables = new Map()
-    keys = new Map()
+    observers = new Map()
     values = new Map()
-    writeListeners = new Set()
-    readListeners = new Set()
-    watched = new Set()
+    _internalUnwatchKey = new Map()
 
-    getTable(key: QueryKey) ->
+    _addWatcher(key: Key, observer: Observer) ->
+        let keyString = key.toString()
+        var keyObservers = this.observers.get(keyString)
+        if keyObservers is Null
+            keyObservers = new Set()
+            this.observers.set(keyString, keyObservers)
+        keyObservers.add(observer)
+        if keyObservers.size == 1
+            this._internalUnwatchKey.set(keyString, this._onWatched(key))
+    _removeWatcher(key: Key, observer: Observer) ->
+        let keyString = key.toString()
+        let keyObservers = this.observers.get(keyString)
+        if keyObservers?.has(observer)
+            keyObservers.delete(observer)
+            // if keyObservers.size == 0
+            //     this._internalUnwatchKey.get(keyString)()
+            //     this._internalUnwatchKey.delete(keyString)
+        else
+            throw new Error(`observer for key '${keyString}' not found`)
+
+    _onWatched(key: Key) ->
+        //  subclasses can override this to actually watch things
+        //  then return a function that will be called to unwatch things
+        return () ->
+
+    _onObserve(key: Key) ->
+        var value = this.peek(key)
+        if value is Undefined
+            value = null
+        this._notify(key, value)
+
+    watch(key: Key, observer: Observer) ->
+        this._addWatcher(key, observer)
+        this._onObserve(key, observer)
+        return =>
+            this._removeWatcher(key, observer)
+
+    _getTable(key: QueryKey) ->
         var table = this.tables.get(key.toString())
         if table is Null
             table = new Table(key)
-            for ikey in this.keys.values()
+            for [ikey, ivalue] in this.values.values()
                 if ikey is IdentityKey
                     if isPossibleMatch(key, ikey)
-                        let model = this.peek(ikey)
-                        if model is Null
-                            throw new Error("Model is missing for key: " + ikey)
-                        table.update(ikey, model)
+                        table.update(ikey, ivalue)
             this.tables.set(key.toString(), table)
         return table
 
-    addReadListener(listener: Listener) ->
-        this.readListeners.add(listener)
+    peek(key: Key) ->
+        if key is IdentityKey
+            let value = this.values.get(key.toString())
+            return value?[1]
+        return this._getTable(key).getValues(this)
 
-    removeReadListener(listener: Listener) ->
-        this.readListeners.delete(listener)
-
-    addWriteListener(listener: Listener) ->
-        this.writeListeners.add(listener)
-
-    removeWriteListener(listener: Listener) ->
-        this.writeListeners.delete(listener)
-
-    get(key: Key, peek: Boolean = false) ->
-        // if it's a query make sure we have the corresponding table tracking changes
-        if !peek
-            this.notify(key, this.readListeners)
-            this.ensureWatched(key)
-
-        var value = this.values.get(key.toString())
-        if value is Null
-            // if it's a query key not explicitly cached then we create it.
-            if key is QueryKey
-                return this.getTable(key).getKeys(this)
-            // if a ModelClass provides a default value we return that when no value is present.
-            value = key.type.default ?? null
-        return value
-
-    ensureWatched(key: Key) ->
-        if this.watched.has(key.toString())
-            return false
-        this.watched.add(key.toString())
-        return true
-
-    removeWatched(key: Key) ->
-        return this.watched.delete(key.toString())
-
-    patch(key: IdentityKey, value) ->
-        value = clonePatch(this.get(key, true), value)
+    async patch(key: IdentityKey, value) ->
+        value = clonePatch(await this.get(key), value)
         if key.type isnt Null && value isnt Null
             if value isnt key.type
                 if key.type.coerce is Function
                     value = key.type.coerce(value)
-                else
-                    throw new Error(value + " isnt type " + (key.type.name ?? key.type))
+                    if value isnt key.type
+                        throw new Error(value + " wasnt coerced to type " + (key.type.name ?? key.type))
+                throw new Error(value + " isnt type " + (key.type.name ?? key.type))
 
-        this.setValue(key, value)
+        this._setValue(key, value)
+        return value
 
-    setValue(key: Key, value) ->
-        if key is IdentityKey
-            if key.type isnt Null && value isnt Null
-                if value isnt key.type
-                    throw new Error(value + " isnt type " + (key.type.name ?? key.type))
-            if !this.keys.has(key.toString())
-                this.keys.set(key.toString(), key)
-            for table in this.tables.values()
-                if table.update(key, value)
-                    this.notify(table.key, this.writeListeners)
-        this.values.set(key.toString(), value)
-        this.notify(key, this.writeListeners)
+    _updateValues(...keyValues) ->
+        let updateTables = new Set()
+        for [key, value] in keyValues
+            if value isnt Null
+                if key is IdentityKey
+                    if key.type isnt Null && value isnt Null
+                        if value isnt key.type
+                            throw new Error(value + " isnt type " + (key.type.name ?? key.type))
+                    for table in this.tables.values()
+                        if table.update(key, value)
+                            updateTables.add(table)
+        for table in updateTables
+            this._notify(table.key, table.getValues(this))
+
+    _setValue(key: Key, value) ->
+        let currentValue = this.peek(key)
+        if currentValue == value
+            return false
+        if value is Null
+            this.values.delete(key.toString())
+        else
+            this.values.set(key.toString(), [key, value])
+
+        if value is Array
+            this._updateValues(...value)
+        else if value isnt Null
+            this._updateValues([key, value])
+
+        this._notify(key, value)
         return true
 
-    notify(key: Key, listeners: Set<Listener>) ->
-        for listener in listeners
-            listener(key)
+    _notify(key: Key, value) ->
+        let keyObservers = this.observers.get(key.toString())
+        if keyObservers isnt Null
+            for observer in keyObservers
+                observer(value)

@@ -1,0 +1,16 @@
+import .useStore
+    store
+    createUseStore
+import ..data.Key
+import ..data.Query
+import ..data.Store
+
+export let createUseQuery = (store: Store) ->
+    let useStore = createUseStore(store)
+    return
+        (type: Type | Key, query: Query | Null) ->
+            let key = type is Key ? type : Key.create(type, query ?? {})
+            let [values] = useStore(key)
+            return values
+
+export default createUseQuery(store)

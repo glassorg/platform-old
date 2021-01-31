@@ -4,9 +4,9 @@ import .functions
 
 export default data struct Vector3
 
-    var x: Number
-    var y: Number
-    var z: Number
+    var x: F32
+    var y: F32
+    var z: F32
 
     *[Symbol.iterator]() ->
         yield this.x
@@ -15,7 +15,7 @@ export default data struct Vector3
     add(v: Vector3) -> new Vector3(this.x + v.x, this.y + v.y, this.z + v.z)
     subtract(v: Vector3) -> new Vector3(this.x - v.x, this.y - v.y, this.z - v.z)
     multiply(v: Vector3) -> new Vector3(this.x * v.x, this.y * v.y, this.z * v.z)
-    scale(f: Number) -> new Vector3(this.x * f, this.y * f, this.z * f)
+    scale(f: F32) -> new Vector3(this.x * f, this.y * f, this.z * f)
     negate() -> new Vector3(- this.x, - this.y, - this.z)
     dot(v: Vector3) -> this.x * v.x + this.y * v.y + this.z * v.z
     cross(v: Vector3) ->
@@ -31,7 +31,7 @@ export default data struct Vector3
                 equivalent(this.x, v.x)
                 equivalent(this.y, v.y)
                 equivalent(this.z, v.z)
-    lerp(v: Vector3, alpha: Number) ->
+    lerp(v: Vector3, alpha: F32) ->
         return
             new Vector3()
                 this.x + alpha * (v.x - this.x)
@@ -60,7 +60,7 @@ export default data struct Vector3
                 (m.m00 * x + m.m10 * y + m.m20 * z + m.m30) / w
                 (m.m01 * x + m.m11 * y + m.m21 * z + m.m31) / w
                 (m.m02 * x + m.m12 * y + m.m22 * z + m.m32) / w
-    writeTo(array, index: Number) ->
+    writeTo(array, index: F32) ->
         array[index + 0] = this.x
         array[index + 1] = this.y
         array[index + 2] = this.z
@@ -69,7 +69,7 @@ export default data struct Vector3
     toString() -> `(${this.x},${this.y},${this.z})`
 
     static let zero = new Vector3(0, 0, 0)
-    static random(radius: Number, generate = Math.random) ->
+    static random(radius: F32, generate = Math.random) ->
         let u = generate()
         let v = generate()
         let theta = 2 * Math.PI * u

@@ -1,24 +1,24 @@
 
 export let epsilon = 0.000001
 
-export function equivalent(a: Number, b: Number) ->
+export function equivalent(a: F32, b: F32) ->
     return Math.abs(a - b) <= epsilon * Math.max(1, Math.abs(a), Math.abs(b))
 
-export function clamp(value: Number, min: Number = 0, max: Number = 1) ->
+export function clamp(value: F32, min: F32 = 0, max: F32 = 1) ->
     return value < min ? min : value > max ? max : value
 
 export function lerp(a, b, alpha = 0.5) ->
-    if a is Number
+    if a is F32
         return a * (1 - alpha) + b * alpha
     return a.lerp(b, alpha)
 
 export function easeInOutCubic(x) ->
     return x ** 2 * 3 - x ** 3 * 2
 
-export type RandomNumberGenerator = (min: Number | Null = null, max: Number | Null = null) => Number
+export type RandomNumberGenerator = (min: F32 | Null = null, max: F32 | Null = null) => F32
 
 // Source: https://en.wikipedia.org/wiki/Xorshift
-export function randomNumberGenerator(seed = Number.MAX_SAFE_INTEGER): RandomNumberGenerator ->
+export function randomNumberGenerator(seed = F32.MAX_SAFE_INTEGER): RandomNumberGenerator ->
     let x = seed
     let coef = 1 / (1 << 31)
     return

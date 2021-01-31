@@ -3,13 +3,13 @@ import .math.Matrix4
 import .ResourceManager
 import .ResourceLoader
 import .Invalidatable
-import preact.*
-import preact.hooks
+import react
     useContext
     useEffect
     useState
+    createContext
 
-export let GraphicsContext = preact.createContext(null)
+export let GraphicsContext = createContext(null)
 export function useGraphics() -> useContext(GraphicsContext)
 
 export default abstract class Graphics

@@ -9,7 +9,7 @@ import .functions
 export default data struct Plane
 
     var normal: Vector3
-    var distance: Number
+    var distance: F32
 
     getClosestPointToOrigin() ->
         return

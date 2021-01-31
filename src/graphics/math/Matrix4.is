@@ -4,22 +4,22 @@ import .functions
 
 export default data struct Matrix4
 
-    var m00: Number
-    var m01: Number
-    var m02: Number
-    var m03: Number
-    var m10: Number
-    var m11: Number
-    var m12: Number
-    var m13: Number
-    var m20: Number
-    var m21: Number
-    var m22: Number
-    var m23: Number
-    var m30: Number
-    var m31: Number
-    var m32: Number
-    var m33: Number
+    var m00: F32
+    var m01: F32
+    var m02: F32
+    var m03: F32
+    var m10: F32
+    var m11: F32
+    var m12: F32
+    var m13: F32
+    var m20: F32
+    var m21: F32
+    var m22: F32
+    var m23: F32
+    var m30: F32
+    var m31: F32
+    var m32: F32
+    var m33: F32
 
     multiply(b: Matrix4) ->
         let a = this
@@ -124,7 +124,7 @@ export default data struct Matrix4
             0, 0, 1, 0
             0, 0, 0, 1
 
-    static rotation(axis: Vector3, angle: Number) ->
+    static rotation(axis: Vector3, angle: F32) ->
         var { x, y, z } = axis
         var len = Math.hypot(x, y, z)
         var s
@@ -162,7 +162,7 @@ export default data struct Matrix4
 
                 0, 0, 0, 1
 
-    static scaling(x: Number, y: Number = x, z: Number = y) ->
+    static scaling(x: F32, y: F32 = x, z: F32 = y) ->
         return
             new Matrix4()
                 x, 0, 0, 0
@@ -170,7 +170,7 @@ export default data struct Matrix4
                 0, 0, z, 0
                 0, 0, 0, 1
 
-    static translation(x: Number, y: Number, z: Number) ->
+    static translation(x: F32, y: F32, z: F32) ->
         return
             new Matrix4()
                 1, 0, 0, 0
@@ -179,7 +179,7 @@ export default data struct Matrix4
                 x, y, z, 1
 
     // https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_model_view_projection#Perspective_Matrix
-    static perspective(fov: Number, aspect: Number, near: Number, far: Number) ->
+    static perspective(fov: F32, aspect: F32, near: F32, far: F32) ->
         let f = 1.0 / Math.tan(fov  / 2.0)
         let rangeInv = 1.0 / (near - far)
         return
@@ -189,7 +189,7 @@ export default data struct Matrix4
                 0, 0, (near + far) * rangeInv, -1
                 0, 0, near * far * rangeInv * 2, 0
 
-    static orthographic(left: Number, right: Number, bottom: Number, top: Number, near: Number, far: Number) ->
+    static orthographic(left: F32, right: F32, bottom: F32, top: F32, near: F32, far: F32) ->
         let lr = 1 / (left - right)
         let bt = 1 / (bottom - top)
         let nf = 1 / (near - far)

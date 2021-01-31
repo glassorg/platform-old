@@ -12,7 +12,7 @@ export default data struct Capsule
     line() -> new Line(this.a.center, this.b.center)
     //  Gets the radius at a normalized position along the capsule.
     getRadius(alpha = 0.5) -> this.a.radius * (1 - alpha) + this.b.radius * alpha
-    addRadius(value: Number) ->
+    addRadius(value: F32) ->
         return value == 0 ? this : new Capsule(this.a.addRadius(value), this.b.addRadius(value))
     translate(v: Vector3) -> new Capsule(this.a.translate(v), this.b.translate(v))
     transform(m: Matrix4) -> new Capsule(this.a.transform(m), this.b.transform(m))

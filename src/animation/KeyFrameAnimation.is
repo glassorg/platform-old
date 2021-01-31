@@ -8,7 +8,7 @@ import ..graphics.functions
 // also need convenient typed constructor with only numbers...
 export default class KeyFrameAnimation<T>
 
-    ops: Operations<T>
+    ops: Operations
     frames // : Array<KeyFrame<T>>
     loop: Boolean
 

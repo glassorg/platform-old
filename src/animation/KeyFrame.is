@@ -4,8 +4,17 @@ export enum Interpolation
     smooth = 1
     linear = 2
 
-export default data struct KeyFrame<T>
+export default class KeyFrame<T>
 
     time: Number
-    value // : T
+    value: Any
     interpolation: Interpolation = Interpolation.smooth
+
+    constructor()
+        time: Number
+        value: Any
+        interpolation: Interpolation = Interpolation.smooth
+        ->
+        this.time = time
+        this.value = value
+        this.interpolation = interpolation

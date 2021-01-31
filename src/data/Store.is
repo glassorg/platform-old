@@ -2,71 +2,26 @@ import .Key
     QueryKey
     IdentityKey
 
-// do we like this function type signature?
-export type Listener = (key: Key) => Void
+export type Value = Object | Array | Null
+export type Observer = (value: Value) => Void
 export type Unwatch = () => Void
-export type Callback = (value) => Void
 
-//  TODO: Add Abstract modifier on properties
 export default abstract class Store
-    abstract addReadListener: (listener: Listener) => Void
-    abstract removeReadListener: (listener: Listener) => Void
-    abstract addWriteListener: (listener: Listener) => Void
-    abstract removeWriteListener: (listener: Listener) => Void
-    abstract ensureWatched: (key: Key) => boolean
-    abstract removeWatched: (key: Key) => boolean
 
-    get: (key: Key, peek: Boolean) => Object | Array<Key> | Null
-    patch: (key: IdentityKey, value) => Void
-
-    peek(key: Key) -> this.get(key, true)
-    delete(key: Key | Array<Key>) ->
-        if key is QueryKey
-            key = this.get(key)
-            if key is Null
-                throw new Error("Could not get keys to delete")
-        if key is Array
-            for k in key
-                this.patch(k, null)
-        else
-            this.patch(key, null)
-
-    list(key: QueryKey, peek = false) ->
-        let keys = this.get(key, peek)
-        if keys is Null
-            return
-        return
-            []
-                for itemKey in keys
-                    let item = this.get(itemKey, peek)
-                    if item isnt Null
-                        item
-
-    //  private does this matter?
-    watchers: Map<String,Set> | Null = null
-    watchListener(key: Key) ->
-        let value = this.peek(key) ?? null
-        let watchers = this.watchers.get(key.toString())
-        if watchers isnt Null
-            for watcher in watchers.values()
-                watcher(value)
-
-    watch(key: Key, callback): Unwatch ->
-        if this.watchers is Null
-            this.watchers = new Map()
-            // TODO: Shouldn't there be a more convenient way to indicate a function needs to be bound to this?
-            this.addWriteListener(this.watchListener.bind(this))
-
-        var keyWatchers = this.watchers.get(key.toString())
-        if keyWatchers is Null
-            keyWatchers = new Set()
-            this.watchers.set(key.toString(), keyWatchers)
-        keyWatchers.add(callback)
-
-        let value = this.peek(key)
-        if value isnt Undefined
-            callback(value)
-        
-        return
-            ->
-                keyWatchers.delete(callback)
+    abstract watch: (key: Key, observer: Observer) => Unwatch
+    abstract patch: (key: IdentityKey, value) => Promise
+    delete(key: IdentityKey) -> this.patch(key, null)
+    get(key: Key): Promise<Value> ->
+        return new Promise()
+            (resolve, reject) =>
+                var resolved = false
+                var unobserve = null
+                unobserve = this.watch(key)
+                    (value) ->
+                        resolved = true
+                        resolve(value)
+                        unobserve?()
+                //  if we already resolved synchronously then unobserve now
+                //  because we couldn't have unobserved during the call
+                if resolved
+                    unobserve()

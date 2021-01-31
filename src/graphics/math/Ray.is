@@ -19,7 +19,7 @@ export default data struct Ray
     //     else
     //         this.unitHeading = heading
 
-    getPosition(distance: Number) -> this.point.add(this.unitHeading.scale(distance))
+    getPosition(distance: F32) -> this.point.add(this.unitHeading.scale(distance))
 
     containsPoint(point: Vector3) ->
         return equivalent(point.subtract(this.point).dot(this.unitHeading), 0)

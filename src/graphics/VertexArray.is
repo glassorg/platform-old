@@ -20,6 +20,7 @@ export default class VertexArray
     format: VertexFormat
     floatData: Float32Array
     uintData: Uint32Array
+    view: DataView
     _length = 0
 
     constructor(format: VertexFormat, capacity = 256) ->
@@ -53,6 +54,7 @@ export default class VertexArray
             let buffer = this.buffer ? transfer(this.buffer, newSize) : new ArrayBuffer(newSize)
             this.floatData = new Float32Array(buffer)
             this.uintData = new Uint32Array(buffer)
+            this.view = new DataView(buffer)
 
     getElement(name: String) ->
         let element = this.format.elements[name]

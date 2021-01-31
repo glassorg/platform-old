@@ -90,6 +90,8 @@ export let isPossibleMatch = (query: QueryKey, key: IdentityKey) ->
             query.type == key.type
             query.parent?.toString() == key.parent?.toString()
 
+function combine(...steps) -> steps.filter(step => step isnt Null).join("/")
+
 export default data class Key
 
     parent: Key | Null = null
@@ -102,8 +104,14 @@ export default data class Key
     // let toString = () =>
     //     return memoize
 
+    get path() -> combine(this.parent?.path, this.type.name, this.id)
+
     toString() -> keyToString(this)
     toJSON() -> { [typeKey]: Key.name, value: this.toString() }
+
+    constructor(props) ->
+        debugger
+        super(props)
 
     static fromJSON(object, namespace) ->
         return Key.parse(namespace, object.value)

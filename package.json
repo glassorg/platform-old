@@ -16,8 +16,11 @@
         "watch": "run-p watch:*"
     },
     "dependencies": {
+        "firebase": "^8.2.4",
+        "firebaseui": "^4.7.1",
         "ionscript": "^0.4.1",
-        "preact": "^10.5.8"
+        "preact": "^10.5.8",
+        "react-firebaseui": "^4.1.0"
     },
     "devDependencies": {
         "@glas/test": "^1.0.3",

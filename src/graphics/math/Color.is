@@ -11,10 +11,10 @@ import .Vector4
 
 export default data struct Color
 
-    var red: Number
-    var green: Number
-    var blue: Number
-    var alpha: Number = 1.0
+    var red: F32
+    var green: F32
+    var blue: F32
+    var alpha: F32 = 1.0
 
     *[Symbol.iterator]() ->
         yield this.red
@@ -47,10 +47,10 @@ export default data struct Color
             green += color.green
         return new Color(red, green, blue, this.alpha)
     subtract(c) -> new Color(this.red - c.red, this.green - c.green, this.blue - c.blue)
-    scale(f: Number) -> new Color(this.red * f, this.green * f, this.blue * f, this.alpha)
-    opacity(alpha: Number) -> new Color(this.red, this.green, this.blue, alpha)
+    scale(f: F32) -> new Color(this.red * f, this.green * f, this.blue * f, this.alpha)
+    opacity(alpha: F32) -> new Color(this.red, this.green, this.blue, alpha)
 
-    writeTo(array, index: Number) ->
+    writeTo(array, index: F32) ->
         array[index + 0] = this.red
         array[index + 1] = this.green
         array[index + 2] = this.blue
@@ -58,7 +58,7 @@ export default data struct Color
 
     toVector4() -> new Vector4(this.red, this.green, this.blue, this.alpha)
 
-    lerp(color: Color, alpha: Number) ->
+    lerp(color: Color, alpha: F32) ->
         return
             new Color()
                 this.red + alpha * (color.red - this.red)

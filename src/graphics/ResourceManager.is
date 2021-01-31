@@ -17,7 +17,7 @@ export default class ResourceManager
         this.g = g
         this.resources = new Map()
 
-    info(loader: ResourceLoader<T>, id): ResourceInfo<T> ->
+    info(loader: ResourceLoader, id): ResourceInfo ->
         var resources = this.resources.get(loader)
         if resources is Null
             resources = new Map()
@@ -28,7 +28,7 @@ export default class ResourceManager
             resources.set(id, info)
         return info
 
-    load(loader: ResourceLoader<T>, id): Promise<T> ->
+    load(loader: ResourceLoader, id): Promise ->
         return
             new Promise()
                 (resolve, reject) =>
@@ -42,7 +42,7 @@ export default class ResourceManager
                     if result isnt Null
                         resolve(result)
 
-    use(loader: ResourceLoader<T>, id, observer: (value) => Void): T | Null ->
+    use(loader: ResourceLoader, id, observer: (value) => Void) ->
         let info = this.info(loader, id)
         info.observers.add(observer)
 
@@ -66,7 +66,7 @@ export default class ResourceManager
             if info.observers.size == 0
                 console.log("release resource", { loader, id })
 
-    get(loader: ResourceLoader<T>, id, observer: Invalidatable): T | Null ->
+    get(loader: ResourceLoader, id, observer: Invalidatable) ->
         console.log("ResourceManager.get is deprecated, use ResourceManager.use")
         this.use(loader, id)
             (value) =>
