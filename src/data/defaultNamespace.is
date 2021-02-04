@@ -1,8 +1,0 @@
-import .Model
-
-class EmptyModel extends Model
-
-var defaultNamespace = {}
-    EmptyModel: EmptyModel
-
-export default defaultNamespace

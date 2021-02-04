@@ -5,7 +5,7 @@ import ..Index
 import .MemoryStore
 import ..Serializer
 import ..Namespace
-import ..Entity
+import ..Record
 import ...utility.common.*
 import firebase.app as firebase
 //  import for side effect which makes firebase.firestore() function available
@@ -15,21 +15,25 @@ export let serializedProperty = "_"
 
 export type Snapshot = .data is Function & .exists is Boolean & .ref.path is String
 
-export function getIndexedValues(entity: Entity) ->
-    let values = {}
-    let deleted = entity.deleted isnt Null
+export function getIndexedValues(record, values = {}, prefix = "") ->
+    let deleted = record.deleted isnt Null
     // we only index root values for now
-    for [name, property] in entity.properties
+    for [name, property] in record.properties
         let indexed = property[Index.symbol]
         if indexed
-            values[name] = entity[name]
+            values[prefix + name] = record[name]
+        let value = record[name]
+        // recurse and index sub value items.
+        if value?.properties is Map
+            getIndexedValues(value, values, (prefix.length > 0 ? (prefix + "_" + name) : name) + "_")
+    
     return values
 
 let getSerializer = common.memoize(ns -> new Serializer(ns))
 
-function serialize(entity: Entity, namespace: Namespace) ->
+function serialize(record: Record, namespace: Namespace) ->
     //  remove the type
-    let values = Object.assign({}, entity)
+    let values = Object.assign({}, record)
     //  remove the key
     delete values.key
     return getSerializer(namespace).stringify(values)
@@ -41,8 +45,8 @@ function deserialize(key: IdentityKey, serialized: String, namespace: Namespace)
     //  restore the type
     return new key.type(values)
 
-export function toDocumentValues(entity: Entity, namespace: Namespace) ->
-    return { [serializedProperty]: serialize(entity, namespace), ...getIndexedValues(entity) }
+export function toDocumentValues(record: Record, namespace: Namespace) ->
+    return { [serializedProperty]: serialize(record, namespace), ...getIndexedValues(record) }
 
 function getKey(namespace: Namespace, doc: Snapshot): IdentityKey -> Key.parse(namespace, doc.ref.path)
 
@@ -83,17 +87,19 @@ export default class FireStore extends MemoryStore
     namespace: Namespace
     serializer: Serializer
     db
+    _hasResults: Set<String>
 
     constructor(namespace: Namespace) ->
         super()
         this.namespace = namespace
         this.serializer = new Serializer(namespace)
         this.db = firebase.firestore()
+        this._hasResults = new Set()
 
     _onObserve(key: Key) ->
         let value = this.peek(key)
         if value isnt Undefined
-            this._notify(key, value)
+            this._notify(key.toString(), value)
 
     _onWatched(key: Key) ->
         if key is QueryKey
@@ -102,29 +108,27 @@ export default class FireStore extends MemoryStore
             return collectionRef.onSnapshot()
                 snapshot =>
                     let keyValues = []
-                    // save each doc
-                    //  TODO: What to do with these results
-                    //  convert each one into a keyValue
                     for doc in snapshot.docs
                         let key = getKey(this.namespace, doc)
                         let value = toEntity(this.namespace, doc, key)
-                        // super.setValue(key, entity)
                         if value isnt Null
                             keyValues.push([key, value])
-                    // // save keys as result of query.
+                    // save keys as result of query.
+                    this._hasResults.add(key.toString())
                     super._setValue(key, keyValues)
         else
             let docRef = this.db.doc(key.path)
             return docRef.onSnapshot()
                 doc =>
                     let key = getKey(this.namespace, doc)
-                    let entity = toEntity(this.namespace, doc, key)
-                    super._setValue(key, entity)
+                    let record = toEntity(this.namespace, doc, key)
+                    this._hasResults.add(key.toString())
+                    super._setValue(key, record)
 
     _setValue(key: Key, value) ->
         let changed = super._setValue(key, value)
         if changed && key is IdentityKey
-            //  mark this entity as watched
+            //  mark this record as watched
             if value isnt Null
                 if key.type isnt Null && value.constructor != key.type
                     value = new key.type(value)
@@ -148,3 +152,8 @@ export default class FireStore extends MemoryStore
                     e =>
                         console.error(`FireStore.setValue delete error`, e)
         return changed
+
+    _notify(key: String, value) ->
+        // we don't notify clients until we have results.
+        if this._hasResults.has(key)
+            super._notify(key, value)

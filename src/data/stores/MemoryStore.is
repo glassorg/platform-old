@@ -50,7 +50,7 @@ export default class MemoryStore extends Store
         var value = this.peek(key)
         if value is Undefined
             value = null
-        this._notify(key, value)
+        this._notify(key.toString(), value)
 
     watch(key: Key, observer: Observer) ->
         this._addWatcher(key, observer)
@@ -88,7 +88,7 @@ export default class MemoryStore extends Store
         this._setValue(key, value)
         return value
 
-    _updateValues(...keyValues) ->
+    _updateValues(notifyQueue, ...keyValues) ->
         let updateTables = new Set()
         for [key, value] in keyValues
             if value isnt Null
@@ -100,9 +100,10 @@ export default class MemoryStore extends Store
                         if table.update(key, value)
                             updateTables.add(table)
         for table in updateTables
-            this._notify(table.key, table.getValues(this))
+            notifyQueue.set(table.key.toString(), table.getValues(this))
 
     _setValue(key: Key, value) ->
+        let notifyQueue = new Map()
         let currentValue = this.peek(key)
         if currentValue == value
             return false
@@ -112,14 +113,17 @@ export default class MemoryStore extends Store
             this.values.set(key.toString(), [key, value])
 
         if value is Array
-            this._updateValues(...value)
+            this._updateValues(notifyQueue, ...value)
         else if value isnt Null
-            this._updateValues([key, value])
+            this._updateValues(notifyQueue, [key, value])
 
-        this._notify(key, value)
+        notifyQueue.set(key.toString(), value)
+        for [key, value] in notifyQueue
+            this._notify(key.toString(), value)
+
         return true
 
-    _notify(key: Key, value) ->
+    _notify(key: String, value) ->
         let keyObservers = this.observers.get(key.toString())
         if keyObservers isnt Null
             for observer in keyObservers

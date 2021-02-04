@@ -1,0 +1,31 @@
+import assert
+    strict as assert
+import ...Model
+import ...Key
+    IdentityKey
+    QueryKey
+import ...Query
+    createPredicate
+import ...Record
+import ...TimeStamp
+import ..FireStore
+    getIndexedValues
+
+let by = "foo@bar.com"
+let time = new Date().toISOString()
+
+let record =
+    new Record()
+        {}
+            created: new TimeStamp({ by, time })
+            updated: new TimeStamp({ by, time })
+
+let indexed = getIndexedValues(record)
+assert.deepEqual()
+    indexed
+    {}
+        created_by: by
+        created_time: time
+        updated_by: by
+        updated_time: time
+

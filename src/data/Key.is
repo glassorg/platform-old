@@ -158,8 +158,8 @@ export default data class Key
         var query: Query | Null = null
         if props.type
             let foundType = namespace[props.type]
-            if (foundType == null)
-                throw new Error("Type not found in namespace: " + props.type + ". Did you forget @Model.register()")
+            if foundType is Null
+                throw new Error("Type not found in namespace: " + props.type + ".")
             type = foundType
         else
             throw new Error("Type is required")

@@ -1,0 +1,21 @@
+import
+    .Email
+    .Index
+    .DateTime
+
+export default data class TimeStamp
+
+    [Index]
+    by: String
+
+    [Index]
+    time: DateTime
+
+    static coerce(value) ->
+        // converting legcacy time stamps.
+        if value
+            var { by, time } = value
+            if time is Number
+                time = new Date(time).toISOString()
+            return new TimeStamp({ by, time })
+        return null
