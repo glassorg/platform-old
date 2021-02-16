@@ -89,11 +89,11 @@ export default class FireStore extends MemoryStore
     db
     _hasResults: Set<String>
 
-    constructor(namespace: Namespace) ->
+    constructor(namespace: Namespace, db = firebase.firestore()) ->
         super()
         this.namespace = namespace
         this.serializer = new Serializer(namespace)
-        this.db = firebase.firestore()
+        this.db = db
         this._hasResults = new Set()
 
     _onObserve(key: Key) ->

@@ -1,0 +1,116 @@
+import ..data
+    .Entity
+    .Key
+        IdentityKey
+        QueryKey
+    .Namespace
+    .stores
+        .FireStore
+            toDocumentValues
+            toEntity
+            toGoogleQuery
+    .TimeStamp
+import ..utility
+    .common.*
+    .clonePatch
+import "@google-cloud/firestore"
+    Firestore as GoogleFirestore
+    Query as GoogleQuery
+
+// TODO: stamp should be applied on the client FireStore as well.
+export function stamp(record, time = new Date().toISOString(), by = "SERVER") ->
+    let timestamp = new TimeStamp({ by, time })
+    return
+        record.patch()
+            {}
+                created: record.created ?? timestamp
+                updated: timestamp
+
+export default class Firestore
+
+    db
+    namespace: Namespace
+    projectId: String
+    hardDelete = true
+
+    constructor(namespace: Namespace, projectId: String) ->
+        this.namespace = namespace
+        this.projectId = projectId
+        this.db = new GoogleFirestore({ projectId: this.projectId })
+
+    async get(keys: Array<IdentityKey>) ->
+        let refs = keys.map(key => this.db.doc(key.path))
+        let docs = await this.db.getAll(...refs)
+        let entities = docs.map()
+            doc =>
+                let entity = toEntity<T>(this.namespace, doc)
+                // console.log({ doc, entity })
+                return entity
+        return entities
+
+    query(key: QueryKey) ->
+        let gquery = toGoogleQuery(this.db, key)
+        var error = null
+        return new Promise()
+            (resolve, reject) =>
+                let records = []
+                gquery.stream()
+                .on("data")
+                    (doc) =>
+                        try
+                            records.push(toEntity(this.namespace, doc))
+                        catch e
+                            error = e
+                            reject(error)
+                .on("end")
+                    () =>
+                        if error is Null
+                            resolve(records)
+                .on("error")
+                    (e) =>
+                        error = e
+                        reject(error)
+
+    //  create, update, delete
+    async put(entities: Array<Entity>) ->
+        let batch = this.db.batch()
+        for entity in entities
+            // timestamp each entity
+            entity = stamp(entity)
+            let docRef = this.db.doc(entity.key.toString())
+            if entity.deleted && this.hardDelete
+                batch.delete(docRef)
+            else
+                let values = toDocumentValues(entity, this.namespace)
+                batch.set(docRef, values)
+        console.log(`Firestore.put\n${entities.map(e => `    ${e.key}`).join(`\n`)}`)
+        await batch.commit()
+
+    getKey(k) -> Key.parse(this.namespace, k.toString())
+
+    async patch(batch, patchExisting = true) ->
+        let keys = Object.keys(batch).map(k => this.getKey(k))
+        for key in keys
+            if key isnt IdentityKey
+                throw new Error(`Invalid Identity key: ${key}`)
+        let response = {}
+        let newEntities = []
+        var entities = null
+        if patchExisting
+            entities = await this.get(keys)
+        for i in 0 .. keys.length
+            let key = keys[i]
+            let patch = batch[key.toString()]
+            var entity = entities?[i]
+            if entity isnt Null
+                // no deletion yet.
+                if patch is Null
+                    throw new Error("No deletion yet")
+                entity = clonePatch(entity, patch)
+            else if patch isnt Null
+                // make sure patch is a full instance
+                entity = patch is Entity ? patch : new key.type({ key, ...patch })
+            newEntities.push(entity)
+            response[key.toString()] = patch is Null ? null : entity
+        await this.put(newEntities)
+        return response

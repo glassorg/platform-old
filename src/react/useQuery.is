@@ -10,7 +10,8 @@ export let createUseQuery = (store: Store) ->
     return
         (type: Type | Key, query: Query | Null) ->
             let key = type is Key ? type : Key.create(type, query ?? {})
-            let [values] = useStore(key)
+            let [keyValuePairs] = useStore(key)
+            let values = keyValuePairs ? keyValuePairs.map(([key, value]) -> value) : []
             return values
 
 export default createUseQuery(store)

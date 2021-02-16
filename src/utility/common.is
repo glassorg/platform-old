@@ -4,6 +4,8 @@ export type Primitive = Null | String | Number | Boolean
 export type PlainObject = .constructor == Object
 export let EmptyObject = new Type()
     isEmptyObject(value) ->
+        if value isnt PlainObject
+            return false
         for _ in value
             return false
         return true

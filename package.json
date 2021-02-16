@@ -16,6 +16,7 @@
         "watch": "run-p watch:*"
     },
     "dependencies": {
+        "@google-cloud/firestore": "^4.9.3",
         "firebase": "^8.2.4",
         "firebaseui": "^4.7.1",
         "ionscript": "^0.4.1",
