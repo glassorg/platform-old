@@ -15,9 +15,9 @@ export default function bindPointerEvents(canvas) ->
             let front = new Vector3(position.x, position.y, 0)
             let back = new Vector3(position.x, position.y, 1)
             let ray = new Capsule(new Sphere(front, 0), new Sphere(back, 0))
-            let picked = firstChild.pick(ray)
-            // console.log("picked: ", picked ? { id: picked.node.id, x: picked.position.x, y: picked.position.y } : null)
-            let pickedNode = picked ? picked.node : null
+            let collision = firstChild.collision(ray)
+            // console.log("collision: ", JSON.stringify(collision))
+            let pickedNode = collision ? collision.b : null
             if pointerTarget != pickedNode
                 if pointerTarget
                     pointerTarget.dispatchEvent(new PointerEvent("pointerout", e))

@@ -7,8 +7,8 @@ import .Vector3
 //  between zero and one.
 export default data struct Line
 
-    var a: Vector3
-    var b: Vector3
+    a: Vector3
+    b: Vector3
 
     //  Returns the position between a and b where 0 = a and 1 = b.
     //  @param alpha value normally between 0 and 1
@@ -19,5 +19,6 @@ export default data struct Line
         let ab = this.b.subtract(this.a)
         let ap = position.subtract(this.a)
         return ab.dot(ap) / ab.lengthSquared()
+    reverse() -> new Line(this.b, this.a)
     support(v: Vector3) -> v.dot(this.a) > v.dot(this.b) ? this.a : this.b
     toString() -> `${this.a} -> ${this.b}`

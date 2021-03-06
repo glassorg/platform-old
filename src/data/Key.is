@@ -110,7 +110,6 @@ export default data class Key
     toJSON() -> { [typeKey]: Key.name, value: this.toString() }
 
     constructor(props) ->
-        debugger
         super(props)
 
     static fromJSON(object, namespace) ->

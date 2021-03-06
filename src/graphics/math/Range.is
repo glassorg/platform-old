@@ -1,0 +1,42 @@
+import .functions
+    clamp
+
+export default data struct Range
+    min: F32
+    max: F32
+
+    constructor(min: F32, max: F32) ->
+        this.min = Math.min(min, max)
+        this.max = Math.max(min, max)
+
+    contains(value: F32) -> value >= this.min && value <= this.max
+
+    add(min: F32, max: F32 = min) ->
+        if min == 0 && max == 0
+            return this
+        return new Range(this.min + min, this.max + max)
+
+    overlaps(range: Range | Null) ->
+        if range is Null
+            return false
+        return range.min <= this.max && range.max >= this.min
+
+    intersect(range: Range | Null) ->
+        if !this.overlaps(range)
+            return null
+        return new Range()
+            clamp(range.min, this.min, this.max)
+            clamp(range.max, this.min, this.max)
+
+    static unit = new Range(0, 1)
+
+    static intersection(...ranges: Array<Range>) ->
+        debugger
+        var a = ranges[0]
+        for i in 1 .. ranges.length
+            if a is Null
+                return null
+            let b = ranges[i]
+            a = a.intersect(b)
+        return a
+

@@ -4,22 +4,22 @@ import .functions
 
 export default data struct Matrix4
 
-    var m00: F32
-    var m01: F32
-    var m02: F32
-    var m03: F32
-    var m10: F32
-    var m11: F32
-    var m12: F32
-    var m13: F32
-    var m20: F32
-    var m21: F32
-    var m22: F32
-    var m23: F32
-    var m30: F32
-    var m31: F32
-    var m32: F32
-    var m33: F32
+    m00: F32
+    m01: F32
+    m02: F32
+    m03: F32
+    m10: F32
+    m11: F32
+    m12: F32
+    m13: F32
+    m20: F32
+    m21: F32
+    m22: F32
+    m23: F32
+    m30: F32
+    m31: F32
+    m32: F32
+    m33: F32
 
     multiply(b: Matrix4) ->
         let a = this

@@ -1,19 +1,19 @@
 import .Node
-import ..math.Color
-import ..math.Capsule
-import ..math.Rectangle
-import ..math.Vector3
-import ..math.Spacing
-import ..math.Size
-import ..math.BoundingShape
-import ..math.Line
-import ..math.Matrix4
-import ..math.functions
+import ..math
+    .Capsule
+    .Collision
+    .Color
+    .Rectangle
+    .Vector3
+    .Spacing
+    .Size
+    .BoundingShape
+    .Line
+    .Matrix4
+    .functions
 import .Dock
     layout
 import .Pickable
-import .PickResult
-    equals
 import ..TextureBase
 import ..Graphics
 import ..Graphics3D
@@ -123,8 +123,11 @@ export default class Control extends Node
 
     //  pick children in reverse because we render the latter ones on top of the former
     get pickChildrenReverse() -> true
-    pickSelf(ray: Capsule) ->
+
+    collideSelf(ray: Capsule): Collision | Null ->
         if this.pickRadius
             ray = ray.addRadius(this.pickRadius)
         let intersection = this.boundingShape.intersectsCapsule(ray)
-        return intersection ? new PickResult(this, intersection) : null
+        if intersection
+            return new Collision(ray, null, this, intersection)
+        return null

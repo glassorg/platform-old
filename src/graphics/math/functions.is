@@ -12,8 +12,18 @@ export function lerp(a, b, alpha = 0.5) ->
         return a * (1 - alpha) + b * alpha
     return a.lerp(b, alpha)
 
-export function easeInOutCubic(x) ->
-    return x ** 2 * 3 - x ** 3 * 2
+//  basically the inverse of lerp
+export function getAlpha(a: F32, b: F32, value: F32, valueIfEqualsBoth = 0) ->
+    //  special case to avoid divide by zero
+    let top = value - a
+    let bottom = b - a
+    if bottom == 0
+        if value == a
+            return valueIfEqualsBoth
+        return top > 0 ? Number.MAX_VALUE : Number.MIN_VALUE
+    return top / bottom
+
+export function easeInOutCubic(x) -> x ** 2 * 3 - x ** 3 * 2
 
 export type RandomNumberGenerator = (min: F32 | Null = null, max: F32 | Null = null) => F32
 

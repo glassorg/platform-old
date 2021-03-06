@@ -1,14 +1,15 @@
 import .VirtualElement
 import ..Graphics
-import ..math.Capsule
+import ..math
+    .Capsule
+    .Shape
 import ..math.BoundingShape
 import .Pickable
-// import PickResult from "./PickResult"
 import ..math.Matrix4
 import ..Effect
 import ..Program
 
-export default class Node extends VirtualElement
+export default class Node extends VirtualElement implements Shape
 
     _boundingShape: BoundingShape
     _pickable: Pickable
@@ -90,41 +91,35 @@ export default class Node extends VirtualElement
             node?.render(g)
             node = node.nextSibling
 
-    pick(ray: Capsule): PickResult | Null ->
-        // debugger
+    collision(a) ->
+        for collision in this.collisions(a)
+            return collision
+        return null
+
+    *collisions(a) ->
         var pickable = this.pickable
         if pickable is Null
             pickable = Pickable.children
         if pickable != Pickable.none
-            let { transform: localTransform } = this
+            let localTransform = this.transform
             if localTransform
-                ray = ray.transform(localTransform.inverse())
+                a = a.transform(localTransform.inverse())
         if pickable & Pickable.children
             let boundingShape = this.boundingShape
-            if (boundingShape is Null || boundingShape.intersectsCapsule(ray))
-                let result = this.pickChildren(ray)
-                if result isnt Null
-                    return result
+            if (boundingShape is Null || boundingShape.intersectsCapsule(a))
+                let reverse = this.pickChildrenReverse
+                var child = reverse ? this.lastChild : this.firstChild
+                while child isnt Null
+                    if child is Node
+                        yield* child.collisions(a)
+                    child = reverse ? child.previousSibling : child.nextSibling
         if pickable & Pickable.self
-            let result = this.pickSelf(ray)
+            let result = this.collideSelf(a)
             if result isnt Null
-                return result
-        return null
-
-    pickSelf(ray: Capsule): PickResult | Null -> null
+                yield result
 
     get pickChildrenReverse() -> false
-    pickChildren(ray: Capsule): PickResult | Null ->
-        // //  we iterate children from last to first since later children are on top.
-        let reverse = this.pickChildrenReverse
-        var child = reverse ? this.lastChild : this.firstChild
-        while child isnt Null
-            if child is Node
-                let result = child.pick(ray)
-                if result isnt Null
-                    return result
-            child = reverse ? child.previousSibling : child.nextSibling
-        return null
+    collideSelf(a): Collision | Null -> Null
 
     onPointerOver: (e: PointerEvent) => Void
     onPointerOut:  (e: PointerEvent) => Void

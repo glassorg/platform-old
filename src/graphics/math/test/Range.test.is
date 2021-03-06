@@ -1,0 +1,47 @@
+import assert
+    strict as assert
+import ..Range
+
+assert.deepEqual()
+    new Range(1, 0)
+    new Range(0, 1)
+
+assert.deepEqual()
+    new Range(0, 1).intersect(new Range(0.5, 10))
+    new Range(0.5, 1)
+
+assert.deepEqual()
+    new Range(0, 1).intersect(new Range(1, 2))
+    new Range(1, 1)
+
+assert.deepEqual()
+    new Range(0, 1).intersect(new Range(2, 3))
+    null
+
+assert.deepEqual()
+    Range.intersection()
+        new Range(0, 10)
+        new Range(-10, 5)
+        new Range(4, 20)
+    new Range(4, 5)
+
+assert.deepEqual()
+    Range.intersection()
+        null
+        new Range(-10, 5)
+        new Range(4, 20)
+    null
+
+assert.deepEqual()
+    Range.intersection()
+        new Range(-10, 5)
+        null
+        new Range(4, 20)
+    null
+
+assert.deepEqual()
+    Range.intersection()
+        new Range(-10, 5)
+        new Range(4, 20)
+        null
+    null

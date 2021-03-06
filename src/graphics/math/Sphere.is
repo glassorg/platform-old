@@ -5,8 +5,8 @@ import .Ray
 
 export default data struct Sphere
 
-    var center: Vector3 = Vector3.zero
-    var radius: F32 = 1
+    center: Vector3 = Vector3.zero
+    radius: F32 = 1
 
     translate(v: Vector3) -> new Sphere(this.center.translate(v), this.radius)
 

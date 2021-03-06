@@ -9,8 +9,8 @@ import .AABB
 //  then UnitRay becomes a runtime type of Ray where the direction is normalized.
 export default data struct Ray
 
-    var point: Vector3
-    var unitHeading: Vector3
+    point: Vector3
+    unitHeading: Vector3
 
     // constructor(point: Vector3, heading: Vector3) ->
     //     this.point = point

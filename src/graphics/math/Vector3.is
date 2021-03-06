@@ -4,9 +4,9 @@ import .functions
 
 export default data struct Vector3
 
-    var x: F32 = 0
-    var y: F32 = 0
-    var z: F32 = 0
+    x: F32 = 0
+    y: F32 = 0
+    z: F32 = 0
 
     *[Symbol.iterator]() ->
         yield this.x
@@ -15,9 +15,15 @@ export default data struct Vector3
     add(v: Vector3) -> new Vector3(this.x + v.x, this.y + v.y, this.z + v.z)
     subtract(v: Vector3) -> new Vector3(this.x - v.x, this.y - v.y, this.z - v.z)
     multiply(v: Vector3) -> new Vector3(this.x * v.x, this.y * v.y, this.z * v.z)
+    divide(v: Vector3) ->
+        return
+            new Vector3()
+                v.x == 0 ? 0 : this.x / v.x
+                v.y == 0 ? 0 : this.y / v.y
+                v.z == 0 ? 0 : this.z / v.z
     scale(f: F32) -> new Vector3(this.x * f, this.y * f, this.z * f)
     negate() -> new Vector3(- this.x, - this.y, - this.z)
-    dot(v: Vector3)-> this.x * v.x + this.y * v.y + this.z * v.z
+    dot(v: Vector3) -> this.x * v.x + this.y * v.y + this.z * v.z
     cross(v: Vector3) ->
         return
             new Vector3()
@@ -38,6 +44,7 @@ export default data struct Vector3
                 this.y + alpha * (v.y - this.y)
                 this.z + alpha * (v.z - this.z)
     projection(v: Vector3) -> this.scale(v.dot(this) / this.lengthSquared())
+    // what is this?
     rejection(v: Vector3) ->
         let s = v.dot(this) / this.lengthSquared()
         return

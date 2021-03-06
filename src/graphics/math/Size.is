@@ -2,8 +2,8 @@ import .Spacing
 
 export default data struct Size
 
-    var width: F32
-    var height: F32
+    width: F32
+    height: F32
 
     add(b: Spacing) ->
         if !b || b.isZero

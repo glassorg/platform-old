@@ -1,55 +1,97 @@
 import .Vector3
 import .Ray
+import .Line
+import .Range
+import .functions
+    getAlpha
+
+function withinUnit(value: Number) -> value >= 0 && value <= 1
 
 export default data struct AABB
 
-    center: Vector3
-    dimensions: Vector3
+    min: Vector3
+    max: Vector3
 
-    normal(point: Vector3) ->
-        let dx = (point.x - this.center.x) / this.dimensions.x
-        let dy = (point.y - this.center.y) / this.dimensions.y
-        let dz = (point.z - this.center.z) / this.dimensions.z
-        let max = Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz))
-        let keepSignIfMax = (v) => Math.abs(v) >= max ? Math.sign(v) : 0
-        return new Vector3()
-            keepSignIfMax(dx)
-            keepSignIfMax(dy)
-            keepSignIfMax(dz)
+    center() -> this.min.add(this.max).scale(0.5)
+    size() -> this.max.subtract(this.min)
 
-    raycastDistance(ray: Ray, front = true) ->
-        let b = this.center
-        let d = this.dimensions
-        let p = ray.point
-        let h = ray.unitHeading
+    containsPoint(p: Vector3) ->
+        let { min, max } = this
+        return &&
+            p.x >= min.x
+            p.y >= min.y
+            p.z >= min.z
+            p.x <= max.x
+            p.y <= max.y
+            p.z <= max.z
 
-        // Overlap times for projection on each axis.
-        let tx0 = (b.x - p.x - d.x) / h.x
-        let ty0 = (b.y - p.y - d.y) / h.y
-        let tz0 = (b.z - p.z - d.z) / h.z
+    rangeX() -> new Range(this.min.x, this.max.x)
+    rangeY() -> new Range(this.min.y, this.max.y)
+    rangeZ() -> new Range(this.min.z, this.max.z)
 
-        let tx1 = (b.x - p.x + d.x) / h.x
-        let ty1 = (b.y - p.y + d.y) / h.y
-        let tz1 = (b.z - p.z + d.z) / h.z
+    // returns a normalized range of intersection in the lines coordinate system
+    intersectionLine(line: Line) ->
+        return
+            Range.intersection()
+                new Range()
+                    getAlpha(line.a.x, line.b.x, this.min.x, 0)
+                    getAlpha(line.a.x, line.b.x, this.max.x, 1)
+                new Range()
+                    getAlpha(line.a.y, line.b.y, this.min.y, 0)
+                    getAlpha(line.a.y, line.b.y, this.max.y, 1)
+                new Range()
+                    getAlpha(line.a.z, line.b.z, this.min.z, 0)
+                    getAlpha(line.a.z, line.b.z, this.max.z, 1)
 
-        // Overlaps in 3D when every axis is overlapped.
-        let maxDistance = Math.min()
-            Math.max(tx0, tx1)
-            Math.max(ty0, ty1)
-            Math.max(tz0, tz1)
+    intersectsLine(line: Line) ->
+        return Range.unit.overlaps(this.intersectionLine(line))
 
-        let minDistance = Math.max()
-            Math.min(tx0, tx1)
-            Math.min(ty0, ty1)
-            Math.min(tz0, tz1)
+    static unitCube = new AABB(new Vector3(0, 0, 0), new Vector3(1, 1, 1))
 
-        if maxDistance <= minDistance
-            return null
+    // normal(point: Vector3) ->
+    //     let dx = (point.x - this.center.x) / this.size.x
+    //     let dy = (point.y - this.center.y) / this.size.y
+    //     let dz = (point.z - this.center.z) / this.size.z
+    //     let max = Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz))
+    //     let keepSignIfMax = (v) => Math.abs(v) >= max ? Math.sign(v) : 0
+    //     return new Vector3()
+    //         keepSignIfMax(dx)
+    //         keepSignIfMax(dy)
+    //         keepSignIfMax(dz)
 
-        return front ? minDistance : maxDistance
+    // raycastDistance(ray: Ray, front = true) ->
+    //     let b = this.center
+    //     let d = this.size
+    //     let p = ray.point
+    //     let h = ray.unitHeading
 
-    raycast(ray: Ray, front = true) ->
-        let distance = this.raycastDistance(ray, front)
-        if distance is Null
-            return null
-        return ray.getPosition(distance)
+    //     // Overlap times for projection on each axis.
+    //     let tx0 = (b.x - p.x - d.x) / h.x
+    //     let ty0 = (b.y - p.y - d.y) / h.y
+    //     let tz0 = (b.z - p.z - d.z) / h.z
+
+    //     let tx1 = (b.x - p.x + d.x) / h.x
+    //     let ty1 = (b.y - p.y + d.y) / h.y
+    //     let tz1 = (b.z - p.z + d.z) / h.z
+
+    //     // Overlaps in 3D when every axis is overlapped.
+    //     let maxDistance = Math.min()
+    //         Math.max(tx0, tx1)
+    //         Math.max(ty0, ty1)
+    //         Math.max(tz0, tz1)
+
+    //     let minDistance = Math.max()
+    //         Math.min(tx0, tx1)
+    //         Math.min(ty0, ty1)
+    //         Math.min(tz0, tz1)
+
+    //     if maxDistance <= minDistance
+    //         return null
+
+    //     return front ? minDistance : maxDistance
+
+    // raycast(ray: Ray, front = true) ->
+    //     let distance = this.raycastDistance(ray, front)
+    //     if distance is Null
+    //         return null
+    //     return ray.getPosition(distance)

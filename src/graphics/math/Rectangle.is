@@ -13,10 +13,10 @@ import .functions
 
 export default data struct Rectangle
 
-    var x: F32
-    var y: F32
-    var width: F32
-    var height: F32
+    x: F32
+    y: F32
+    width: F32
+    height: F32
 
     get top() -> this.y
     get left() -> this.x

@@ -2,6 +2,7 @@ import .Capsule
 import .Line
 import .Vector3
 
+//  TODO: This should be an interface
 export default class BoundingShape
     // returns something truthy if this bounding shape intersects this capsule at all
     intersectsCapsule(capsule: Capsule) ->

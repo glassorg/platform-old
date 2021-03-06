@@ -1,0 +1,12 @@
+
+export default class Collision
+    a
+    aDetails
+    b
+    bDetails
+
+    constructor(a, aDetails, b, bDetails) ->
+        this.a = a
+        this.aDetails = a
+        this.b = b
+        this.bDetails = b

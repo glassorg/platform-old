@@ -1,10 +1,10 @@
 
 export default data struct Spacing
 
-    var left: F32 = 0
-    var top: F32 = 0
-    var right: F32 = 0
-    var bottom: F32 = 0
+    left: F32 = 0
+    top: F32 = 0
+    right: F32 = 0
+    bottom: F32 = 0
 
     negate() ->
         if this.isZero

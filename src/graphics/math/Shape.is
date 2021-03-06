@@ -1,0 +1,4 @@
+import .Collision
+
+export default interface Shape
+    collisions: (a: Shape) => Iterator<Collision>

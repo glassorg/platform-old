@@ -1,12 +1,5 @@
 import .Graphics
 
-type Load = (g: Graphics, id: Any) => Promise<Any>
-type Unload = (g: Graphics, id: Any, resource: Any) => Void
-
-//  TODO: Need a cleaner way to represent an interface type
-//  type ResourceLoader = {}
-//      load(g: Graphics, id: String) => Any
-//      unload(g: Graphics, id: String, resource) => Void
-type ResourceLoader = .load is Load & .unload is Unload
-
-export default ResourceLoader
+export default interface ResourceLoader
+    load: (g: Graphics, id: Any) => Promise<Any>
+    unload: (g: Graphics, id: Any, resource: Any) => Void

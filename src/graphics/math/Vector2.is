@@ -4,8 +4,8 @@ import .functions
 
 export default data struct Vector2
 
-    var x: F32
-    var y: F32
+    x: F32 = 0
+    y: F32 = 0
 
     *[Symbol.iterator]() ->
         yield this.x
