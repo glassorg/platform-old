@@ -5,48 +5,50 @@ import .Range
 import .functions
     getAlpha
 
-function withinUnit(value: Number) -> value >= 0 && value <= 1
+export default data struct Box
 
-export default data struct AABB
+    minX: Number
+    minY: Number
+    minZ: Number
+    maxX: Number
+    maxY: Number
+    maxZ: Number
 
-    min: Vector3
-    max: Vector3
-
-    center() -> this.min.add(this.max).scale(0.5)
-    size() -> this.max.subtract(this.min)
+    // center() -> this.min.add(this.max).scale(0.5)
+    // size() -> this.max.subtract(this.min)
 
     containsPoint(p: Vector3) ->
         let { min, max } = this
         return &&
-            p.x >= min.x
-            p.y >= min.y
-            p.z >= min.z
-            p.x <= max.x
-            p.y <= max.y
-            p.z <= max.z
+            p.x >= minX
+            p.y >= minY
+            p.z >= minZ
+            p.x <= maxX
+            p.y <= maxY
+            p.z <= maxZ
 
-    rangeX() -> new Range(this.min.x, this.max.x)
-    rangeY() -> new Range(this.min.y, this.max.y)
-    rangeZ() -> new Range(this.min.z, this.max.z)
+    rangeX() -> new Range(this.minX, this.maxX)
+    rangeY() -> new Range(this.minY, this.maxY)
+    rangeZ() -> new Range(this.minZ, this.maxZ)
 
     // returns a normalized range of intersection in the lines coordinate system
     intersectionLine(line: Line) ->
         return
             Range.intersection()
                 new Range()
-                    getAlpha(line.a.x, line.b.x, this.min.x, 0)
-                    getAlpha(line.a.x, line.b.x, this.max.x, 1)
+                    getAlpha(line.a.x, line.b.x, this.minX, 0)
+                    getAlpha(line.a.x, line.b.x, this.maxX, 1)
                 new Range()
-                    getAlpha(line.a.y, line.b.y, this.min.y, 0)
-                    getAlpha(line.a.y, line.b.y, this.max.y, 1)
+                    getAlpha(line.a.y, line.b.y, this.minY, 0)
+                    getAlpha(line.a.y, line.b.y, this.maxY, 1)
                 new Range()
-                    getAlpha(line.a.z, line.b.z, this.min.z, 0)
-                    getAlpha(line.a.z, line.b.z, this.max.z, 1)
+                    getAlpha(line.a.z, line.b.z, this.minZ, 0)
+                    getAlpha(line.a.z, line.b.z, this.maxZ, 1)
 
     intersectsLine(line: Line) ->
         return Range.unit.overlaps(this.intersectionLine(line))
 
-    static unitCube = new AABB(new Vector3(0, 0, 0), new Vector3(1, 1, 1))
+    static unitCube = new Box(0, 0, 0, 1, 1, 1)
 
     // normal(point: Vector3) ->
     //     let dx = (point.x - this.center.x) / this.size.x

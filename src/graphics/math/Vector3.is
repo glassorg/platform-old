@@ -72,7 +72,7 @@ export default data struct Vector3
         array[index + 2] = this.z
     toArray() -> [this.x, this.y, this.z]
     toFloat32Array() -> new Float32Array(this.toArray())
-    toString() -> `(${this.x},${this.y},${this.z})`
+    toString() -> `(${this.x.toFixed(2)}, ${this.y.toFixed(2)}, ${this.z.toFixed(2)})`
     static let zero = new Vector3(0, 0, 0)
     static random(radius: F32, generate = Math.random) ->
         let u = generate()

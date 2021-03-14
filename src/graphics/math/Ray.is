@@ -2,7 +2,7 @@ import .Vector3
 import .functions
     equivalent
 import .Sphere
-import .AABB
+import .Box
 
 //  Kris: I don't think the ray should have a unit heading
 //  instead it should just have a direction which may or may not be normalized.

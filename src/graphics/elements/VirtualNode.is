@@ -33,14 +33,10 @@ export default class VirtualNode
     nextSibling: INode | Null = null
     previousSibling: INode | Null = null
 
-    // var component: Component
-    factory: NodeFactory
-    properties
-    dirty: Boolean = false
-
     get nodeType() -> 1
 
     eventListeners
+    hasEventListener(name) -> this.eventListeners?[name] isnt Null
     dispatchEvent(e) ->
         let handler = this.eventListeners?[e.type]
         if handler
@@ -98,11 +94,5 @@ export default class VirtualNode
                 this.firstChild = child
         child.parentNode = this
         return child
-
-    invalidate() ->
-        var node = this
-        while node?.dirty == false
-            node.dirty = true
-            node = node.parentNode
 
     static nodes = new Map()

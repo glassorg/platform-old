@@ -11,19 +11,22 @@ import ..Program
 
 export default class Node extends VirtualElement implements Shape
 
+    // is this bounding shape thing good?
     _boundingShape: BoundingShape
     _pickable: Pickable
-    //  the worldTransform, transforms from child space to world space
-    //  worldTransform
-    worldTransform = Matrix4.identity
-    //  localTransform
     _transform: Matrix4 | Null
-    //  effect to use when rendering this node
     _effect: Effect | Null
+    dirty: Boolean = false
 
     get effect() -> this._effect || null
     set effect(value) ->
         this._effect = value
+
+    //  the transform to use for picking.
+    //  usually just the inverse of the local transform.
+    get pickingTransform() ->
+        let transform = this.transform
+        return transform ? transform.inverse() : null
 
     get transform() -> this._transform
     set transform(value) ->
@@ -40,16 +43,8 @@ export default class Node extends VirtualElement implements Shape
         this.invalidate()
         this._pickable = value
 
-    calculateWorldTransform(parentTransform, localTransform) ->
-        return Matrix4.multiply(parentTransform, localTransform) ?? Matrix4.identity
-
     update(g: Graphics): Boolean ->
         var animating = false
-        let localTransform = this.transform
-        let parentTransform = this.parentNode is Node ? this.parentNode.worldTransform : null
-        let worldTransform = this.calculateWorldTransform(parentTransform, localTransform)
-        if this.worldTransform != worldTransform
-            this.worldTransform = worldTransform
         if this.updateSelf(g)
             animating = true
         if this.updateChildren(g)
@@ -70,14 +65,18 @@ export default class Node extends VirtualElement implements Shape
 
     render(g: Graphics) ->
         //  convert to uniforms
-        let saveTransform = g.uniforms.modelView
-        g.uniforms.modelView = this.worldTransform
+        var parentModel
+        let localModel = this.transform
+        if localModel
+            parentModel = g.uniforms.model
+            g.uniforms.model = parentModel.multiply(localModel)
         if this._effect is Null
             this.draw(g)
         else
             this._effect.render(g, this.draw.bind(this))
         this.dirty = false
-        g.uniforms.modelView = saveTransform
+        if parentModel
+            g.uniforms.model = parentModel
 
     draw(g: Graphics) ->
         this.drawSelf(g)
@@ -101,28 +100,34 @@ export default class Node extends VirtualElement implements Shape
         if pickable is Null
             pickable = Pickable.children
         if pickable != Pickable.none
-            let localTransform = this.transform
-            if localTransform
-                a = a.transform(localTransform.inverse())
-        if pickable & Pickable.children
-            let boundingShape = this.boundingShape
-            if (boundingShape is Null || boundingShape.intersectsCapsule(a))
-                let reverse = this.pickChildrenReverse
-                var child = reverse ? this.lastChild : this.firstChild
-                while child isnt Null
-                    if child is Node
-                        yield* child.collisions(a)
-                    child = reverse ? child.previousSibling : child.nextSibling
-        if pickable & Pickable.self
-            let result = this.collideSelf(a)
-            if result isnt Null
-                yield result
+            let pickingTransform = this.pickingTransform
+            if pickingTransform
+                a = a.transform(pickingTransform)
+            if pickable & Pickable.children
+                let boundingShape = this.boundingShape
+                if (boundingShape is Null || boundingShape.intersectsCapsule(a))
+                    let reverse = this.pickChildrenReverse
+                    var child = reverse ? this.lastChild : this.firstChild
+                    while child isnt Null
+                        if child is Node
+                            yield* child.collisions(a)
+                        child = reverse ? child.previousSibling : child.nextSibling
+            if pickable & Pickable.self
+                let result = this.collideSelf(a)
+                if result isnt Null
+                    yield result
 
     get pickChildrenReverse() -> false
     collideSelf(a): Collision | Null -> Null
 
-    onPointerOver: (e: PointerEvent) => Void
-    onPointerOut:  (e: PointerEvent) => Void
-    onPointerMove: (e: PointerEvent) => Void
-    onPointerDown: (e: PointerEvent) => Void
-    onPointerUp:   (e: PointerEvent) => Void
+    invalidate() ->
+        var node = this
+        while node?.dirty == false
+            node.dirty = true
+            node = node.parentNode
+
+    onpointerover: (e: PointerEvent) => Void
+    onpointerout:  (e: PointerEvent) => Void
+    onpointermove: (e: PointerEvent) => Void
+    onpointerdown: (e: PointerEvent) => Void
+    onpointerup:   (e: PointerEvent) => Void

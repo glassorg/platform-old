@@ -23,8 +23,8 @@ type LayoutFunction = (container) => Void
 
 export default class Control extends Node
 
-    _x: Number = 0
-    _y: Number = 0
+    x: Number = 0
+    y: Number = 0
     width: Number = 100
     height: Number = 50
     _backgroundColor: Color | Null = null
@@ -41,23 +41,12 @@ export default class Control extends Node
     minimumSize: Size
     maximumSize: Size
     optimumSize: Size
-    transformValid: Boolean = false
     text: String
     fontSize: Number
     //  Layout function for positioning children.
     layoutChildren: LayoutFunction = layout
     //  Layout options for self.
     layout: Any
-    set x(value) ->
-        if this._x != value
-            this.transformValid = false
-            this._x = value
-    get x() -> this._x
-    set y(value) ->
-        if this._y != value
-            this.transformValid = false
-            this._y = value
-    get y() -> this._y
 
     draw(g: Graphics) ->
         this.drawBackground(g)
@@ -76,15 +65,9 @@ export default class Control extends Node
         if this.backgroundColor || this.backgroundImage
             g.fillRectangle(0, 0, this.width, this.height, this.backgroundColor || Color.white, this.backgroundImage)
 
-    calculateLocalTransform() ->
-        return (this.x != 0 || this.y != 0) ? Matrix4.translation(this.x, this.y, 0) : null
-
-    _transform: Matrix4 | Null
     get transform() ->
-        if !this.transformValid
-            this._transform = this.calculateLocalTransform()
-            this.transformValid = true
-        return this._transform
+        return (this.x != 0 || this.y != 0) ? Matrix4.translation(this.x, this.y, 0) : null
+    set transform(value) -> throw new Error("Cannot set transform on Controls")
 
     updateChildren(g: Graphics) ->
         this.layoutChildren?(this)
@@ -114,7 +97,7 @@ export default class Control extends Node
         var value = this._pickable
         if value is Null
             value = Pickable.children
-            if this.isVisible || this.onpointerdown || this.onpointerup || this.onpointermove
+            if this.isVisible || this.hasEventListener("pointerdown") || this.hasEventListener("pointerup") || this.hasEventListener("pointermove")
                 value |= Pickable.self
         return value
 

@@ -110,12 +110,14 @@ export default data struct Matrix4
                 a.m20 == b.m20 && a.m21 == b.m21 && a.m22 == b.m22 && a.m23 == b.m23
                 a.m30 == b.m30 && a.m31 == b.m31 && a.m32 == b.m32 && a.m33 == b.m33
 
-    static multiply(a: Matrix4 | Null, b: Matrix4 | Null) ->
-        if a is Null
-            return b ?? null
-        if b is Null
-            return a ?? null
-        return a.multiply(b)
+    static multiply(...matrices: Array<Matrix4 | Null>) ->
+        var result = matrices[0]
+        for i in 1 .. matrices.length
+            if result is Null
+                result = matrices[i]
+            else if matrices[i] isnt Null
+                result = result.multiply(matrices[i])
+        return result
 
     static identity =
         new Matrix4()
@@ -208,9 +210,9 @@ export default data struct Matrix4
         z0 *= inverseZLength
         z1 *= inverseZLength
         z2 *= inverseZLength
-        let x0 = up.y * z2 - up.z * z1
-        let x1 = up.z * z0 - up.x * z2
-        let x2 = up.x * z1 - up.y * z0
+        var x0 = up.y * z2 - up.z * z1
+        var x1 = up.z * z0 - up.x * z2
+        var x2 = up.x * z1 - up.y * z0
         let xLength = Math.hypot(x0, x1, x2)
         if !xLength
             x0 = x1 = x2 = 0
@@ -218,9 +220,9 @@ export default data struct Matrix4
             x0 /= xLength
             x1 /= xLength
             x2 /= xLength
-        let y0 = z1 * x2 - z2 * x1
-        let y1 = z2 * x0 - z0 * x2
-        let y2 = z0 * x1 - z1 * x0
+        var y0 = z1 * x2 - z2 * x1
+        var y1 = z2 * x0 - z0 * x2
+        var y2 = z0 * x1 - z1 * x0
         let yLength = Math.hypot(y0, y1, y2)
         if !yLength
             y0 = y1 = y2 = 0
@@ -239,11 +241,15 @@ export default data struct Matrix4
                 -(z0 * eye.x + z1 * eye.y + z2 * eye.z)
                 1
 
+    // DEPRECATED: this api sucks.
     static transformation(translation: Vector3, scaling: Vector3 = new Vector3(1, 1, 1), axis: Vector3 = new Vector3(0, 0, 0), angle = 0) ->
         // TODO: This can be made much more efficient than this later.
-        var transform = Matrix4.translation(translation.x, translation.y, translation.z)
+        var transform: Matrix4
         if scaling.x != 1 || scaling.y != 1 || scaling.z != 1
-            transform = transform.multiply(Matrix4.scaling(scaling.x, scaling.y, scaling.z))
+            transform = Matrix4.scaling(scaling.x, scaling.y, scaling.z)
+        else
+            transform = Matrix4.identity
+        transform = transform.multiply(Matrix4.translation(translation.x, translation.y, translation.z))
         if angle != 0
             transform = transform.multiply(Matrix4.rotation(axis, angle))
         return transform

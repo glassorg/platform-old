@@ -8,6 +8,8 @@ export default data struct Sphere
     center: Vector3 = Vector3.zero
     radius: F32 = 1
 
+    toString() -> `${this.center}, ${this.radius}`
+
     translate(v: Vector3) -> new Sphere(this.center.translate(v), this.radius)
 
     transform(m: Matrix4) ->

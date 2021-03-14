@@ -3,6 +3,7 @@ import .math.Matrix4
 import .ResourceManager
 import .ResourceLoader
 import .Invalidatable
+import .Uniforms
 import react
     useContext
     useEffect
@@ -18,7 +19,7 @@ export default abstract class Graphics
     resources: ResourceManager
     // timing
     time = 0
-    uniforms: .modelView is Matrix4 & .projection is Matrix4
+    uniforms: Uniforms
 
     constructor() ->
         this.resources = new ResourceManager(this)

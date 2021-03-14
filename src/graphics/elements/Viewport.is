@@ -5,24 +5,31 @@ import ..Graphics3D
 import ..Program
 import ..math.Matrix4
 
-export default class View extends Control
+export default class Viewport extends Control
 
-    projection: Matrix4 = Matrix4.identity
+    _projection: Matrix4 = Matrix4.identity
+    _view: Matrix4 = Matrix4.identity
     layout = Dock.fill
     effect = Program.default3D
-    _view: Matrix4 = Matrix4.identity
 
     get view() -> this._view
     set view(value) ->
         this.invalidate()
         this._view = value
 
-    //  a view resets the world transform
-    calculateWorldTransform(parentTransform, localTransform) -> this.view
+    get projection() -> this._projection
+    set projection(value) ->
+        this.invalidate()
+        this._projection = value
+
+    get pickingTransform() ->
+        // haven't tested yet, this might be reversed
+        return this.view.multiply(this.projection).inverse()
+
+    get transform() -> null
 
     drawBackground(g: Graphics) ->
         // this would draw in wrong coordinate space
-
     render(g: Graphics) ->
         // we draw background in the parents coordinate space before we reset ours
         if this.backgroundColor || this.backgroundImage
@@ -32,10 +39,13 @@ export default class View extends Control
     drawChildren(g: Graphics) ->
         let saveProjection = g.uniforms.projection
         g.uniforms.projection = this.projection
+        let saveView = g.uniforms.view
+        g.uniforms.view = this.view
         if g is Graphics3D
             g.flush()
             // really we need the absolute x, y position taking ancestors into account
-            g.gl.viewport(this.x, this.y, this.width, this.height)
+            // gl viewports start in the lower left so we must convert.
+            g.gl.viewport(this.x, g.uniforms.screen.y - this.height - this.y, this.width, this.height)
         super.drawChildren(g)
         if g is Graphics3D
             g.flush()
@@ -43,3 +53,4 @@ export default class View extends Control
             g.gl.viewport(0, 0, g.width, g.height)
 
         g.uniforms.projection = saveProjection
+        g.uniforms.view = saveView

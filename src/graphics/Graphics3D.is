@@ -20,6 +20,7 @@ import .VertexShader
 import .FragmentShader
 import .Program
 import .Uniforms
+import .Graphics3DUniforms
     createUniforms
     setUniform
 import .Texture
@@ -85,7 +86,7 @@ export default class Graphics3D extends Graphics
         gl.enable(GL.CULL_FACE)
         gl.cullFace(GL.BACK)
 
-        // this.updateScreenSize()
+        this.updateScreenSize()
 
     invalidate() ->
         this.gl.canvas.dirty = true

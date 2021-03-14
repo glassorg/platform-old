@@ -1,0 +1,67 @@
+
+type Size = Integer & > 0
+
+export default class Volume
+
+    width: Size
+    height: Size
+    depth: Size
+    data: Array
+
+    constructor(width: Size, height: Size = 1, depth: Size = 1, data = Array(width * height * depth)) ->
+        this.data = data
+        this.width = width
+        this.height = height
+        this.depth = depth
+
+    clear(value: T) ->
+        for i in 0 .. this.data.length
+            this.data[i] = value
+        return this
+
+    index(x, y, z = 0) ->
+        if x < 0 || y < 0 || z < 0 || x >= this.width || y >= this.height || z >= this.depth
+            return -1
+        return x + this.width * (y + z * this.height)
+
+    x(index: Integer) -> index % this.width
+    y(index: Integer) -> Math.floor(index / this.width)
+    z(index: Integer) -> Math.floor(index / (this.width * this.height))
+
+    get(x: Integer, y: Integer = 0, z: Integer = 0) ->
+        let index = this.index(x, y, z)
+        return index < 0 ? null : this.data[index]
+    set(x: Integer, y: Integer = 0, z: Integer = 0, value) ->
+        let index = this.index(x, y, z)
+        if index >= 0
+            this.data[index] = value
+
+//     *getAdjacentIndexes(index: number, predicate?: (cell: T) => boolean) {
+//         const x = this.x(index);
+//         const y = this.y(index);
+//         const z = this.z(index);
+//         const check = (dx: number, dy: number, dz: number) => {
+//             let index = this.index(x + dx, y + dy, z + dz);
+//             if (index < 0)
+//                 return false;
+//             if (predicate)
+//                 return predicate(this.data[index]);
+//             return true;
+//         if (check(-1, 0, 0))
+//             yield index - 1;
+//         if (check(+1, 0, 0))
+//             yield index + 1;
+//         if (check(0, -1, 0))
+//             yield index - this.width;
+//         if (check(0, +1, 0))
+//             yield index + this.width;
+//         if (check(0, 0, -1))
+//             yield index - this.width * this.height;
+//         if (check(0, 0, +1))
+//             yield index + this.width * this.height;
+
+//     *indexes(predicate?: (cell: T, index: number) => boolean) ->
+//         const { data } = this;
+//         for (let i = 0; i < data.length; i++)
+//             if (predicate == null || predicate(data[i], i))
+//                 yield i;

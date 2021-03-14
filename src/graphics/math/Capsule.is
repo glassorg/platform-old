@@ -16,6 +16,7 @@ export default data struct Capsule
         return value == 0 ? this : new Capsule(this.a.addRadius(value), this.b.addRadius(value))
     translate(v: Vector3) -> new Capsule(this.a.translate(v), this.b.translate(v))
     transform(m: Matrix4) -> new Capsule(this.a.transform(m), this.b.transform(m))
+    toString() -> `Capsule(${this.a} -> ${this.b})`
     // Returns the furthest point along a direction.
     support(v: Vector3) ->
         //  KODY: This is wrong, what if the point is along the cylinder between the spheres?
