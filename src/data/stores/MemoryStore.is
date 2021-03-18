@@ -83,12 +83,16 @@ export default class MemoryStore extends Store
                     value = key.type.coerce(value)
                     if value isnt key.type
                         throw new Error(value + " wasnt coerced to type " + (key.type.name ?? key.type))
-                throw new Error(value + " isnt type " + (key.type.name ?? key.type))
+                if value isnt key.type
+                    if key.type is Function && value is Object
+                        value = new key.type(value)
+                    else
+                        throw new Error(value + " isnt type " + (key.type.name ?? key.type))
 
-        this._setValue(key, value)
+        value = await this._setValue(key, value)
         return value
 
-    _updateValues(notifyQueue, ...keyValues) ->
+    async _updateValues(notifyQueue, ...keyValues) ->
         let updateTables = new Set()
         for [key, value] in keyValues
             if value isnt Null
@@ -102,7 +106,7 @@ export default class MemoryStore extends Store
         for table in updateTables
             notifyQueue.set(table.key.toString(), table.getValues(this))
 
-    _setValue(key: Key, value) ->
+    async _setValue(key: Key, value) ->
         let notifyQueue = new Map()
         let currentValue = this.peek(key)
         if currentValue == value
@@ -113,15 +117,15 @@ export default class MemoryStore extends Store
             this.values.set(key.toString(), [key, value])
 
         if value is Array
-            this._updateValues(notifyQueue, ...value)
+            await this._updateValues(notifyQueue, ...value)
         else if value isnt Null
-            this._updateValues(notifyQueue, [key, value])
+            await this._updateValues(notifyQueue, [key, value])
 
         notifyQueue.set(key.toString(), value)
         for [key, value] in notifyQueue
             this._notify(key.toString(), value)
 
-        return true
+        return value
 
     _notify(key: String, value) ->
         let keyObservers = this.observers.get(key.toString())

@@ -63,7 +63,7 @@ export default class Control extends Node
 
     drawBackground(g: Graphics) ->
         if this.backgroundColor || this.backgroundImage
-            g.fillRectangle(0, 0, this.width, this.height, this.backgroundColor || Color.white, this.backgroundImage)
+            g.fillRectangle(this.x, this.y, this.width, this.height, this.backgroundColor || Color.white, this.backgroundImage)
 
     get transform() ->
         return (this.x != 0 || this.y != 0) ? Matrix4.translation(this.x, this.y, 0) : null
@@ -87,7 +87,8 @@ export default class Control extends Node
     set position(value) ->
         this.x = value.x
         this.y = value.y
-    get boundingShape() -> new Rectangle(0, 0, this.width, this.height)
+    // bounding shape is in parents coordinate space
+    get boundingShape() -> new Rectangle(this.x, this.y, this.width, this.height)
 
     get isVisible() ->
         return this.backgroundImage || (this.backgroundColor && this.backgroundColor.isVisible)
@@ -107,10 +108,13 @@ export default class Control extends Node
     //  pick children in reverse because we render the latter ones on top of the former
     get pickChildrenReverse() -> true
 
-    collideSelf(ray: Capsule): Collision | Null ->
+    *collisions(ray) ->
         if this.pickRadius
             ray = ray.addRadius(this.pickRadius)
-        let intersection = this.boundingShape.intersectsCapsule(ray)
-        if intersection
-            return new Collision(ray, null, this, intersection)
-        return null
+        yield* super.collisions(ray)
+
+    collideSelf(ray: Capsule, intersection): Collision | Null ->
+        // if this.pickRadius
+        //     ray = ray.addRadius(this.pickRadius)
+        // let intersection = this.boundingShape.intersectsCapsule(ray)
+        return intersection ? new Collision(ray, null, this, intersection) : null

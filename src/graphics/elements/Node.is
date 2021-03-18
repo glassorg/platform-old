@@ -64,23 +64,27 @@ export default class Node extends VirtualElement implements Shape
         return animating
 
     render(g: Graphics) ->
-        //  convert to uniforms
-        var parentModel
-        let localModel = this.transform
-        if localModel
-            parentModel = g.uniforms.model
-            g.uniforms.model = parentModel.multiply(localModel)
         if this._effect is Null
             this.draw(g)
         else
             this._effect.render(g, this.draw.bind(this))
         this.dirty = false
-        if parentModel
-            g.uniforms.model = parentModel
 
     draw(g: Graphics) ->
         this.drawSelf(g)
-        this.drawChildren(g)
+
+        let hasChildren = this.firstChild isnt Null
+        let hasCustomDrawChildren = this.drawChildren != Node.prototype.drawChildren
+        let shouldDrawChildren = hasChildren || hasCustomDrawChildren
+        if shouldDrawChildren
+            var parentModel
+            let localModel = this.transform
+            if localModel
+                parentModel = g.uniforms.model
+                g.uniforms.model = parentModel.multiply(localModel)
+            this.drawChildren(g)
+            if localModel
+                g.uniforms.model = parentModel || Matrix4.identity
 
     drawSelf(g: Graphics) ->
 
@@ -90,35 +94,41 @@ export default class Node extends VirtualElement implements Shape
             node?.render(g)
             node = node.nextSibling
 
-    collision(a) ->
-        for collision in this.collisions(a)
+    collision(ray) ->
+        for collision in this.collisions(ray)
             return collision
         return null
 
-    *collisions(a) ->
+    *collisions(ray) ->
         var pickable = this.pickable
         if pickable is Null
             pickable = Pickable.children
         if pickable != Pickable.none
-            let pickingTransform = this.pickingTransform
-            if pickingTransform
-                a = a.transform(pickingTransform)
-            if pickable & Pickable.children
-                let boundingShape = this.boundingShape
-                if (boundingShape is Null || boundingShape.intersectsCapsule(a))
+            let boundingShape = this.boundingShape
+            var intersection = boundingShape?.intersectsCapsule(ray) ?? null
+            if boundingShape is Null || intersection
+                let pickingTransform = this.pickingTransform
+                var transformedRay = ray
+                if pickingTransform
+                    transformedRay = transformedRay.transform(pickingTransform)
+                if pickable & Pickable.children
                     let reverse = this.pickChildrenReverse
                     var child = reverse ? this.lastChild : this.firstChild
                     while child isnt Null
                         if child is Node
-                            yield* child.collisions(a)
+                            yield* child.collisions(transformedRay)
                         child = reverse ? child.previousSibling : child.nextSibling
-            if pickable & Pickable.self
-                let result = this.collideSelf(a)
-                if result isnt Null
-                    yield result
+                if pickable & Pickable.self
+                    let result = this.collideSelf(ray, intersection)
+                    if result isnt Null
+                        yield result
+    
+    // STUFF. The canvas 2d is NOT working because we're no longer transforming for based on .transform
+    //  BUT... the viewport doesn't pick right because the pickingTransform is wrong.
+    // Idea -> draw within parents coordinate space, transform ONLY applies to children.
 
     get pickChildrenReverse() -> false
-    collideSelf(a): Collision | Null -> Null
+    collideSelf(ray, intersection): Collision | Null -> Null
 
     invalidate() ->
         var node = this

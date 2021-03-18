@@ -127,31 +127,39 @@ export default class FireStore extends MemoryStore
 
     _setValue(key: Key, value) ->
         let changed = super._setValue(key, value)
-        if changed && key is IdentityKey
-            //  mark this record as watched
-            if value isnt Null
-                if key.type isnt Null && value.constructor != key.type
-                    value = new key.type(value)
+        return new Promise()
+            (resolve, reject) =>
+                if !changed
+                    resolve(value)
+                    return
+                if key is IdentityKey
+                    //  mark this record as watched
+                    if value isnt Null
+                        if key.type isnt Null && value.constructor != key.type
+                            value = new key.type(value)
 
-            let doc = toDocumentValues(value, this.namespace)
-            let docRef = this.db.doc(key.path)
-            if value isnt Null
-                docRef.set(doc, { merge: true })
-                .then()
-                    =>
-                        console.log(`FireStore.setValue updated`)
-                .catch()
-                    e =>
-                        console.error(`FireStore.setValue update error:`, e)
-            else
-                docRef.delete()
-                .then()
-                    =>
-                        console.log(`FireStore.setValue deleted`)
-                .catch()
-                    e =>
-                        console.error(`FireStore.setValue delete error`, e)
-        return changed
+                    let doc = toDocumentValues(value, this.namespace)
+                    let docRef = this.db.doc(key.path)
+                    if value isnt Null
+                        docRef.set(doc, { merge: true })
+                        .then()
+                            =>
+                                console.log(`FireStore.setValue updated`)
+                                resolve(value)
+                        .catch()
+                            e =>
+                                console.error(`FireStore.setValue update error:`, e)
+                                reject(e)
+                    else
+                        docRef.delete()
+                        .then()
+                            =>
+                                console.log(`FireStore.setValue deleted`)
+                                resolve(value)
+                        .catch()
+                            e =>
+                                console.error(`FireStore.setValue delete error`, e)
+                                reject(e)
 
     _notify(key: String, value) ->
         // we don't notify clients until we have results.

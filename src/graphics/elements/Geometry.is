@@ -11,7 +11,7 @@ export default class Geometry extends Node
     id: String | (g: Graphics3D) => DataBuffer
     instance: Array<Number>
 
-    drawSelf(g: Graphics3D) ->
+    drawChildren(g: Graphics3D) ->
         //  still have to check because it might not have been loaded yet.
         if this.buffer
             if this.instance

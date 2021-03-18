@@ -1,5 +1,6 @@
 import .Control
 import .Dock
+import .Pickable
 import ..Graphics
 import ..Graphics3D
 import ..Program
@@ -11,6 +12,7 @@ export default class Viewport extends Control
     _view: Matrix4 = Matrix4.identity
     layout = Dock.fill
     effect = Program.default3D
+    // pickable = Pickable.self | Pickable.children
 
     get view() -> this._view
     set view(value) ->
@@ -26,15 +28,7 @@ export default class Viewport extends Control
         // haven't tested yet, this might be reversed
         return this.view.multiply(this.projection).inverse()
 
-    get transform() -> null
-
-    drawBackground(g: Graphics) ->
-        // this would draw in wrong coordinate space
-    render(g: Graphics) ->
-        // we draw background in the parents coordinate space before we reset ours
-        if this.backgroundColor || this.backgroundImage
-            g.fillRectangle(this.x, this.y, this.width, this.height, this.backgroundColor ?? Color.white, this.backgroundImage)
-        super.render(g)
+    get transform() -> Matrix4.identity
 
     drawChildren(g: Graphics) ->
         let saveProjection = g.uniforms.projection
@@ -51,6 +45,5 @@ export default class Viewport extends Control
             g.flush()
             // restore viewport
             g.gl.viewport(0, 0, g.width, g.height)
-
         g.uniforms.projection = saveProjection
         g.uniforms.view = saveView

@@ -1,0 +1,20 @@
+import react
+    useRef
+    useEffect
+import qrcode
+    * as QRCode
+
+export default function QRCanvas({ value, scale, width = 400, ...canvasProps }) ->
+    let ref = useRef()
+    useEffect()
+        ->
+            let options = { scale, width }
+            QRCode.toCanvas(ref.current, value, options)
+                e ->
+                    if (e)
+                        console.error(e)
+                    else
+                        console.log(`Rendered to Canvas`)
+        [value]
+    return
+        <canvas ref={ref} {...canvasProps} width={width} height={width} />

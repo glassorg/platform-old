@@ -197,8 +197,12 @@ export default class Graphics3D extends Graphics
         let count = this.gl.getProgramParameter(glProgram, GL.ACTIVE_UNIFORMS)
         for i in 0..count
             let {name} = gl.getActiveUniform(glProgram, i)
+            if name == "modelView"
+                deps.model = true
+                deps.view = true
             if name == "modelViewProjection"
-                deps.modelView = true
+                deps.model = true
+                deps.view = true
                 deps.projection = true
             else
                 deps[name] = true

@@ -173,10 +173,18 @@ export default data class Key
         if props.id
             id = props.id
         return new Key({ parent, type, id, query })
-
-//     get(model: T) {
-//         return JSONPointer.get(model, this.query.path)
-//     }
+    
+    //  gets the next incremental key with a unique id
+    static next(keys: Array<Key>, ...args) ->
+        var ids = new Set()
+        for key in keys
+            ids.add(key.id)
+        var i = 1
+        while true
+            let id = `${i}`
+            if !ids.has(id)
+                return Key.create(...args, id)
+            i++
 
 //     /**
 //      * Creates a patch using the query.path and the value.

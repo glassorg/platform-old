@@ -42,6 +42,7 @@ export default class VirtualNode
         if handler
             handler.call(this, e)
     addEventListener(name, handler) ->
+        console.log("addEventListener", name)
         if this[name] isnt Null
             throw new Error(`Event ${name} already has a handler`)
         if this.eventListeners is Null
