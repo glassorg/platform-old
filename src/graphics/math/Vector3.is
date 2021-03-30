@@ -96,7 +96,18 @@ export default data struct Vector3
     static fromJSON(object) ->
         let { x, y, z} = object
         return new Vector3(x, y, z)
-
+    static equals(a: Vector3 | Null, b: Vector3 | Null) ->
+        if a == b
+            return true
+        if a is Null || b is Null
+            return false
+        return a.equals(b)
+    static equivalent(a: Vector3 | Null, b: Vector3 | Null) ->
+        if a == b
+            return true
+        if a is Null || b is Null
+            return false
+        return a.equivalent(b)
 
 //     // https://www.habrador.com/tutorials/interpolation/1-catmull-rom-splines/
 //     // //Returns a position between 4 Vector3 with Catmull-Rom spline algorithm

@@ -24,9 +24,22 @@ export default class Viewport extends Control
         this.invalidate()
         this._projection = value
 
+    get screen() ->
+        let { x, y, width: w, height: h } = this
+        // transforms from -1 to +1 to screen width
+        return new Matrix4()
+            w / 2, 0, 0, 0
+            0, - h / 2, 0, 0
+            0, 0, - 0.5, 0
+            w / 2, h / 2, 0.5, 1
+
     get pickingTransform() ->
-        // haven't tested yet, this might be reversed
-        return this.view.multiply(this.projection).inverse()
+        return
+            Matrix4.multiply()
+                this.screen
+                this.projection
+                this.view
+            .inverse()
 
     get transform() -> Matrix4.identity
 

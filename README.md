@@ -34,7 +34,20 @@ Main glass library
 
 ## Coordinate System
     The default coordinate system is right handed with +z pointing towards the viewer.
+    The 2d control coordinate system is also right handed with the origin in the top left and the +z pointing away from the viewer.
     The projection transformation turns it into a left handed system as +z points away from the viewer.
+
+    modelView = view.multiply(model)
+
+    model space
+        -> model
+    world space
+        -> view
+    camera space
+        -> projection
+    clip space
+        -> screen
+    screen space
 
 ## Todo
     X   Change default2D shader to actually use modelViewProjection matrix.

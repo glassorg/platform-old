@@ -31,7 +31,7 @@ if typeof window != "undefined"
 
 export default Canvas({ children, ...other }) ->
     //  TODO: Fix the destructuring syntax to accept default values
-    // let { dimensions = 3, childre, ...other } = props
+    // let { dimensions = 3, children, ...other } = props
     let ref = useRef()
     let [graphics, setGraphics] = useState(null)
     useEffect()

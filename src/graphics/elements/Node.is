@@ -109,15 +109,10 @@ export default class Node extends VirtualElement implements Shape
             if boundingShape is Null || intersection
                 let pickingTransform = this.pickingTransform
                 var transformedRay = ray
-                if pickingTransform
-                    transformedRay = transformedRay.transform(pickingTransform)
                 if pickable & Pickable.children
-                    let reverse = this.pickChildrenReverse
-                    var child = reverse ? this.lastChild : this.firstChild
-                    while child isnt Null
-                        if child is Node
-                            yield* child.collisions(transformedRay)
-                        child = reverse ? child.previousSibling : child.nextSibling
+                    if pickingTransform
+                        transformedRay = transformedRay.transform(pickingTransform)
+                    yield* this.collideChildren(transformedRay, intersection)
                 if pickable & Pickable.self
                     let result = this.collideSelf(ray, intersection)
                     if result isnt Null
@@ -128,7 +123,14 @@ export default class Node extends VirtualElement implements Shape
     // Idea -> draw within parents coordinate space, transform ONLY applies to children.
 
     get pickChildrenReverse() -> false
-    collideSelf(ray, intersection): Collision | Null -> Null
+    *collideChildren(localRay, boundingIntersection) ->
+        let reverse = this.pickChildrenReverse
+        var child = reverse ? this.lastChild : this.firstChild
+        while child isnt Null
+            if child is Node
+                yield* child.collisions(localRay)
+            child = reverse ? child.previousSibling : child.nextSibling
+    collideSelf(parentRay, boundingIntersection): Collision | Null -> Null
 
     invalidate() ->
         var node = this

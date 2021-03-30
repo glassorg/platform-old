@@ -19,6 +19,7 @@ export default data struct Line
         let ab = this.b.subtract(this.a)
         let ap = position.subtract(this.a)
         return ab.dot(ap) / ab.lengthSquared()
+    direction() -> this.b.subtract(this.a)
     reverse() -> new Line(this.b, this.a)
     support(v: Vector3) -> v.dot(this.a) > v.dot(this.b) ? this.a : this.b
     toString() -> `${this.a} -> ${this.b}`
