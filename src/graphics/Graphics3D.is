@@ -98,7 +98,7 @@ export default class Graphics3D extends Graphics
     createTexture(id: String, glTextureOrSrc: WebGLTexture | String = id, width?: Number, height?: Number) ->
         //  we cache IF the id is the same as the name
         let cache = id == glTextureOrSrc
-        let texture = cache ? this.cachedTextures[id] : null
+        var texture = cache ? this.cachedTextures[id] : null
         if texture is Null
             texture = new Texture(this.gl, id, glTextureOrSrc, width, height)
             if cache

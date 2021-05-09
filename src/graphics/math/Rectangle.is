@@ -81,7 +81,7 @@ export default data struct Rectangle
     static getBounds(rectangles) ->
         if rectangles.length == 0
             return Rectangle.empty
-        let result = rectangles[0]
+        var result = rectangles[0]
         for r in rectangles
             result = result.combine(r)
         return result
