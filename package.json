@@ -1,6 +1,6 @@
 {
     "name": "@glas/platform",
-    "version": "2.0.2",
+    "version": "2.0.4",
     "main": "index.js",
     "repository": "https://github.com/glassorg/platform.git",
     "author": "Kris Nye <krisnye@gmail.com>",
@@ -20,7 +20,7 @@
         "@google-cloud/firestore": "^4.9.3",
         "firebase": "^8.2.4",
         "firebaseui": "^4.7.1",
-        "ionscript": "^0.4.1",
+        "ionscript": "^0.4.4",
         "preact": "^10.5.8",
         "qrcode": "^1.4.4",
         "react-firebaseui": "^4.1.0"
