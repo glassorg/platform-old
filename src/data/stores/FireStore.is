@@ -62,9 +62,11 @@ export function toGoogleQuery(db, key: Key) ->
     var gquery = db.collection(key.path)
     if query
         if query.limit isnt Null
-            gquery = gquery.limit(query.limit)
-        if query.offset isnt Null
-            gquery = gquery.startAt(query.offset)
+            // google has no offset support, so we provide it by skipping results
+            gquery = gquery.limit((query.offset || 0) + query.limit)
+        // if query.offset isnt Null
+        //      //  this doesn't work like I thought. it expects document snapshots
+        //     gquery = gquery.startAt(query.offset)
         if query.sort
             for sort in query.sort
                 for [name,direction] in sort
@@ -108,11 +110,13 @@ export default class FireStore extends MemoryStore
             return collectionRef.onSnapshot()
                 snapshot =>
                     let keyValues = []
-                    for doc in snapshot.docs
-                        let key = getKey(this.namespace, doc)
-                        let value = toEntity(this.namespace, doc, key)
-                        if value isnt Null
-                            keyValues.push([key, value])
+                    let offset = key.query.offset || 0
+                    for doc, index in snapshot.docs
+                        if index >= offset
+                            let key = getKey(this.namespace, doc)
+                            let value = toEntity(this.namespace, doc, key)
+                            if value isnt Null
+                                keyValues.push([key, value])
                     // save keys as result of query.
                     this._hasResults.add(key.toString())
                     super._setValue(key, keyValues)
