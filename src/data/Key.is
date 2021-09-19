@@ -8,7 +8,6 @@ import ..utility.common
 import .Query
 import .Model
 import .Namespace
-import .defaultNamespace
 import .JSONPointer.*
 import ..utility.guid
 import .Serializer
@@ -145,7 +144,7 @@ export default data class Key
             namespace = first
             steps.shift()
         else
-            namespace = defaultNamespace
+            throw new Error("Namespace required")
         //  get the text of the key
         let text = stringify(steps)
         //  parse it

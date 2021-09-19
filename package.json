@@ -1,6 +1,6 @@
 {
     "name": "@glas/platform",
-    "version": "2.0.4",
+    "version": "2.0.5",
     "main": "index.js",
     "repository": "https://github.com/glassorg/platform.git",
     "author": "Kris Nye <krisnye@gmail.com>",
@@ -9,7 +9,7 @@
         "setup": "yarn install",
         "copy": "mkdir -p lib && cp package.json lib",
         "build": "yarn copy && isc src lib",
-        "deploy": "yarn build && cd lib && npm publish",
+        "deploy": "yarn build && cd lib && sleep 4 && npm publish",
         "test": "gtest lib",
         "debug": "node --inspect-brk node_modules/@glas/test/gtest.js lib",
         "watch:build": "yarn copy && isc src lib -w",

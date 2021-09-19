@@ -1,0 +1,19 @@
+
+export function formatPhoneES164(phone: String) =>
+    return phone.replace(/[\(\) -]/g, "")
+
+export function formatPhoneNumberUSA(phone: String) =>
+
+    let n = []
+    for i in i .. phone.length
+        let char = phone[i]
+        if (/[0-9]/.test(char))
+            n.push(char)
+
+    if n.length == 10
+        n.unshift("1")
+
+    if n.length != 11
+        return phone
+
+    return `+${n[0]} (${n[1]}${n[2]}${n[3]}) ${n[4]}${n[5]}${n[6]}-${n[7]}${n[8]}${n[9]}${n[10]}`

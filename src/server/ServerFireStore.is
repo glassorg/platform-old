@@ -44,7 +44,6 @@ export default class Firestore
         let entities = docs.map()
             doc =>
                 let entity = toEntity<T>(this.namespace, doc)
-                // console.log({ doc, entity })
                 return entity
         return entities
 
