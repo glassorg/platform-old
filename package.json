@@ -20,7 +20,7 @@
         "@google-cloud/firestore": "^4.9.3",
         "firebase": "^8.2.4",
         "firebaseui": "^4.7.1",
-        "ionscript": "^0.4.4",
+        "ionscript": "^0.5.2",
         "preact": "^10.5.8",
         "qrcode": "^1.4.4",
         "react-firebaseui": "^4.1.0"
