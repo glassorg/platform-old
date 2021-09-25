@@ -25,8 +25,6 @@ export default class Table
         this.values = null
 
     getValues(store: Store) ->
-        // if window.__dbg
-        //     debugger
         if this.values is Null
             this.values = []
             let visited = new Set()
@@ -45,8 +43,6 @@ export default class Table
         return this.values
 
     update(key: IdentityKey, value): Boolean ->
-        if key.type.name == "Location"
-            console.log({key, value})
         if value isnt Null
             if isPossibleMatch(this.key, key) && this.filter(value)
                 if !this.keys.has(key.toString())
