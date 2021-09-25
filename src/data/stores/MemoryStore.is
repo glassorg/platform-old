@@ -98,14 +98,14 @@ export default class MemoryStore extends Store
     async _updateValues(notifyQueue, ...keyValues) ->
         let updateTables = new Set()
         for [key, value] in keyValues
-            if value isnt Null
-                if key is IdentityKey
-                    if key.type isnt Null && value isnt Null
-                        if value isnt key.type
-                            throw new Error(value + " isnt type " + (key.type.name ?? key.type))
-                    for table in this.tables.values()
-                        if table.update(key, value)
-                            updateTables.add(table)
+            // if value isnt Null
+            if key is IdentityKey
+                if key.type isnt Null && value isnt Null
+                    if value isnt key.type
+                        throw new Error(value + " isnt type " + (key.type.name ?? key.type))
+                for table in this.tables.values()
+                    if table.update(key, value)
+                        updateTables.add(table)
         for table in updateTables
             notifyQueue.set(table.key.toString(), table.getValues(this))
 
@@ -121,8 +121,8 @@ export default class MemoryStore extends Store
 
         if value is Array
             await this._updateValues(notifyQueue, ...value)
-        else if value isnt Null
-            await this._updateValues(notifyQueue, [key, value])
+        // else if value isnt Null
+        await this._updateValues(notifyQueue, [key, value])
 
         notifyQueue.set(key.toString(), value)
         for [key, value] in notifyQueue
