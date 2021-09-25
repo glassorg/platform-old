@@ -119,6 +119,15 @@ export default class FireStore extends MemoryStore
                                 keyValues.push([key, value])
                     // save keys as result of query.
                     this._hasResults.add(key.toString())
+
+                    // if key.type.name == "Location"
+                    //     console.log()
+                    //         key.toString()
+                    //         JSON.stringify()
+                    //             keyValues.map()
+                    //                 kv -> kv[1]
+                    //             null, 2
+                    
                     super._setValue(key, keyValues)
         else
             let docRef = this.db.doc(key.path)
@@ -142,9 +151,9 @@ export default class FireStore extends MemoryStore
                         if key.type isnt Null && value.constructor != key.type
                             value = new key.type(value)
 
-                    let doc = toDocumentValues(value, this.namespace)
                     let docRef = this.db.doc(key.path)
                     if value isnt Null
+                        let doc = toDocumentValues(value, this.namespace)
                         docRef.set(doc, { merge: true })
                         .then()
                             =>

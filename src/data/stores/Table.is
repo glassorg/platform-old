@@ -25,17 +25,28 @@ export default class Table
         this.values = null
 
     getValues(store: Store) ->
+        // if window.__dbg
+        //     debugger
         if this.values is Null
             this.values = []
-            for key in this.keys.values()
-                let value = store.peek(key)
-                if value isnt Null
+            let visited = new Set()
+            let rawValues = store.peekRaw(this.key)
+            if rawValues
+                for [key, value] in rawValues
+                    visited.add(key.toString())
                     this.values.push([key, value])
+            for key in this.keys.values()
+                if !visited.has(key.toString())
+                    let value = store.peek(key)
+                    if value isnt Null
+                        this.values.push([key, value])
             if this.key.query.sort isnt Null && this.key.query.sort.length > 0
                 this.values.sort(createSortCompareFunction(this.key.query))
         return this.values
 
     update(key: IdentityKey, value): Boolean ->
+        if key.type.name == "Location"
+            console.log({key, value})
         if value isnt Null
             if isPossibleMatch(this.key, key) && this.filter(value)
                 if !this.keys.has(key.toString())

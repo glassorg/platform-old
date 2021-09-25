@@ -71,9 +71,12 @@ export default class MemoryStore extends Store
 
     peek(key: Key) ->
         if key is IdentityKey
-            let value = this.values.get(key.toString())
-            return value?[1]
+            return this.peekRaw(key)
         return this._getTable(key).getValues(this)
+    
+    peekRaw(key: Key) ->
+        let value = this.values.get(key.toString())
+        return value?[1]
 
     async patch(key: IdentityKey, value) ->
         value = clonePatch(await this.get(key), value)
