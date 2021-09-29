@@ -119,6 +119,17 @@ export default class FireStore extends MemoryStore
                                 keyValues.push([key, value])
                     // save keys as result of query.
                     this._hasResults.add(key.toString())
+
+                    // if keyValues.length > 0
+                    //     console.log("")
+                    //     console.log("=Snapshot:============================")
+                    //     for [key, value] in keyValues
+                    //         console.log()
+                    //             JSON.stringify()
+                    //                 value, null, 2
+                    //     console.log("======================================")
+                    //     console.log("")
+                    
                     super._setValue(key, keyValues)
         else
             let docRef = this.db.doc(key.path)

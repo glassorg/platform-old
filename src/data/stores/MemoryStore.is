@@ -114,15 +114,19 @@ export default class MemoryStore extends Store
         let currentValue = this.peek(key)
         if currentValue == value
             return false
+            
         if value is Null
             this.values.delete(key.toString())
         else
             this.values.set(key.toString(), [key, value])
 
         if value is Array
+            let table = this.tables.get(key.toString())
+            if table
+                table.updateQuery(key, value)
             await this._updateValues(notifyQueue, ...value)
-        // else if value isnt Null
-        await this._updateValues(notifyQueue, [key, value])
+        else
+            await this._updateValues(notifyQueue, [key, value])
 
         notifyQueue.set(key.toString(), value)
         for [key, value] in notifyQueue

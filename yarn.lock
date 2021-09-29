@@ -504,6 +504,11 @@
   resolved "https://registry.yarnpkg.com/@glas/test/-/test-1.0.3.tgz#f2d1780aed3bb42b34de27920fee27f7f86d02df"
   integrity sha512-SJqhXBwN48D60njrq544fxowiqrFivQ9FfgeHYyCNv99p72KE19kFDXY1aqsAY7MN9hnBS3P+0/3VBqhVw92Bw==
 
+"@glas/test@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@glas/test/-/test-1.0.4.tgz#de06433f506131abb2d3b4673ba8d99fc6a57f8d"
+  integrity sha512-kw/8dHN0yFlr3El6/TfXi1uV5rt1KD5TZkkr0IWf40eFUk1ka+1PljQzJkU8YXKGoUqQp1i60kbOmpdrOGHCDg==
+
 "@glas/traverse@^1.0.6":
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@glas/traverse/-/traverse-1.0.6.tgz#a3b8d8e40f4f8a2c66f9c5f39303d55335823e6c"

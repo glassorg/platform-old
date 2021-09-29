@@ -42,6 +42,17 @@ export default class Table
                 this.values.sort(createSortCompareFunction(this.key.query))
         return this.values
 
+    updateQuery(key: QueryKey, keyValues) ->
+        if keyValues.length != this.keys.size
+            this.invalidateValues()
+            return true
+        else
+            for [key, value] in keyValues
+                if !this.keys.has(key)
+                    this.invalidateValues()
+                    return true
+        return false
+
     update(key: IdentityKey, value): Boolean ->
         if value isnt Null
             if isPossibleMatch(this.key, key) && this.filter(value)
@@ -51,7 +62,7 @@ export default class Table
                     return true
             else
                 value = null
-
+                
         if value is Null && this.keys.has(key.toString())
             this.invalidateValues()
             this.keys.delete(key.toString())
