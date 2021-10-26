@@ -2,6 +2,7 @@ import ..Key
     IdentityKey
     QueryKey
 import ..Index
+import ..Cache
 import .MemoryStore
 import ..Serializer
 import ..Namespace
@@ -29,11 +30,19 @@ export function getIndexedValues(record, values = {}, prefix = "") ->
     
     return values
 
+export function getCachedValues(record) ->
+    return {}
+        for [name, property] in record.properties
+            let cacheFn = property[Cache.symbol]
+            if cacheFn
+                [name]: cacheFn(record)
+
 let getSerializer = common.memoize(ns -> new Serializer(ns))
 
 function serialize(record: Record, namespace: Namespace) ->
+    let cachedValues = getCachedValues(record)
     //  remove the type
-    let values = Object.assign({}, record)
+    let values = Object.assign({}, record, cachedValues)
     //  remove the key
     delete values.key
     return getSerializer(namespace).stringify(values)
