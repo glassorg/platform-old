@@ -46,12 +46,12 @@ export default data struct Vector2
         return new Vector2(this.x * invLength, this.y * invLength)
     translate(v: Vector2) -> this.add(v)
     transform(m: Matrix4) ->
-        let { x, y, z } = this
-        let w = (m.m03 * x + m.m13 * y + m.m23 * z + m.m33) || 1.0
+        let { x, y } = this
+        let w = (m.m03 * x + m.m13 * y + m.m33) || 1.0
         return
             new Vector2()
-                (m.m00 * x + m.m10 * y + m.m20 * z + m.m30) / w
-                (m.m01 * x + m.m11 * y + m.m21 * z + m.m31) / w
+                (m.m00 * x + m.m10 * y + m.m30) / w
+                (m.m01 * x + m.m11 * y + m.m31) / w
     writeTo(array, index: F32) ->
         array[index + 0] = this.x
         array[index + 1] = this.y
