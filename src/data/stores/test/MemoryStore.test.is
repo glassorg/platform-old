@@ -45,6 +45,29 @@ assert.doesNotReject()
 data class Person extends Model
     name: String
 
+// Verify that watching identical keys no longer gives incomplete results.
+do async ->
+    try
+        var store = new MemoryStore()
+        var key = Key.create(Integer, {})
+        var events = []
+        var expectedEvents = []
+            "A "
+            "A Integer/foo,11"
+            "A Integer/foo,11"
+            "B Integer/foo,11"
+        store.watch()
+            key
+            newValue -> events.push("A " + newValue.toString())
+        await store._setValue(key, [[Key.create(Integer, "foo"), 11]])
+        store.watch()
+            key
+            newValue -> events.push("B " + newValue.toString())
+        assert.equal()
+            JSON.stringify(events)
+            JSON.stringify(expectedEvents)
+    catch e
+        console.error(e)
 
 // //  Where Query Peeking
 // store = new MemoryStore()

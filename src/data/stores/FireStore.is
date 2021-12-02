@@ -2,6 +2,7 @@ import ..Key
     IdentityKey
     QueryKey
 import ..Index
+import ..Cache
 import .MemoryStore
 import ..Serializer
 import ..Namespace
@@ -29,11 +30,19 @@ export function getIndexedValues(record, values = {}, prefix = "") ->
     
     return values
 
+export function getCachedValues(record) ->
+    return {}
+        for [name, property] in record.properties
+            let cacheFn = property[Cache.symbol]
+            if cacheFn
+                [name]: cacheFn(record)
+
 let getSerializer = common.memoize(ns -> new Serializer(ns))
 
 function serialize(record: Record, namespace: Namespace) ->
+    let cachedValues = getCachedValues(record)
     //  remove the type
-    let values = Object.assign({}, record)
+    let values = Object.assign({}, record, cachedValues)
     //  remove the key
     delete values.key
     return getSerializer(namespace).stringify(values)
@@ -119,6 +128,17 @@ export default class FireStore extends MemoryStore
                                 keyValues.push([key, value])
                     // save keys as result of query.
                     this._hasResults.add(key.toString())
+
+                    // if keyValues.length > 0
+                    //     console.log("")
+                    //     console.log("=Snapshot:============================")
+                    //     for [key, value] in keyValues
+                    //         console.log()
+                    //             JSON.stringify()
+                    //                 value, null, 2
+                    //     console.log("======================================")
+                    //     console.log("")
+                    
                     super._setValue(key, keyValues)
         else
             let docRef = this.db.doc(key.path)
@@ -142,9 +162,9 @@ export default class FireStore extends MemoryStore
                         if key.type isnt Null && value.constructor != key.type
                             value = new key.type(value)
 
-                    let doc = toDocumentValues(value, this.namespace)
                     let docRef = this.db.doc(key.path)
                     if value isnt Null
+                        let doc = toDocumentValues(value, this.namespace)
                         docRef.set(doc, { merge: true })
                         .then()
                             =>
