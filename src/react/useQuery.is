@@ -8,7 +8,7 @@ import ..data.Store
 export let createUseQuery = (store: Store) ->
     let useStore = createUseStore(store)
     return
-        (type: Array | Type | Key, query: Query | Null) ->
+        (type: Array | Type | Key | Null, query: Query | Null) ->
             if type is Array
                 let results = useStore(type)
                 return {}
