@@ -8,10 +8,19 @@ import ..data.Store
 export let createUseQuery = (store: Store) ->
     let useStore = createUseStore(store)
     return
-        (type: Type | Key, query: Query | Null) ->
-            let key = type is Key ? type : Key.create(type, query ?? {})
-            let [keyValuePairs] = useStore(key)
-            let values = keyValuePairs ? keyValuePairs.map(([key, value]) -> value) : []
-            return values
+        (type: Array | Type | Key | Null, query: Query | Null) ->
+            if type is Array
+                let results = useStore(type)
+                return {}
+                    for [queryKey, keyValuePairs] in results
+                        [queryKey]: keyValuePairs ? keyValuePairs.map(([key, value]) -> value) : []
+            else 
+                let key = do ->
+                    if type is Null && query is Null
+                        return null
+                    return type is Key ? type : Key.create(type, query ?? {})
+                let [keyValuePairs] = useStore(key)
+                let values = keyValuePairs ? keyValuePairs.map(([key, value]) -> value) : []
+                return values
 
 export default createUseQuery(store)

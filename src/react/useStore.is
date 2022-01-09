@@ -7,33 +7,71 @@ import ..data
     .Key
         IdentityKey
 
+function useStoreSingleKey(store: Store, defaultValue, key: Key) ->
+    var [value, setValue] = useState(defaultValue)
+
+    useEffect()
+        ->
+            let unwatch = store.watch()
+                key
+                newValue ->
+                    setValue(newValue)
+            return unwatch
+        [key.toString()]
+
+    let setStore = value ->
+        store.patch(key, value)
+
+    return [value, setStore]
+
+function useStoreMultipleKeys(store: Store, defaultValue, keys: Array) ->
+    var [values, setValues] = useState({})
+
+    let jointKeyString = keys.map(key -> key.toString()).join(",")
+
+    function watchSingle(key) ->
+        let keyString = key.toString()
+        return store.watch()
+            key
+            newValue ->
+                // We have to set this immediately so other closures will see these changes before rerender.
+                values = { ...values, [keyString]: newValue }
+                setValues( values )
+
+    useEffect()
+        ->
+            values = {}
+            setValues(values)
+            let unwatches = keys.map(watchSingle)
+            return () ->
+                for unwatch in unwatches
+                    unwatch()
+        [jointKeyString]
+    
+    return values
+
 export let createUseStore = (store: Store) ->
     return
-        (keyOrType: Key | Type, idOrQueryOrDefaultValue, defaultValue) ->
-            var key: Key
-            if keyOrType is Key
-                key = keyOrType
-                defaultValue = idOrQueryOrDefaultValue
+        (keyOrType: Array | Key | Type | Null, idOrQueryOrDefaultValue, defaultValue) ->
+            if keyOrType is Null && idOrQueryOrDefaultValue is Null
+                useState()
+                useEffect(() -> null, [""])
+                let setter = value -> throw new Error("Cannot set entity with undefined key.")
+                return [null, setter]
+            else if keyOrType is Array
+                let keys = keyOrType.filter(key -> key isnt Null)
+                return useStoreMultipleKeys(store, defaultValue, keys)
             else
-                if idOrQueryOrDefaultValue is Null
-                    throw new Error("Invalid id: " + idOrQueryOrDefaultValue)
-                key = Key.create(keyOrType, idOrQueryOrDefaultValue)
+                var key: Key
+                if keyOrType is Key
+                    key = keyOrType
+                    defaultValue = idOrQueryOrDefaultValue
+                else
+                    if idOrQueryOrDefaultValue is Null
+                        throw new Error("Invalid id: " + idOrQueryOrDefaultValue)
+                    key = Key.create(keyOrType, idOrQueryOrDefaultValue)
 
-            var [value, setValue] = useState(defaultValue)
-
-            useEffect()
-                ->
-                    let unwatch = store.watch()
-                        key
-                        newValue ->
-                            setValue(newValue)
-                    return unwatch
-                [key.toString()]
-
-            let setStore = value ->
-                store.patch(key, value)
-            
-            return [value, setStore]
+                return useStoreSingleKey(store, defaultValue, key)
 
 export let store = new MemoryStore()
 let useStore = createUseStore(store)
