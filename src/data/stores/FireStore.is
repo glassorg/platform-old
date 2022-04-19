@@ -2,13 +2,13 @@ import ..Key
     IdentityKey
     QueryKey
 import ..Index
-import ..Cache
 import .MemoryStore
 import ..Serializer
 import ..Namespace
 import ..Record
 import ...utility.common.*
 import firebase.app as firebase
+
 //  import for side effect which makes firebase.firestore() function available
 import "firebase/firestore"
 
@@ -30,21 +30,27 @@ export function getIndexedValues(record, values = {}, prefix = "") ->
     
     return values
 
-export function getCachedValues(record) ->
-    return {}
-        for [name, property] in record.properties
-            let cacheFn = property[Cache.symbol]
-            if cacheFn
-                [name]: cacheFn(record)
+let isTypedArray = (value) -> value?.buffer is ArrayBuffer
+
+export function getBinaryValues(record) ->
+    let values = {}
+    // we only index root values for now
+    for [name, property] in record.properties
+        let value = record[name]
+        if isTypedArray(value)
+            values[name] = firebase.firestore.Blob.fromUint8Array(new Uint8Array(value.buffer))
+    return values
 
 let getSerializer = common.memoize(ns -> new Serializer(ns))
 
+//  BEGIN Serialization Code
 function serialize(record: Record, namespace: Namespace) ->
-    let cachedValues = getCachedValues(record)
-    //  remove the type
-    let values = Object.assign({}, record, cachedValues)
-    //  remove the key
-    delete values.key
+    //  remove the type and key
+    let values = { ...record, key: undefined }
+    //  remove any binary values
+    for [name, value] in values
+        if isTypedArray(value)
+            delete values[name]
     return getSerializer(namespace).stringify(values)
 
 function deserialize(key: IdentityKey, serialized: String, namespace: Namespace) ->
@@ -55,7 +61,9 @@ function deserialize(key: IdentityKey, serialized: String, namespace: Namespace)
     return new key.type(values)
 
 export function toDocumentValues(record: Record, namespace: Namespace) ->
-    return { [serializedProperty]: serialize(record, namespace), ...getIndexedValues(record) }
+    let serialized = serialize(record, namespace)
+    let binaryValues = getBinaryValues(record)
+    return { [serializedProperty]: serialized, ...getIndexedValues(record), ...binaryValues }
 
 function getKey(namespace: Namespace, doc: Snapshot): IdentityKey -> Key.parse(namespace, doc.ref.path)
 
@@ -63,7 +71,18 @@ export function toEntity(namespace: Namespace, doc: Snapshot, key: IdentityKey =
     if !doc.exists
         return null
     let data = doc.data()
-    return deserialize(key, data[serializedProperty], namespace)
+    let entity = deserialize(key, data[serializedProperty], namespace)
+    // now set the binary data back on the object.
+    for [name, value] in data
+        if value is firebase.firestore.Blob
+            let currentValue = entity[name]
+            if currentValue is null
+                throw new Error(`binary fields must have default values: ${entity.constructor.name}.${name}`)
+            let newValue = new currentValue.constructor(value.toUint8Array().buffer)
+            entity[name] = newValue
+    return entity
+
+//  END Serialization Code
 
 export function toGoogleQuery(db, key: Key) ->
     let { parent, type, query } = key
@@ -128,7 +147,6 @@ export default class FireStore extends MemoryStore
                                 keyValues.push([key, value])
                     // save keys as result of query.
                     this._hasResults.add(key.toString())
-
                     // if keyValues.length > 0
                     //     console.log("")
                     //     console.log("=Snapshot:============================")
@@ -138,7 +156,6 @@ export default class FireStore extends MemoryStore
                     //                 value, null, 2
                     //     console.log("======================================")
                     //     console.log("")
-                    
                     super._setValue(key, keyValues)
         else
             let docRef = this.db.doc(key.path)

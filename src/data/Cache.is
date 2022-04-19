@@ -1,4 +1,0 @@
-
-meta Cache: Function = (record) -> null
-
-export default Cache
