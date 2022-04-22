@@ -14,7 +14,6 @@
         "debug": "node --inspect-brk node_modules/@glas/test/gtest.js lib",
         "watch:build": "yarn copy && isc src lib -w",
         "watch:test": "nodemon --delay 100ms -w lib -x gtest lib",
-        "watch:debug": "nodemon --inspect-brk node_modules/@glas/test/gtest.js lib",
         "watch": "run-p watch:*"
     },
     "dependencies": {

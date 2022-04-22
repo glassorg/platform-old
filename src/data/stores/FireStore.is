@@ -76,10 +76,11 @@ export function toEntity(namespace: Namespace, doc: Snapshot, key: IdentityKey =
     for [name, value] in data
         if value is firebase.firestore.Blob
             let currentValue = entity[name]
-            if currentValue is null
-                throw new Error(`binary fields must have default values: ${entity.constructor.name}.${name}`)
-            let newValue = new currentValue.constructor(value.toUint8Array().buffer)
-            entity[name] = newValue
+            if currentValue is Null
+                console.warn(`binary fields must have default values: ${entity.constructor.name}.${name}`)
+            else
+                let newValue = new currentValue.constructor(value.toUint8Array().buffer)
+                entity[name] = newValue
     return entity
 
 //  END Serialization Code
