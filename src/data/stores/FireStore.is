@@ -12,6 +12,9 @@ import firebase.app as firebase
 //  import for side effect which makes firebase.firestore() function available
 import "firebase/firestore"
 
+let isNode = process?.title?.endsWith("node") || false
+// console.log({isNode})
+
 export let serializedProperty = "_"
 
 export type Snapshot = .data is Function & .exists is Boolean & .ref.path is String
@@ -32,13 +35,28 @@ export function getIndexedValues(record, values = {}, prefix = "") ->
 
 let isTypedArray = (value) -> value?.buffer is ArrayBuffer
 
+function isBlob(value) ->
+    if isNode
+        return value is Buffer
+    return value is firebase.firestore.Blob
+
+function getBlobBuffer(value) ->
+    if isNode
+        return value.buffer.slice(value.byteOffset, value.byteOffset + value.length)
+    return value.toUint8Array().buffer
+
+function toBlob(value) ->
+    if isNode
+        return Buffer.from(value.buffer)
+    return firebase.firestore.Blob.fromUint8Array(new Uint8Array(value.buffer))
+
 export function getBinaryValues(record) ->
     let values = {}
     // we only index root values for now
     for [name, property] in record.properties
         let value = record[name]
         if isTypedArray(value)
-            values[name] = firebase.firestore.Blob.fromUint8Array(new Uint8Array(value.buffer))
+            values[name] = toBlob(value)
     return values
 
 let getSerializer = common.memoize(ns -> new Serializer(ns))
@@ -74,12 +92,12 @@ export function toEntity(namespace: Namespace, doc: Snapshot, key: IdentityKey =
     let entity = deserialize(key, data[serializedProperty], namespace)
     // now set the binary data back on the object.
     for [name, value] in data
-        if value is firebase.firestore.Blob
+        if isBlob(value)
             let currentValue = entity[name]
             if currentValue is Null
                 console.warn(`binary fields must have default values: ${entity.constructor.name}.${name}`)
             else
-                let newValue = new currentValue.constructor(value.toUint8Array().buffer)
+                let newValue = new currentValue.constructor(getBlobBuffer(value))
                 entity[name] = newValue
     return entity
 
