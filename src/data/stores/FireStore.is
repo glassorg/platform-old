@@ -8,7 +8,7 @@ import ..Namespace
 import ..Record
 import ...utility.common.*
 import firebase.app as firebase
-
+import .Table
 //  import for side effect which makes firebase.firestore() function available
 import "firebase/firestore"
 
@@ -86,6 +86,7 @@ export function toDocumentValues(record: Record, namespace: Namespace) ->
 function getKey(namespace: Namespace, doc: Snapshot): IdentityKey -> Key.parse(namespace, doc.ref.path)
 
 export function toEntity(namespace: Namespace, doc: Snapshot, key: IdentityKey = getKey(namespace, doc)): T | Null ->
+    // console.log("Calling toEntity on", key.toString())
     if !doc.exists
         return null
     let data = doc.data()
@@ -131,6 +132,37 @@ export function toGoogleQuery(db, key: Key) ->
                     gquery = gquery.where(name, "==", value)
     return gquery
 
+function isDocSame(doc, record: Record, namespace: Namespace) ->
+    let updated = doc.get("updated_time")
+    let lastUpdated = record?.created?.time
+
+    // At the present, we're not enforcing time stamping on every write,
+    // so we need to default to assuming an incoming snapshot is different.
+    if !updated || !lastUpdated
+        return false
+
+    let docKeyString = getKey(namespace, doc).toString()
+    let recordKeyString = record.key.toString()
+
+    let keySame = docKeyString == recordKeyString
+    let updatedSame = updated == lastUpdated
+
+    return updatedSame && keySame 
+
+function areQueryResultsSame(docs, offset, records, namespace: Namespace) ->
+    if !records
+        return false
+    let docsSize = docs.length - offset
+    let tableSize = records?.length ?? 0
+    if docsSize != tableSize
+        return false
+    for i in 0 .. tableSize
+        let doc = docs[i + offset]
+        let record = records[i][1]
+        if !isDocSame(doc, record, namespace)
+            return false
+    return true
+
 export default class FireStore extends MemoryStore
 
     namespace: Namespace
@@ -144,7 +176,7 @@ export default class FireStore extends MemoryStore
         this.serializer = new Serializer(namespace)
         this.db = db
         this._hasResults = new Set()
-
+    
     _onObserve(key: Key) ->
         let value = this.peek(key)
         if value isnt Undefined
@@ -158,23 +190,38 @@ export default class FireStore extends MemoryStore
                 snapshot =>
                     let keyValues = []
                     let offset = key.query.offset || 0
+
+                    let keyString = key.toString()
+                    let records = this.values.get(keyString)?[1]
+
+                    // Avoid expensive reparse if nothing changed. (yes this happens sometimes)
+                    if areQueryResultsSame(snapshot.docs, offset, records, this.namespace)
+                        return
+                    
+                    let previousValues = {}
+                        if records
+                            for entry in records
+                                let [key, value] = entry
+                                [key.toString()]: value
+                    
                     for doc, index in snapshot.docs
                         if index >= offset
                             let key = getKey(this.namespace, doc)
+
+                            let previousValue = previousValues[key.toString()]
+                            if previousValue
+                                let prevKey = previousValue.key
+                                if isDocSame(doc, previousValue, this.namespace)
+                                    keyValues.push([key, previousValue])
+                                    // console.log("Reusing previous value from", doc.get("updated_time"))
+                                    continue
+                            
                             let value = toEntity(this.namespace, doc, key)
                             if value isnt Null
                                 keyValues.push([key, value])
+                            
                     // save keys as result of query.
-                    this._hasResults.add(key.toString())
-                    // if keyValues.length > 0
-                    //     console.log("")
-                    //     console.log("=Snapshot:============================")
-                    //     for [key, value] in keyValues
-                    //         console.log()
-                    //             JSON.stringify()
-                    //                 value, null, 2
-                    //     console.log("======================================")
-                    //     console.log("")
+                    this._hasResults.add(keyString)
                     super._setValue(key, keyValues)
         else
             let docRef = this.db.doc(key.path)
