@@ -19,12 +19,7 @@ import "@google-cloud/firestore"
 
 // TODO: stamp should be applied on the client FireStore as well.
 export function stamp(record, time = new Date().toISOString(), by = "SERVER") ->
-    let timestamp = new TimeStamp({ by, time })
-    return
-        record.patch()
-            {}
-                created: record.created ?? timestamp
-                updated: timestamp
+    return record.stamp(by, time)
 
 export default class Firestore
 

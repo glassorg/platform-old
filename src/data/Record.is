@@ -12,4 +12,4 @@ export default data class Record extends Entity
 
     stamp(by: Email, time: DateTime = new Date().toISOString()) ->
         let updated = new TimeStamp({ by, time })
-        return this.patch({ created: this.created || updated, updated })
+        return this.patch({ created: this.created ?? updated, updated })
